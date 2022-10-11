@@ -8,7 +8,15 @@ library(tidyxl)
 
 
 # get_xf_raw() --------------------------------------------------------------
-
+#' Get the data of the Seahorse 'Raw'-sheet
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return xf_raw object with 'Raw' Seahorse information.
+#'
+#' @examples
 get_xf_raw <- function(filepath_seahorse){
 
   xf_raw <- read_excel(filepath_seahorse, sheet = "Raw")
@@ -403,6 +411,16 @@ get_originalRateTable<- function(filepath_seahorse){
 
 
 # read_xfplate() -------------------------------------------------------
+#' Read necessary Seahorse plate from Seahorse Excel file.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return xf list with all necessary Seahorse data.
+#' @export
+#'
+#' @examples
 read_xfplate <- function(filepath_seahorse) {
 
   #read data
