@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+seahtrue.Rcheck/
+seahtrue*.tar.gz
+seahtrue*.tgz
+# Ignore All (xlsx) files
+*.xlsx
