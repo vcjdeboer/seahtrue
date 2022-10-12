@@ -14,12 +14,37 @@ library(tidyxl)
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
-#' @return xf_raw object with 'Raw' Seahorse information.
+#' @return xf_raw tibble (list) with 'Raw' Seahorse information.
 #'
 #' @examples
+#' get_xf_raw(file.path(working_directory, paste("/data-raw/seahorse_test_data.xlsx")))
 get_xf_raw <- function(filepath_seahorse){
 
-  xf_raw <- read_excel(filepath_seahorse, sheet = "Raw")
+  xf_raw_2 <<- read_excel(filepath_seahorse,
+                       sheet = "Raw",
+                       col_types = c("numeric", #Measurment
+                                     "numeric", #Tick
+                                     "text", #Well
+                                     "text", #Group
+                                     "text", #TimeStamp # Note: This should be converted to date.
+                                     "numeric", #Well Temperature
+                                     "numeric", # Environment Temperature
+                                     "text", # O2 is Valid
+                                     "numeric", # O2 (mmHg)
+                                     "numeric", # O2 Light Emission
+                                     "numeric", # O2 Dark Emission
+                                     "numeric", # O2 Ref Light
+                                     "numeric", # O2 Ref Dark
+                                     "numeric", # O2 Corrected Em.
+                                     "text", # pH Is Valid
+                                     "numeric", # pH
+                                     "numeric", # pH Light
+                                     "numeric", # pH Dark
+                                     "numeric", #pH Ref Light
+                                     "numeric",# pH Ref Dark
+                                     "numeric" # pH Corrected Em.
+                       ))
+
   return(xf_raw)
 }
 
@@ -442,11 +467,11 @@ read_xfplate <- function(filepath_seahorse) {
   xf <- list(
     raw = xf_raw,
     rate = xf_rate,
-    assayinfo = xf_assayinfo,
+    # assayinfo = xf_assayinfo,
     inj = xf_inj,
     pHcal = xf_pHcal,
     O2cal = xf_O2cal,
-    norm = xf_norm,
+    # norm = xf_norm,
     buffer = xf_buffer,
     flagged = xf_flagged,
     filepath_seahorse = filepath_seahorse
