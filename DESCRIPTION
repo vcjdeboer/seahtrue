@@ -9,3 +9,18 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports:
+    readxl,
+    logger,
+    tidyxl,
+    magrittr,
+    knitr,
+    dplyr,
+    purrr,
+    usethis
+RoxygenNote: 7.2.1
+Depends: 
+    R (>= 2.10)
