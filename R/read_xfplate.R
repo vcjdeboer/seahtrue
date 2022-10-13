@@ -2,11 +2,6 @@
 # vincent de boer
 # September 24th, 2022
 
-library(tidyverse)
-library(readxl)
-library(tidyxl)
-
-
 # get_xf_raw() --------------------------------------------------------------
 #' Get the data of the Seahorse 'Raw'-sheet
 #'
@@ -20,7 +15,7 @@ library(tidyxl)
 #' get_xf_raw(file.path(working_directory, paste("/data-raw/seahorse_test_data.xlsx")))
 get_xf_raw <- function(filepath_seahorse){
 
-  xf_raw <- read_excel(filepath_seahorse,
+  xf_raw <- readxl::read_excel(filepath_seahorse,
                        sheet = "Raw",
                        col_types = c("numeric", # Measurment
                                      "numeric", # Tick
