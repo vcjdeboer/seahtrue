@@ -20,14 +20,14 @@ library(tidyxl)
 #' get_xf_raw(file.path(working_directory, paste("/data-raw/seahorse_test_data.xlsx")))
 get_xf_raw <- function(filepath_seahorse){
 
-  xf_raw_2 <<- read_excel(filepath_seahorse,
+  xf_raw <- read_excel(filepath_seahorse,
                        sheet = "Raw",
-                       col_types = c("numeric", #Measurment
-                                     "numeric", #Tick
-                                     "text", #Well
-                                     "text", #Group
-                                     "text", #TimeStamp # Note: This should be converted to date.
-                                     "numeric", #Well Temperature
+                       col_types = c("numeric", # Measurment
+                                     "numeric", # Tick
+                                     "text", # Well
+                                     "text", # Group
+                                     "text", # TimeStamp # Note: This should actually be type date.
+                                     "numeric", # Well Temperature
                                      "numeric", # Environment Temperature
                                      "text", # O2 is Valid
                                      "numeric", # O2 (mmHg)
@@ -40,10 +40,11 @@ get_xf_raw <- function(filepath_seahorse){
                                      "numeric", # pH
                                      "numeric", # pH Light
                                      "numeric", # pH Dark
-                                     "numeric", #pH Ref Light
+                                     "numeric", # pH Ref Light
                                      "numeric",# pH Ref Dark
                                      "numeric" # pH Corrected Em.
                        ))
+
 
   return(xf_raw)
 }
