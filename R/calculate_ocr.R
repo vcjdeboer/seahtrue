@@ -181,8 +181,8 @@ sternVolmer <- function(x, KSV, F0){
 }
 
 #data
+my_data_pbmc <<- load("/cloud/project/data/my_pbmc_data.rda")
 
-data <<- load("/cloud/project/data/data.rda")
 #script
 processed <- data %>%
   mutate(pr_raw_data = purrr::map2(raw_data,
