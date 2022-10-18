@@ -2,3 +2,6 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^seahtrue\.Rcheck$
+^seahtrue.*\.tar\.gz$
+^seahtrue.*\.tgz$

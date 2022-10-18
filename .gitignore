@@ -2,3 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
+seahtrue.Rcheck/
+seahtrue*.tar.gz
+seahtrue*.tgz
+# Ignore All (xlsx) files
+*.xlsx
+# Ignore PBMC data upload
+/data/my_pbmc_data.rda
