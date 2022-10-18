@@ -143,7 +143,7 @@ preprocess_xfplate <- function(xf){
     nest() %>%
     mutate(filepath_seahorse = xf$filepath_seahorse,
            date = xf$assayinfo$date_run,
-           assayinfo = list(tibble(xf$assayinfo)),
+           assay_info = list(tibble(xf$assayinfo)),
            rate_data = list(tibble(xf_rate_pr)),
            injection_info = list(tibble(xf$inj))) %>%
     select(plate_id, filepath_seahorse, date, assay_info, injection_info,
