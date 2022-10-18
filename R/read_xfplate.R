@@ -21,7 +21,7 @@ get_xf_raw <- function(filepath_seahorse){
                                      "numeric", # Tick
                                      "text", # Well
                                      "text", # Group
-                                     "text", # TimeStamp # Note: This should actually be type date.
+                                     "text", # TimeStamp
                                      "numeric", # Well Temperature
                                      "numeric", # Environment Temperature
                                      "text", # O2 is Valid
@@ -39,7 +39,6 @@ get_xf_raw <- function(filepath_seahorse){
                                      "numeric",# pH Ref Dark
                                      "numeric" # pH Corrected Em.
                        ))
-
 
   return(xf_raw)
 }
@@ -463,11 +462,11 @@ read_xfplate <- function(filepath_seahorse) {
   xf <- list(
     raw = xf_raw,
     rate = xf_rate,
-    # assayinfo = xf_assayinfo,
+    assayinfo = xf_assayinfo,
     inj = xf_inj,
     pHcal = xf_pHcal,
     O2cal = xf_O2cal,
-    # norm = xf_norm,
+    norm = xf_norm,
     buffer = xf_buffer,
     flagged = xf_flagged,
     filepath_seahorse = filepath_seahorse
