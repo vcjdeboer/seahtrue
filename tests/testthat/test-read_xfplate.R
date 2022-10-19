@@ -35,7 +35,7 @@ check_column_names <- function(df, df_columns_list){
 # testthat: Test 'Raw' data --------------------------------------------------------------
 test_that("Test 'Raw' data derived from Seahorse XFe96 analyser 'Raw' Excel datasheet.", {
   # check return
-  xf_raw <- expect_type(get_xf_raw(file.path(working_directory, paste("/data-raw/seahorse_test_data.xlsx"))), "list")
+  xf_raw <- expect_type(get_xf_raw(file.path(working_directory, paste("data-raw/seahorse_test_data.xlsx"))), "list")
   # perform checks on the returned tibble (list)
   check_column_names(xf_raw, xf_raw_columns_list)
   expect_length(xf_raw, 21)
