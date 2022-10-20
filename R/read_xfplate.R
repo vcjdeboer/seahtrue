@@ -45,6 +45,15 @@ get_xf_raw <- function(filepath_seahorse){
 
 # get_xf_norm -------------------------------------------------------------
 
+#' Get normalization info from the Assay Configuration sheet.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List consisting well names and the corresponding normalization values.
+#'
+#' @examples get_xf_norm(here::here("data-raw", "seahorse_test_data.xlsx")
 get_xf_norm <- function(filepath_seahorse){
   norm_info <- get_platelayout_data(filepath_seahorse,
                                     my_sheet = "Assay Configuration",
@@ -57,9 +66,9 @@ get_xf_norm <- function(filepath_seahorse){
   } else {
     norm_available <- TRUE}
 
-  xf_norm_list <- list(norm_info, norm_available)
+  xf_norm <- list(norm_info, norm_available)
 
-  return(xf_norm_list)
+  return(xf_norm)
 }
 
 # get_xf_flagged() -----------------------------------------------------
