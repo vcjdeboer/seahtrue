@@ -61,6 +61,12 @@ test_that("Test 'Raw' data derived from Seahorse XFe96 analyser 'Raw' Excel data
   expect_type(xf_raw$`pH Corrected Em.`, "double")
 })
 
+# testthat: Test 'Normalization' data --------------------------------------------------------------
+test_that("Test normalization list with 'Normalization values' derived from the Assay configuration sheet.", {
+xf_norm <- expect_type(get_xf_norm(here::here("data-raw", "seahorse_test_data.xlsx")), "list")
+expect_type(xf_norm$well, "character")
+expect_type(xf_norm$cell_n, "logical")
+})
 # testthat: Test xfplate data --------------------------------------------------------------
 # # Check if a data tibble is returned, and check data tibble. (Note: tibble has type list)
 # test_that("a data tibble is returned (list format)", {
