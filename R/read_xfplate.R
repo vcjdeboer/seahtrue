@@ -381,14 +381,14 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
 
-  df <- read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
+  df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
 
   colnames(df)[1] <- "firstCol"
 
-  df <-  gather(df, key = "key", value = "my_value", -firstCol) %>%
-    mutate(firstCol = paste0(firstCol, key) ) %>%
-    select(well = firstCol, my_value) %>%
-    arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
+  df <-  tidyr::gather(df, key = "key", value = "my_value", -firstCol) %>%
+    dplyr::mutate(firstCol = paste0(firstCol, key) ) %>%
+    dplyr::select(well = firstCol, my_value) %>%
+    dplyr::arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
 
   colnames(df)[2] <- my_param
 
