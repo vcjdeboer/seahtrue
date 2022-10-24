@@ -69,8 +69,9 @@ expect_type(xf_norm$cell_n, "logical")
 expect_length(xf_norm$well, 96)
 expect_length(xf_norm$well, 96)
 expect_equal(ncol(xf_norm), 2)
-expect_equal(nchar(xf_norm$well), 3)
+expect_equal(nchar(xf_norm$well[1]), 3)
 })
+
 # testthat: Test xfplate data --------------------------------------------------------------
 # # Check if a data tibble is returned, and check data tibble. (Note: tibble has type list)
 # test_that("a data tibble is returned (list format)", {
