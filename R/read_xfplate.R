@@ -75,12 +75,11 @@ get_xf_norm <- function(filepath_seahorse){
 
 get_xf_flagged <- function(filepath_seahorse){
 
-  #read excel file using tidyxl
-  x <- xlsx_cells(filepath_seahorse, "Assay Configuration")
-  formats <- xlsx_formats(filepath_seahorse, "Assay Configuration")
+  x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
+  formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
   # subset to only the platelayout with the cells that show the "unselected" wells by user
-  subset_x <- x %>% filter(row %in% c(12:19)) %>% filter(col %in% c(3:14))
+  subset_x <- x %>% dplyr::filter(row %in% c(12:19)) %>% dplyr::filter(col %in% c(3:14))
 
   # get the "unselected" (flagged) wells (based on color fill)
   flagged_df <- subset_x[subset_x$local_format_id %in%
@@ -94,18 +93,19 @@ get_xf_flagged <- function(filepath_seahorse){
 
   # changed the cell address to well names
   new_col_names <- flagged_df %>%
-    pull(address) %>% substr(1,1) %>%
-    str_c(collapse = "---") %>%
-    str_replace_all(c("C" = "01", "D" = "02", "E" = "03", "F" = "04", "G" = "05", "H" = "06",
-                      "I" = "07", "J" = "08", "K" = "09", "L" = "10", "M" = "11", "N" = "12"))
-  new_col_names <-   unlist(str_split(new_col_names, "---"))
+    dplyr::pull(address) %>% substr(1,1) %>%
+    stringr::str_c(collapse = "---") %>%
+    stringr::str_replace_all(c("C" = "01", "D" = "02", "E" = "03", "F" = "04", "G" = "05", "H" = "06",
+                               "I" = "07", "J" = "08", "K" = "09", "L" = "10", "M" = "11", "N" = "12"))
+  new_col_names <-   unlist(stringr::str_split(new_col_names, "---"))
+
 
   new_row_names <- flagged_df %>%
-    pull(address) %>% substr(2,3) %>%
-    str_c(collapse = "---") %>%
-    str_replace_all(c("12" = "A", "13" = "B", "14" = "C", "15" = "D", "16" = "E", "17" = "F",
-                      "18" = "G", "18" = "H"))
-  new_row_names <-   unlist(str_split(new_row_names, "---"))
+    dplyr::pull(address) %>% substr(2,3) %>%
+    stringr::str_c(collapse = "---") %>%
+    stringr::str_replace_all(c("12" = "A", "13" = "B", "14" = "C", "15" = "D", "16" = "E", "17" = "F",
+                               "18" = "G", "18" = "H"))
+  new_row_names <-   unlist(stringr::str_split(new_row_names, "---"))
 
   # output the wells that were "unselected" (flagged)
   flagged_vector <- paste0(new_row_names, new_col_names)
