@@ -45,6 +45,15 @@ get_xf_raw <- function(filepath_seahorse){
 
 # get_xf_norm -------------------------------------------------------------
 
+#' Get normalization info from the Assay Configuration sheet.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List consisting well names and the corresponding normalization values.
+#'
+#' @examples get_xf_norm(here::here("data-raw", "seahorse_test_data.xlsx")
 get_xf_norm <- function(filepath_seahorse){
   norm_info <- get_platelayout_data(filepath_seahorse,
                                     my_sheet = "Assay Configuration",
@@ -57,9 +66,9 @@ get_xf_norm <- function(filepath_seahorse){
   } else {
     norm_available <- TRUE}
 
-  xf_norm_list <- list(norm_info, norm_available)
+  xf_norm <- list(norm_info, norm_available)
 
-  return(xf_norm_list)
+  return(xf_norm)
 }
 
 # get_xf_flagged() -----------------------------------------------------
@@ -353,16 +362,33 @@ get_xf_assayinfo <- function(filepath_seahorse,
 }
 
 # get_platelayout_data() -------------------------------------------------
+#' Get plate layout data.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#' @param my_sheet Sheet of the Seahorse Excel file
+#' @param my_range Range of the cells in the Seahorse Excel file
+#' @param my_param Summarised name of the parameter which will include the data that is collected.
+#'
+#' @return dataframe with plate layout data.
+#'
+#' @examples
+#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Assay Configuration", "B84:N92", "cell_n")
+#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Assay Configuration", "B96:N104", "bufferfactor")
+#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
+#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
+
 get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
 
-  df <- read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
+  df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
 
   colnames(df)[1] <- "firstCol"
 
-  df <-  gather(df, key = "key", value = "my_value", -firstCol) %>%
-    mutate(firstCol = paste0(firstCol, key) ) %>%
-    select(well = firstCol, my_value) %>%
-    arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
+  df <-  tidyr::gather(df, key = "key", value = "my_value", -firstCol) %>%
+    dplyr::mutate(firstCol = paste0(firstCol, key) ) %>%
+    dplyr::select(well = firstCol, my_value) %>%
+    dplyr::arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
 
   colnames(df)[2] <- my_param
 
