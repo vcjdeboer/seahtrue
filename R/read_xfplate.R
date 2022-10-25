@@ -73,6 +73,16 @@ get_xf_norm <- function(filepath_seahorse){
 
 # get_xf_flagged() -----------------------------------------------------
 
+#' Get unselected (flagged) wells from the Assay Configuration sheet.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return Vector which contains wells that were "unselected" (flagged).
+#'
+#' @examples
+#' get_xf_flagged(here::here("data-raw", "seahorse_test_data.xlsx"))
 get_xf_flagged <- function(filepath_seahorse){
 
   x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
