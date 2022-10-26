@@ -87,6 +87,15 @@ for (seahorse_file in filepath){
   })
 }
 
+# testthat: Test unselected 'flagged wells' data Assay Configuration sheet. --------------------------------------------------------------
+for (seahorse_file in filepath){
+  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+  test_that("Tests for unselected (flagged) wells derived from Assay configuration sheet.", {
+    flagged <- get_xf_flagged(here::here(filepath_seahorse))
+    expect_type(flagged, "character")
+  })
+}
+
 # testthat: Test xfplate data --------------------------------------------------------------
 # # Check if a data tibble is returned, and check data tibble. (Note: tibble has type list)
 # test_that("a data tibble is returned (list format)", {
