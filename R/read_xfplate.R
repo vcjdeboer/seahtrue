@@ -128,6 +128,7 @@ get_xf_flagged <- function(filepath_seahorse){
 get_xf_rate <- function(filepath_seahorse){
   #first item is table, second ite is background_corrected logical
   xf_rate_list <- get_originalRateTable(filepath_seahorse)
+  return(xf_rate_list)
 }
 
 # get_xf_buffer -----------------------------------------------------------
@@ -138,6 +139,7 @@ get_xf_buffer <- function(filepath_seahorse){
                                             my_sheet = "Assay Configuration",
                                             my_range = "B96:N104",
                                             my_param = "bufferfactor")
+  return(bufferfactor_info)
 }
 
 # get_xf_pHcal ------------------------------------------------------------
@@ -148,6 +150,7 @@ get_xf_pHcal <- function(filepath_seahorse){
                                          my_sheet = "Calibration",
                                          my_range = "P16:AB24",
                                          my_param = "pH_cal_em")
+  return(pH_calibration)
 }
 
 # get_xf_O2cal ------------------------------------------------------------
@@ -157,6 +160,7 @@ get_xf_O2cal <- function(filepath_seahorse){
                                          my_sheet = "Calibration",
                                          my_range = "B7:N15",
                                          my_param = "O2_cal_em")
+  return(pH_calibration)
 }
 
 # get_xf_in()j --------------------------------------------------------------
