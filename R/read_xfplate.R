@@ -1,5 +1,5 @@
 # read_xfplate.r
-# vincent de boer
+# Vincent de Boer
 # September 24th, 2022
 
 # get_xf_raw() --------------------------------------------------------------
@@ -12,7 +12,10 @@
 #' @return xf_raw tibble (list) with 'Raw' Seahorse information.
 #'
 #' @examples
-#' get_xf_raw(file.path(working_directory, paste("/data-raw/seahorse_test_data.xlsx")))
+#' get_xf_raw(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+
 get_xf_raw <- function(filepath_seahorse){
 
   xf_raw <- readxl::read_excel(filepath_seahorse,
@@ -51,22 +54,27 @@ get_xf_raw <- function(filepath_seahorse){
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
-#' @return List consisting well names and the corresponding normalization values.
+#' @return List consisting [1] well names and the corresponding normalization values and
+#' [2] check if normalization data is available (TRUE/FALSE).
 #'
-#' @examples get_xf_norm(here::here("data-raw", "seahorse_test_data.xlsx")
+#' @examples
+#' get_xf_norm(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_norm <- function(filepath_seahorse){
   norm_info <- get_platelayout_data(filepath_seahorse,
                                     my_sheet = "Assay Configuration",
                                     my_range = "B84:N92",
                                     my_param = "cell_n")
-  return(norm_info)
 
   if (sum(is.na(norm_info$cell_n)) >90){
     norm_available <- FALSE
   } else {
     norm_available <- TRUE}
 
+
   xf_norm <- list(norm_info, norm_available)
+
 
   return(xf_norm)
 }
@@ -79,10 +87,12 @@ get_xf_norm <- function(filepath_seahorse){
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
-#' @return Vector which contains wells that were "unselected" (flagged).
+#' @return Vector that contains wells that were "unselected" (flagged).
 #'
 #' @examples
-#' get_xf_flagged(here::here("data-raw", "seahorse_test_data.xlsx"))
+#' get_xf_flagged(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_flagged <- function(filepath_seahorse){
 
   x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
@@ -125,6 +135,22 @@ get_xf_flagged <- function(filepath_seahorse){
 
 # get_xf_rate -------------------------------------------------------------
 
+#' @title Get original rate table
+#'
+#' @details
+#' [2]If rate data was not already corrected a background subtraction was performed and the second element of this list contains TRUE (logical).
+#' [2]If rate data was already corrected there is no need for background subtraction.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#'
+#' @examples
+#' get_xf_rate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_rate <- function(filepath_seahorse){
   #first item is table, second ite is background_corrected logical
   xf_rate_list <- get_originalRateTable(filepath_seahorse)
@@ -133,6 +159,21 @@ get_xf_rate <- function(filepath_seahorse){
 
 # get_xf_buffer -----------------------------------------------------------
 
+#' Get buffer factor (capacity) info
+#'
+#' @details buffer factor(BF): Buffer capacity of the measurement system, comprising the assay medium and XF assay
+#' conditions (instrument, sensor, labware).
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List (tibble) that contains well and bufferfactor.
+#'
+#' @examples
+#' get_xf_buffer(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_buffer <- function(filepath_seahorse){
 
   bufferfactor_info <- get_platelayout_data(filepath_seahorse,
@@ -144,6 +185,18 @@ get_xf_buffer <- function(filepath_seahorse){
 
 # get_xf_pHcal ------------------------------------------------------------
 
+#' Get the pH calibration emission data.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List (tibble) that contains well and the corresponding pH calibration emission info.
+#'
+#' @examples
+#' get_xf_pH(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_pH(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_pH(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_pHcal <- function(filepath_seahorse){
 
   pH_calibration <- get_platelayout_data(filepath_seahorse,
@@ -155,6 +208,18 @@ get_xf_pHcal <- function(filepath_seahorse){
 
 # get_xf_O2cal ------------------------------------------------------------
 
+#' Get O2 calibration emission.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List (tibble) that contains wells and the corresponding O2 calibration emission.
+#'
+#' @examples
+#' get_xf_O2cal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_O2cal <- function(filepath_seahorse){
   pH_calibration <- get_platelayout_data(filepath_seahorse,
                                          my_sheet = "Calibration",
@@ -163,10 +228,30 @@ get_xf_O2cal <- function(filepath_seahorse){
   return(pH_calibration)
 }
 
-# get_xf_in()j --------------------------------------------------------------
+# get_xf_inj --------------------------------------------------------------
+#' Read the injection information from the "Operation log" sheet M-version or H-Version.
+#'
+#'@description The output of the injection information is different on different
+#' XFe96 instruments. We distinguish injection information from our own "HAP" chair
+#' group devices (H-version) and "Manual" injection information (M-version). The H-version
+#' assumes the names of the injection names are listed in the "operation log file". The M-version
+#' uses a manual assignment of the injection names. This function will read the number of
+#' measurements per injection.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#' @param injscheme Name of the injection scheme. Can be "HAP" or "manual".
+#'
+#' @return A list (tibble) that contains injection information.
+#'
+#' @examples
+#' get_xf_inj(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
-  #command_index in "operation log" sheet give numbers to the phases in a seahorse exp
+  #command_index in "Operation Log" sheet give numbers to the phases in a seahorse exp
   # each command (eg. "mix", "measure") gets the command_index for that phase
   # 0 = moving operation
   # 1 = calibration
@@ -176,7 +261,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
   # 5 = injection 3
   # 6 = injection 4
 
-  #read injection strategy and measurements from "operation log" sheet
+  #read injection strategy and measurements from "Operation Log" sheet
   info_sh<-read_excel(filepath_seahorse, sheet = "Operation Log")
   colnames(info_sh) <- c("instruction_name","command_name",
                          "command_index","start_time","end_time",
@@ -223,13 +308,27 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
     #measurement_info <- left_join(measurement_info, injections_glycostress, by = c("interval"))
   }
 
-
-
   return(measurement_info)
 
 }
 
-# get_assay_info_new() ----------------------------------------------------
+# get_assay_info ----------------------------------------------------
+#' Get assay information.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#' @param date_style The format of the date, can be "US" or "NL".
+#' @param instrument The type of seahorse analyzer. Can be "XFe96" or XFHSmini".
+#' @param norm_available requires xf_norm. Can be TRUE or FALSE.
+#' @param xls_ocr_backgroundcorrected requires original rate table. Can be TRUE or FALSE.
+#'
+#' @return List (tibble) with assay information.
+#'
+#' @examples
+#' get_xf_assayinfo(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
+#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
+#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
 get_xf_assayinfo <- function(filepath_seahorse,
                              date_style = "US",
                              instrument = "XFe96",
@@ -385,13 +484,13 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #' @param my_range Range of the cells in the Seahorse Excel file
 #' @param my_param Summarised name of the parameter which will include the data that is collected.
 #'
-#' @return dataframe with plate layout data.
+#' @return data frame with plate layout data.
 #'
 #' @examples
-#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Assay Configuration", "B84:N92", "cell_n")
-#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Assay Configuration", "B96:N104", "bufferfactor")
-#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
-#' get_platelayout_data(here::here("data-raw", "seahorse_test_data.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
+#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B84:N92", "cell_n")
+#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B96:N104", "bufferfactor")
+#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
+#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
 
@@ -421,6 +520,22 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 }
 
 # get_originalRateTable() -------------------------------------------------
+#' get the OCR from the excel file
+#'
+#' @details
+#' [2]If rate data was not already corrected a background subtraction was performed and the second element of this list contains TRUE (logical).
+#' [2]If rate data was already corrected there is no need for background subtraction
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#'
+#' @examples
+#' get_originalRateTable(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_originalRateTable<- function(filepath_seahorse){
 
   original_rate_df <-read_excel(filepath_seahorse, sheet = "Rate")
@@ -447,13 +562,13 @@ get_originalRateTable<- function(filepath_seahorse){
     colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave", "ECAR_wave", "PER_wave")
 
     #do background substraction for wave table
-    background<-original_rate_df %>%
+    background <- original_rate_df %>%
       filter(group=="Background") %>%
       group_by(measurement) %>%
       summarize(bkg_OCR_wave = mean(OCR_wave),
                 bkg_ECAR_wave = mean(ECAR_wave)
       )
-    original_rate_df<-left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
+    original_rate_df <- left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
 
     original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
     original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
@@ -471,7 +586,7 @@ get_originalRateTable<- function(filepath_seahorse){
 
 
 # read_xfplate() -------------------------------------------------------
-#' Read necessary Seahorse plate from Seahorse Excel file.
+#' Read necessary Seahorse plate data from Seahorse Excel file.
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
@@ -481,6 +596,9 @@ get_originalRateTable<- function(filepath_seahorse){
 #' @export
 #'
 #' @examples
+#' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 read_xfplate <- function(filepath_seahorse) {
 
   #read data
