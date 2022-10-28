@@ -67,14 +67,14 @@ get_xf_norm <- function(filepath_seahorse){
                                     my_range = "B84:N92",
                                     my_param = "cell_n")
 
+
+
   if (sum(is.na(norm_info$cell_n)) >90){
     norm_available <- FALSE
   } else {
     norm_available <- TRUE}
 
-
   xf_norm <- list(norm_info, norm_available)
-
 
   return(xf_norm)
 }
@@ -152,7 +152,7 @@ get_xf_flagged <- function(filepath_seahorse){
 #' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_rate <- function(filepath_seahorse){
-  #first item is table, second ite is background_corrected logical
+  #first item is table, second item is background_corrected logical
   xf_rate_list <- get_originalRateTable(filepath_seahorse)
   return(xf_rate_list)
 }
@@ -194,9 +194,9 @@ get_xf_buffer <- function(filepath_seahorse){
 #' @return List (tibble) that contains well and the corresponding pH calibration emission info.
 #'
 #' @examples
-#' get_xf_pH(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_pH(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_pH(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_pHcal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_pHcal <- function(filepath_seahorse){
 
   pH_calibration <- get_platelayout_data(filepath_seahorse,
@@ -221,11 +221,11 @@ get_xf_pHcal <- function(filepath_seahorse){
 #' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_O2cal <- function(filepath_seahorse){
-  pH_calibration <- get_platelayout_data(filepath_seahorse,
+  O2_calibration <- get_platelayout_data(filepath_seahorse,
                                          my_sheet = "Calibration",
                                          my_range = "B7:N15",
                                          my_param = "O2_cal_em")
-  return(pH_calibration)
+  return(O2_calibration)
 }
 
 # get_xf_inj --------------------------------------------------------------
