@@ -262,14 +262,14 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
   # 6 = injection 4
 
   #read injection strategy and measurements from "Operation Log" sheet
-  info_sh<-read_excel(filepath_seahorse, sheet = "Operation Log")
+  info_sh<-readxl::read_excel(filepath_seahorse, sheet = "Operation Log")
   colnames(info_sh) <- c("instruction_name","command_name",
                          "command_index","start_time","end_time",
                          "completion_status")
 
   if (injscheme == "HAP"){
     #assumes injection names are available in operation log file (this is the case for most experiments)
-    measurement_info <- filter(info_sh, command_name == "Measure")
+    measurement_info <- dplyr::filter(info_sh, command_name == "Measure")
     measurement_info$interval <- measurement_info$command_index -1
     measurement_info$measurement <- 1:nrow(measurement_info)
     measurement_info <- measurement_info %>% select(measurement, interval, injection=instruction_name)
@@ -279,7 +279,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
     #in case there is no command index in "opertion log"
     command_names <- c("XF - PC_Measure", "XF - PC_Inject")
-    measurement_info <- filter(info_sh, command_name %in% command_names)
+    measurement_info <- dplyr::filter(info_sh, command_name %in% command_names)
 
     # "PC - inject" has a number as command_index
     # "PC - measure" command_index == 0
@@ -292,15 +292,15 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
           measurement_info$command_index[i] <-  interval}
     }
     colnames(measurement_info)[3] <- "interval"
-    measurement_info <- filter(measurement_info, command_name == "XF - PC_Measure")
+    measurement_info <- dplyr::filter(measurement_info, command_name == "XF - PC_Measure")
     measurement_info$measurement <- 1:nrow(measurement_info)
-    measurement_info <- measurement_info %>% select(measurement, interval)
+    measurement_info <- measurement_info %>% dplyr::select(measurement, interval)
 
     #gives name of the injection manually
     # case mitostress
     injections <- c("basal", "OM", "FCCP", "AM/rot")
-    injections_mitostress <- tibble(interval = 1:4, injection=c("basal", "OM", "FCCP", "AM/rot"))
-    measurement_info <- left_join(measurement_info, injections_mitostress, by = c("interval"))
+    injections_mitostress <- tibble::tibble(interval = 1:4, injection=c("basal", "OM", "FCCP", "AM/rot"))
+    measurement_info <- dplyr::left_join(measurement_info, injections_mitostress, by = c("interval"))
 
     ## case glycostress
     #injections <- c("basal", "glucose", "OM", "2DG")
@@ -346,7 +346,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
   }
 
   # read Assay Configuration sheet
-  meta_df <- read_excel(filepath_seahorse,
+  meta_df <- readxl::read_excel(filepath_seahorse,
                         sheet = "Assay Configuration",
                         col_names = c("parameter", "value"),
                         range = "A1:B83"
@@ -355,27 +355,27 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
 
   # read Assay Configuration sheet gain1
-  gain1 <- read_excel(filepath_seahorse,
+  gain1 <- readxl::read_excel(filepath_seahorse,
                       sheet = "Assay Configuration",
                       col_names = c("value"),
                       range = gain1_cell
   )
 
   # read Assay Configuration sheet gain2
-  gain2 <- read_excel(filepath_seahorse,
+  gain2 <- readxl::read_excel(filepath_seahorse,
                       sheet = "Assay Configuration",
                       col_names = c("value"),
                       range = gain2_cell
   )
 
   # read target emission cells
-  O2_target_emission <- read_excel(filepath_seahorse,
+  O2_target_emission <- readxl::read_excel(filepath_seahorse,
                                    sheet = "Calibration",
                                    col_names = FALSE,
                                    range = "B4"
   )
 
-  pH_target_emission <- read_excel(filepath_seahorse,
+  pH_target_emission <- readxl::read_excel(filepath_seahorse,
                                    sheet = "Calibration",
                                    col_names = FALSE,
                                    range = "P4"
@@ -407,6 +407,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
   O2_0_mmHg <- 151.6900241
   O2_0_mM <- 0.214
 
+
   if (date_style == "US"){
     date_run <- lubridate::mdy_hm(meta_df$value[meta_df$parameter == "Last Run"])
     #be carefull with the data format in excel! either mdy or dmy
@@ -418,7 +419,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
   }
 
   if(instrument == "XFHSmini"){
-    tibbler <- tibble(
+    tibbler <- tibble::tibble(
       F0 = 4.63e04,
       V_C = 9.15,
       Tau_AC = 746,
@@ -445,7 +446,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   }
   if(instrument == "XFe96"){
-    tibbler <- tibble(
+    tibbler <- tibble::tibble(
       F0,
       V_C,
       Tau_AC, Tau_W,
@@ -520,7 +521,7 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 }
 
 # get_originalRateTable() -------------------------------------------------
-#' get the OCR from the excel file
+#' Get the OCR from the excel file
 #'
 #' @details
 #' [2]If rate data was not already corrected a background subtraction was performed and the second element of this list contains TRUE (logical).
@@ -536,13 +537,13 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 #' get_originalRateTable(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
 #' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
-get_originalRateTable<- function(filepath_seahorse){
+get_originalRateTable <- function(filepath_seahorse){
 
-  original_rate_df <-read_excel(filepath_seahorse, sheet = "Rate")
+  original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
 
   # because rate data can be either background corrected or not this should be checked first
-  check_background <- original_rate_df %>% filter(Group == "Background") %>% select(OCR) %>%
-    summarise(mean = mean(OCR)) %>% pull(mean)
+  check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
+    dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
 
   if (check_background == 0) {
     corrected_allready <- TRUE
@@ -556,25 +557,25 @@ get_originalRateTable<- function(filepath_seahorse){
       mutate(OCR_wave = 0, ECAR_wave = 0)
 
     original_rate_df <- original_rate_df %>%
-      select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+      dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
 
   } else{
     colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave", "ECAR_wave", "PER_wave")
 
     #do background substraction for wave table
     background <- original_rate_df %>%
-      filter(group=="Background") %>%
-      group_by(measurement) %>%
-      summarize(bkg_OCR_wave = mean(OCR_wave),
+      dplyr::filter(group=="Background") %>%
+      dplyr::group_by(measurement) %>%
+      dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
                 bkg_ECAR_wave = mean(ECAR_wave)
       )
-    original_rate_df <- left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
+    original_rate_df <- dplyr::left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
 
     original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
     original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
 
     original_rate_df <- original_rate_df %>%
-      select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+      dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
   }
 
   original_rate_df_list <- list(original_rate_df, corrected_allready)
