@@ -17,33 +17,46 @@
 #' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 
 get_xf_raw <- function(filepath_seahorse){
+  tryCatch({
+    xf_raw <- readxl::read_excel(filepath_seahorse,
+                         sheet = "Raw",
+                         col_types = c("numeric", # Measurment
+                                       "numeric", # Tick
+                                       "text", # Well
+                                       "text", # Group
+                                       "text", # TimeStamp
+                                       "numeric", # Well Temperature
+                                       "numeric", # Environment Temperature
+                                       "text", # O2 is Valid
+                                       "numeric", # O2 (mmHg)
+                                       "numeric", # O2 Light Emission
+                                       "numeric", # O2 Dark Emission
+                                       "numeric", # O2 Ref Light
+                                       "numeric", # O2 Ref Dark
+                                       "numeric", # O2 Corrected Em.
+                                       "text", # pH Is Valid
+                                       "numeric", # pH
+                                       "numeric", # pH Light
+                                       "numeric", # pH Dark
+                                       "numeric", # pH Ref Light
+                                       "numeric",# pH Ref Dark
+                                       "numeric" # pH Corrected Em.
+                         ))
 
-  xf_raw <- readxl::read_excel(filepath_seahorse,
-                       sheet = "Raw",
-                       col_types = c("numeric", # Measurment
-                                     "numeric", # Tick
-                                     "text", # Well
-                                     "text", # Group
-                                     "text", # TimeStamp
-                                     "numeric", # Well Temperature
-                                     "numeric", # Environment Temperature
-                                     "text", # O2 is Valid
-                                     "numeric", # O2 (mmHg)
-                                     "numeric", # O2 Light Emission
-                                     "numeric", # O2 Dark Emission
-                                     "numeric", # O2 Ref Light
-                                     "numeric", # O2 Ref Dark
-                                     "numeric", # O2 Corrected Em.
-                                     "text", # pH Is Valid
-                                     "numeric", # pH
-                                     "numeric", # pH Light
-                                     "numeric", # pH Dark
-                                     "numeric", # pH Ref Light
-                                     "numeric",# pH Ref Dark
-                                     "numeric" # pH Corrected Em.
-                       ))
 
-  return(xf_raw)
+    return(xf_raw)
+
+  # The code you want run
+  }, warning = function(war) {
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err), "\n")
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    stop()
+
+  }
+  )
 }
 
 # get_xf_norm -------------------------------------------------------------
@@ -62,21 +75,31 @@ get_xf_raw <- function(filepath_seahorse){
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_norm <- function(filepath_seahorse){
-  norm_info <- get_platelayout_data(filepath_seahorse,
-                                    my_sheet = "Assay Configuration",
-                                    my_range = "B84:N92",
-                                    my_param = "cell_n")
+  tryCatch({
+    norm_info <- get_platelayout_data(filepath_seahorse,
+                                      my_sheet = "Assay Configuration",
+                                      my_range = "B84:N92",
+                                      my_param = "cell_n")
 
 
 
-  if (sum(is.na(norm_info$cell_n)) >90){
-    norm_available <- FALSE
-  } else {
-    norm_available <- TRUE}
+    if (sum(is.na(norm_info$cell_n)) >90){
+      norm_available <- FALSE
+    } else {
+      norm_available <- TRUE}
 
-  xf_norm <- list(norm_info, norm_available)
+    xf_norm <- list(norm_info, norm_available)
 
-  return(xf_norm)
+    return(xf_norm)
+
+  }, warning = function(war) {
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err), "\n")
+    stop()
+  }
+  )
 }
 
 # get_xf_flagged() -----------------------------------------------------
@@ -95,43 +118,56 @@ get_xf_norm <- function(filepath_seahorse){
 #' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_flagged <- function(filepath_seahorse){
 
-  x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
-  formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
+  tryCatch({
 
-  # subset to only the platelayout with the cells that show the "unselected" wells by user
-  subset_x <- x %>% dplyr::filter(row %in% c(12:19)) %>% dplyr::filter(col %in% c(3:14))
+    x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
+    formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
-  # get the "unselected" (flagged) wells (based on color fill)
-  flagged_df <- subset_x[subset_x$local_format_id %in%
-                           which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF"),
-                         c("address")]
+    # subset to only the platelayout with the cells that show the "unselected" wells by user
+    subset_x <- x %>% dplyr::filter(row %in% c(12:19)) %>% dplyr::filter(col %in% c(3:14))
 
-  # optionally alignment format can be used
-  # subset_x[subset_x$local_format_id %in%
-  #            which(formats$local$alignment$horizontal == "center"),
-  #          c("address")]
+    # get the "unselected" (flagged) wells (based on color fill)
+    flagged_df <- subset_x[subset_x$local_format_id %in%
+                             which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF"),
+                           c("address")]
 
-  # changed the cell address to well names
-  new_col_names <- flagged_df %>%
-    dplyr::pull(address) %>% substr(1,1) %>%
-    stringr::str_c(collapse = "---") %>%
-    stringr::str_replace_all(c("C" = "01", "D" = "02", "E" = "03", "F" = "04", "G" = "05", "H" = "06",
-                               "I" = "07", "J" = "08", "K" = "09", "L" = "10", "M" = "11", "N" = "12"))
-  new_col_names <-   unlist(stringr::str_split(new_col_names, "---"))
+    # optionally alignment format can be used
+    # subset_x[subset_x$local_format_id %in%
+    #            which(formats$local$alignment$horizontal == "center"),
+    #          c("address")]
+
+    # changed the cell address to well names
+    new_col_names <- flagged_df %>%
+      dplyr::pull(address) %>% substr(1,1) %>%
+      stringr::str_c(collapse = "---") %>%
+      stringr::str_replace_all(c("C" = "01", "D" = "02", "E" = "03", "F" = "04", "G" = "05", "H" = "06",
+                                 "I" = "07", "J" = "08", "K" = "09", "L" = "10", "M" = "11", "N" = "12"))
+    new_col_names <-   unlist(stringr::str_split(new_col_names, "---"))
 
 
-  new_row_names <- flagged_df %>%
-    dplyr::pull(address) %>% substr(2,3) %>%
-    stringr::str_c(collapse = "---") %>%
-    stringr::str_replace_all(c("12" = "A", "13" = "B", "14" = "C", "15" = "D", "16" = "E", "17" = "F",
-                               "18" = "G", "18" = "H"))
-  new_row_names <-   unlist(stringr::str_split(new_row_names, "---"))
+    new_row_names <- flagged_df %>%
+      dplyr::pull(address) %>% substr(2,3) %>%
+      stringr::str_c(collapse = "---") %>%
+      stringr::str_replace_all(c("12" = "A", "13" = "B", "14" = "C", "15" = "D", "16" = "E", "17" = "F",
+                                 "18" = "G", "18" = "H"))
+    new_row_names <-   unlist(stringr::str_split(new_row_names, "---"))
 
-  # output the wells that were "unselected" (flagged)
-  flagged_vector <- paste0(new_row_names, new_col_names)
+    # output the wells that were "unselected" (flagged)
+    flagged_vector <- paste0(new_row_names, new_col_names)
 
-  return(flagged_vector)
+    return(flagged_vector)
+
+  # The code you want run
+  }, warning = function(war) {
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err), "\n")
+    stop()
+  }
+  )
 }
+
 
 # get_xf_rate -------------------------------------------------------------
 
@@ -152,9 +188,9 @@ get_xf_flagged <- function(filepath_seahorse){
 #' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_rate <- function(filepath_seahorse){
-  #first item is table, second item is background_corrected logical
-  xf_rate_list <- get_originalRateTable(filepath_seahorse)
-  return(xf_rate_list)
+    #first item is table, second item is background_corrected logical
+    xf_rate_list <- get_originalRateTable(filepath_seahorse)
+    return(xf_rate_list)
 }
 
 # get_xf_buffer -----------------------------------------------------------
@@ -495,28 +531,42 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
 
-  df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
+  tryCatch({
 
-  colnames(df)[1] <- "firstCol"
+      df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
 
-  df <-  tidyr::gather(df, key = "key", value = "my_value", -firstCol) %>%
-    dplyr::mutate(firstCol = paste0(firstCol, key) ) %>%
-    dplyr::select(well = firstCol, my_value) %>%
-    dplyr::arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
+      colnames(df)[1] <- "firstCol"
 
-  colnames(df)[2] <- my_param
+      df <-  tidyr::gather(df, key = "key", value = "my_value", -firstCol) %>%
+        dplyr::mutate(firstCol = paste0(firstCol, key) ) %>%
+        dplyr::select(well = firstCol, my_value) %>%
+        dplyr::arrange(gsub("\\d", "", well, as.numeric(gsub("\\D", "", well))))
 
-  # add a zero between letter and number if wellname has 2 characters for normalization data
-  for (i in 1:nrow(df)){
-    if (nchar(df$well[i]) ==  2) {
-      wellName <- sub("(.{1})(.*)", "\\10\\2", df$well[i])
-    } else {
-      wellName <- df$well[i]
-    }
-    df$well[i] <- wellName
+      colnames(df)[2] <- my_param
+
+      # add a zero between letter and number if wellname has 2 characters for normalization data
+      for (i in 1:nrow(df)){
+        if (nchar(df$well[i]) ==  2) {
+          wellName <- sub("(.{1})(.*)", "\\10\\2", df$well[i])
+        } else {
+          wellName <- df$well[i]
+        }
+        df$well[i] <- wellName
+      }
+
+     return(df)
+
+    # The code you want run
+  }, warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    cat("ERROR :", conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err), "\n")
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
   }
-
-  return(df)
+  )
 
 }
 
@@ -539,48 +589,61 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 #' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_originalRateTable <- function(filepath_seahorse){
 
-  original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
+  tryCatch({
 
-  # because rate data can be either background corrected or not this should be checked first
-  check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
-    dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
+    original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
 
-  if (check_background == 0) {
-    corrected_allready <- TRUE
-  } else {
-    corrected_allready <-  FALSE
+    # because rate data can be either background corrected or not this should be checked first
+    check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
+      dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
+
+    if (check_background == 0) {
+      corrected_allready <- TRUE
+    } else {
+      corrected_allready <-  FALSE
+    }
+
+    if (corrected_allready == TRUE){
+      colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
+      original_rate_df <- original_rate_df %>%
+        mutate(OCR_wave = 0, ECAR_wave = 0)
+
+      original_rate_df <- original_rate_df %>%
+        dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+
+    } else{
+      colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave", "ECAR_wave", "PER_wave")
+
+      #do background substraction for wave table
+      background <- original_rate_df %>%
+        dplyr::filter(group=="Background") %>%
+        dplyr::group_by(measurement) %>%
+        dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
+                  bkg_ECAR_wave = mean(ECAR_wave)
+        )
+      original_rate_df <- dplyr::left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
+
+      original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
+      original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
+
+      original_rate_df <- original_rate_df %>%
+        dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+    }
+
+    original_rate_df_list <- list(original_rate_df, corrected_allready)
+
+    return(original_rate_df_list)
+
+  }, warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    cat("ERROR :", conditionMessage(err), "\n")
+    log_error(conditionMessage(err), "\n")
+    break
   }
-
-  if (corrected_allready == TRUE){
-    colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
-    original_rate_df <- original_rate_df %>%
-      mutate(OCR_wave = 0, ECAR_wave = 0)
-
-    original_rate_df <- original_rate_df %>%
-      dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
-
-  } else{
-    colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave", "ECAR_wave", "PER_wave")
-
-    #do background substraction for wave table
-    background <- original_rate_df %>%
-      dplyr::filter(group=="Background") %>%
-      dplyr::group_by(measurement) %>%
-      dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
-                bkg_ECAR_wave = mean(ECAR_wave)
-      )
-    original_rate_df <- dplyr::left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
-
-    original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
-    original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
-
-    original_rate_df <- original_rate_df %>%
-      dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
-  }
-
-  original_rate_df_list <- list(original_rate_df, corrected_allready)
-
-  return(original_rate_df_list)
+  )
 
 }
 
@@ -601,6 +664,8 @@ get_originalRateTable <- function(filepath_seahorse){
 #' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 read_xfplate <- function(filepath_seahorse) {
+
+  tryCatch({
 
   #read data
   xf_raw <- get_xf_raw(filepath_seahorse)
@@ -632,6 +697,19 @@ read_xfplate <- function(filepath_seahorse) {
   )
 
   return(xf)
+  # The code you want run
+  }, warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    cat("ERROR :", conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err), "\n")
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+  }
+  )
+
+
 }
 
 
