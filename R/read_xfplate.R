@@ -647,7 +647,37 @@ get_originalRateTable <- function(filepath_seahorse){
 
 }
 
+# Check if sheets exists in excel file.
+#'
+#' @param filepath_seahorse: Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#' @param sheets list of sheet to check against the seahorse excel file.
+#'
+#' @return TRUE when all input sheets exist. FALSE when sheets are missing.
+#'
+#' @examples
+#' check_excel_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration", "Rate"))
+check_excel_sheets <- function(filepath_seahorse, sheets){
+  logger::log_info(glue::glue("Checking excel sheets for file: {filepath_seahorse}"))
 
+  excel_sheets <- readxl::excel_sheets(filepath_seahorse)
+
+  sheet_exist = c()
+
+  for(sheet in sheets){
+    if (sheet %in% excel_sheets) {
+      sheet_exist <- append(sheet_exist, TRUE)
+    }
+    else {
+      sheet_exist <- append(sheet_exist, FALSE)
+    }
+  }
+
+  sheet_exist <- as.logical(all(sheet_exist))
+
+  return(sheet_exist)
+}
 
 # read_xfplate() -------------------------------------------------------
 #' Read necessary Seahorse plate data from Seahorse Excel file.
@@ -667,36 +697,47 @@ read_xfplate <- function(filepath_seahorse) {
 
   tryCatch({
 
-  #read data
-  xf_raw <- get_xf_raw(filepath_seahorse)
-  xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
-  xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
-  xf_buffer <- get_xf_buffer(filepath_seahorse)
-  xf_inj <- get_xf_inj(filepath_seahorse)
-  xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-  xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-  xf_flagged <- get_xf_flagged(filepath_seahorse)
-  xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
-                                   norm_available = xf_norm[[2]],
-                                   xls_ocr_backgroundcorrected =xf_rate[[2]])
-  xf_norm <- xf_norm[[1]]
-  xf_rate <- xf_rate[[1]]
+    seahorse_sheets <- list("Assay Configuration", "Rate", "Rate (Columns)", "Rate (Plates)",
+                            "Baselined Rate", "Baselined Rate (Columns)", "Baselined Rate (Plates)",
+                            "Raw", "Calibration", "Operation Log")
 
-  # make the output list
-  xf <- list(
-    raw = xf_raw,
-    rate = xf_rate,
-    assayinfo = xf_assayinfo,
-    inj = xf_inj,
-    pHcal = xf_pHcal,
-    O2cal = xf_O2cal,
-    norm = xf_norm,
-    buffer = xf_buffer,
-    flagged = xf_flagged,
-    filepath_seahorse = filepath_seahorse
-  )
+    sheets_exist <- check_excel_sheets(filepath_seahorse, seahorse_sheets)
 
-  return(xf)
+    if(sheets_exist == TRUE){
+    #read data
+    xf_raw <- get_xf_raw(filepath_seahorse)
+    xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
+    xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
+    xf_buffer <- get_xf_buffer(filepath_seahorse)
+    xf_inj <- get_xf_inj(filepath_seahorse)
+    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
+    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
+    xf_flagged <- get_xf_flagged(filepath_seahorse)
+    xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
+                                     norm_available = xf_norm[[2]],
+                                     xls_ocr_backgroundcorrected =xf_rate[[2]])
+    xf_norm <- xf_norm[[1]]
+    xf_rate <- xf_rate[[1]]
+
+    # make the output list
+    xf <- list(
+      raw = xf_raw,
+      rate = xf_rate,
+      assayinfo = xf_assayinfo,
+      inj = xf_inj,
+      pHcal = xf_pHcal,
+      O2cal = xf_O2cal,
+      norm = xf_norm,
+      flagged = xf_flagged,
+      buffer = xf_buffer,
+      filepath_seahorse = filepath_seahorse
+    )
+    return(xf)
+
+    } else{
+      logger::log_error("The excel file doens't contain all seahorse sheets.")
+    }
+
   # The code you want run
   }, warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
