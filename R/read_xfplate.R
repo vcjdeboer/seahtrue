@@ -18,6 +18,8 @@
 
 get_xf_raw <- function(filepath_seahorse){
   tryCatch({
+    logger::log_info("Collecting data from 'Raw' sheet")
+
     xf_raw <- readxl::read_excel(filepath_seahorse,
                          sheet = "Raw",
                          col_types = c("numeric", # Measurment
@@ -43,6 +45,7 @@ get_xf_raw <- function(filepath_seahorse){
                                        "numeric" # pH Corrected Em.
                          ))
 
+    logger::log_info("Finished collecting data from 'Raw' sheet.")
 
     return(xf_raw)
 
@@ -76,6 +79,8 @@ get_xf_raw <- function(filepath_seahorse){
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_norm <- function(filepath_seahorse){
   tryCatch({
+    logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
+
     norm_info <- get_platelayout_data(filepath_seahorse,
                                       my_sheet = "Assay Configuration",
                                       my_range = "B84:N92",
@@ -89,6 +94,8 @@ get_xf_norm <- function(filepath_seahorse){
       norm_available <- TRUE}
 
     xf_norm <- list(norm_info, norm_available)
+
+    logger::log_info("Finished collection normalisation info from 'Assay Configuration' sheet.")
 
     return(xf_norm)
 
@@ -119,6 +126,8 @@ get_xf_norm <- function(filepath_seahorse){
 get_xf_flagged <- function(filepath_seahorse){
 
   tryCatch({
+
+    logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
     x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
@@ -154,6 +163,8 @@ get_xf_flagged <- function(filepath_seahorse){
 
     # output the wells that were "unselected" (flagged)
     flagged_vector <- paste0(new_row_names, new_col_names)
+
+    logger::log_info("Finished collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
     return(flagged_vector)
 
@@ -212,10 +223,15 @@ get_xf_rate <- function(filepath_seahorse){
 #' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_buffer <- function(filepath_seahorse){
 
+  logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
+
   bufferfactor_info <- get_platelayout_data(filepath_seahorse,
                                             my_sheet = "Assay Configuration",
                                             my_range = "B96:N104",
                                             my_param = "bufferfactor")
+
+  logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
+
   return(bufferfactor_info)
 }
 
@@ -234,11 +250,15 @@ get_xf_buffer <- function(filepath_seahorse){
 #' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_pHcal <- function(filepath_seahorse){
+  logger::log_info("Collecting pH calibration emission data")
 
   pH_calibration <- get_platelayout_data(filepath_seahorse,
                                          my_sheet = "Calibration",
                                          my_range = "P16:AB24",
                                          my_param = "pH_cal_em")
+
+  logger::log_info("Finished collecting pH calibration emission data")
+
   return(pH_calibration)
 }
 
@@ -257,10 +277,16 @@ get_xf_pHcal <- function(filepath_seahorse){
 #' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_O2cal <- function(filepath_seahorse){
+
+  logger::log_info("Collecting O2 calibration emission")
+
   O2_calibration <- get_platelayout_data(filepath_seahorse,
                                          my_sheet = "Calibration",
                                          my_range = "B7:N15",
                                          my_param = "O2_cal_em")
+
+  logger::log_info("Finished collecting O2 calibration emission")
+
   return(O2_calibration)
 }
 
@@ -286,6 +312,8 @@ get_xf_O2cal <- function(filepath_seahorse){
 #' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
+
+  logger::log_info("Collecting injection information")
 
   #command_index in "Operation Log" sheet give numbers to the phases in a seahorse exp
   # each command (eg. "mix", "measure") gets the command_index for that phase
@@ -344,6 +372,8 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
     #measurement_info <- left_join(measurement_info, injections_glycostress, by = c("interval"))
   }
 
+  logger::log_info("Finished collecting injection information")
+
   return(measurement_info)
 
 }
@@ -370,6 +400,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
                              instrument = "XFe96",
                              norm_available,
                              xls_ocr_backgroundcorrected) {
+
+  logger::log_info("Collecting assay information")
 
   if (instrument == "XFHSmini"){
     gain1_cell <-  "D68"
@@ -443,6 +475,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
   O2_0_mmHg <- 151.6900241
   O2_0_mM <- 0.214
 
+  logger::log_info("Checking date information.")
+
 
   if (date_style == "US"){
     date_run <- lubridate::mdy_hm(meta_df$value[meta_df$parameter == "Last Run"])
@@ -507,6 +541,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   tibbler$norm_available <- norm_available
   tibbler$xls_ocr_backgroundcorrected <- xls_ocr_backgroundcorrected
+
+  logger::log_info("Finished collecting assay information.")
 
   return(tibbler)
 }
@@ -591,6 +627,8 @@ get_originalRateTable <- function(filepath_seahorse){
 
   tryCatch({
 
+    logger::log_info("Collecting OCR from 'Rate' sheet.")
+
     original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
 
     # because rate data can be either background corrected or not this should be checked first
@@ -631,6 +669,8 @@ get_originalRateTable <- function(filepath_seahorse){
     }
 
     original_rate_df_list <- list(original_rate_df, corrected_allready)
+
+    logger::log_info("Finished collecting OCR from 'Rate' sheet.")
 
     return(original_rate_df_list)
 
@@ -697,42 +737,52 @@ read_xfplate <- function(filepath_seahorse) {
 
   tryCatch({
 
-    seahorse_sheets <- list("Assay Configuration", "Rate", "Rate (Columns)", "Rate (Plates)",
-                            "Baselined Rate", "Baselined Rate (Columns)", "Baselined Rate (Plates)",
-                            "Raw", "Calibration", "Operation Log")
+      logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
 
-    sheets_exist <- check_excel_sheets(filepath_seahorse, seahorse_sheets)
+      seahorse_sheets <- list("Assay Configuration", "Rate", "Rate (Columns)", "Rate (Plates)",
+                              "Baselined Rate", "Baselined Rate (Columns)", "Baselined Rate (Plates)",
+                              "Raw", "Calibration", "Operation Log")
 
-    if(sheets_exist == TRUE){
-    #read data
-    xf_raw <- get_xf_raw(filepath_seahorse)
-    xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
-    xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
-    xf_buffer <- get_xf_buffer(filepath_seahorse)
-    xf_inj <- get_xf_inj(filepath_seahorse)
-    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-    xf_flagged <- get_xf_flagged(filepath_seahorse)
-    xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
-                                     norm_available = xf_norm[[2]],
-                                     xls_ocr_backgroundcorrected =xf_rate[[2]])
-    xf_norm <- xf_norm[[1]]
-    xf_rate <- xf_rate[[1]]
+      logger::log_info("Defined seahorse sheet {seahorse_sheets}")
 
-    # make the output list
-    xf <- list(
-      raw = xf_raw,
-      rate = xf_rate,
-      assayinfo = xf_assayinfo,
-      inj = xf_inj,
-      pHcal = xf_pHcal,
-      O2cal = xf_O2cal,
-      norm = xf_norm,
-      flagged = xf_flagged,
-      buffer = xf_buffer,
-      filepath_seahorse = filepath_seahorse
-    )
-    return(xf)
+      sheets_exist <- check_excel_sheets(filepath_seahorse, seahorse_sheets)
+
+      logger::log_info(glue::glue("Check sheets against excel file: {filepath_seahorse}"))
+      logger::log_info(glue::glue("Sheets exist: {sheets_exist}"))
+
+      if(sheets_exist == TRUE){
+      #read data
+      xf_raw <- get_xf_raw(filepath_seahorse)
+      xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
+      xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
+      xf_buffer <- get_xf_buffer(filepath_seahorse)
+      xf_inj <- get_xf_inj(filepath_seahorse)
+      xf_pHcal <- get_xf_pHcal(filepath_seahorse)
+      xf_O2cal <- get_xf_O2cal(filepath_seahorse)
+      xf_flagged <- get_xf_flagged(filepath_seahorse)
+      xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
+                                       norm_available = xf_norm[[2]],
+                                       xls_ocr_backgroundcorrected =xf_rate[[2]])
+      xf_norm <- xf_norm[[1]]
+      xf_rate <- xf_rate[[1]]
+
+      # make the output list
+      xf <- list(
+        raw = xf_raw,
+        rate = xf_rate,
+        assayinfo = xf_assayinfo,
+        inj = xf_inj,
+        pHcal = xf_pHcal,
+        O2cal = xf_O2cal,
+        norm = xf_norm,
+        flagged = xf_flagged,
+        buffer = xf_buffer,
+        filepath_seahorse = filepath_seahorse
+      )
+
+      logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
+
+      return(xf)
 
     } else{
       logger::log_error("The excel file doens't contain all seahorse sheets.")
