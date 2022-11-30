@@ -169,7 +169,7 @@ for (seahorse_file in filepath){
 for (seahorse_file in filepath){
   filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
   test_that("Test assay information.", {
-    tibbler <- get_xf_assayinfo(here::here(filepath_seahorse), date_style = "US", instrument = "XFe96", norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
+    tibbler <- get_xf_assayinfo(here::here(filepath_seahorse), instrument = "XFe96", norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
     expect_length(tibbler, 23)
     expect_type(tibbler, "list")
     expect_type(tibbler$V_C, "double")
