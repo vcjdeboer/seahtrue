@@ -405,30 +405,29 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 
         source(rstudioapi::getSourceEditorContext()$path)
 
-        # get name for yaml file and pdf validation file.
+        logger::log_info("get name for yaml file and pdf validation file.")
+
         val_name_list <- get_val_name(xf_plate_pr)
         val_yaml_xf_pr_raw <- val_name_list[1]
         val_yaml_xf_pr_assay_info <- val_name_list[2]
 
-        # export rules to yaml file.
+        logger::log_info("export rules to yaml file.")
         export_yaml(xf_plate_pr_raw_rules, file=here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")))
         export_yaml(xf_plate_pr_assay_info_rules ,file=here::here("assertions", glue::glue("{val_yaml_xf_pr_assay_info}.yaml")))
 
-        # validate/assert a given dataset.
         raw_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")),
                                                      xf_plate_pr$raw_data[[1]])
         assay_info_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_assay_info}.yaml")),
                                                      xf_plate_pr$assay_info[[1]])
 
-        # check if plate_id is right format
+        logger::log_info("check if plate_id is right format")
         plate_id_rules <- validator(grepl("^V[0-9]{10}V$", plate_id))
-        confront(xf_plate_pr, plate_id_rules)
+        plate_id_validation_output <- validate::confront(xf_plate_pr, plate_id_rules)
 
-        # summarize validation output.
         validation_summary_raw <- summarise_out(raw_validation_output)
         validation_summary_assay_info <- summarise_out(assay_info_validation_output)
+        validation_plate_id_rules <- summarise_out(plate_id_validation_output)
 
-        # plot validation output
         plot_validation_output(raw_validation_output,
                                here::here("assertions",
                                           glue::glue("{val_yaml_xf_pr_raw}.pdf")))
@@ -446,10 +445,11 @@ validate_xf_plate_pr <- function(xf_plate_pr){
                                                             summary(xf_plate_pr_raw_rules))
 
 
-        validation_summary_list <- list(validation_summary_raw, validation_summary_assay_info)
+        validation_summary_list <- list(validation_plate_id_rules,
+                                        validation_summary_raw,
+                                        validation_summary_assay_info)
 
-
-        # check if no validation failures occur.
+        logger::log_info("Check if no validation failures occur")
         val_true_false <- c()
         for(summary in validation_summary_list){
           check_all_true <- check_all_true(summary)
@@ -460,7 +460,7 @@ validate_xf_plate_pr <- function(xf_plate_pr){
         # can be true or false, depending on validation failures.
         validation_pass <- as.logical(all(val_true_false))
 
-        # If no validation failures occur, return true, else return false.
+        logger::log_info(glue::glue("Validation failures don't exist for sheet : {validation_pass}"))
         return(validation_pass)
       }
     },
@@ -478,7 +478,6 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 
 )
 }
-
 
 check_all_true <- function(validate_summary){
   by(validate_summary[4], seq_len(nrow(validate_summary[4])),
