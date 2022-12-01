@@ -475,17 +475,23 @@ get_xf_assayinfo <- function(filepath_seahorse,
   O2_0_mmHg <- 151.6900241
   O2_0_mM <- 0.214
 
-  logger::log_info("Checking date information.")
+  logger::log_info("Checking date formats.")
+  date_time <- meta_df$value[meta_df$parameter == "Last Run"]
 
+  date <- strsplit(meta_df$value[meta_df$parameter == "Last Run"], " +")[[1]][1]
+  time <- strsplit(meta_df$value[meta_df$parameter == "Last Run"], " +")[[1]][2:3]
 
-  if (date_style == "US"){
+  if (IsDate_US(date) == "TRUE" & isTRUE(time[2] == "AM" || isTRUE(time[2] == "PM"))) {
+    logger::log_info(glue::glue("A date {date_time} was detected, in US format."))
     date_run <- lubridate::mdy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    #be carefull with the data format in excel! either mdy or dmy
-  }
-
-  if (date_style == "NL"){
+    logger::log_info(glue::glue("Date {date_time} converted to {date_run}"))
+  } else if (IsDate_NL(date) == "TRUE") {
+    logger::log_info(glue::glue("A date {date_time} was detected, in NL format."))
     date_run <- lubridate::dmy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    #be carefull with the data format in excel! either mdy or dmy
+    logger::log_info(glue::glue("Date {date_time} converted to {date_run}"))
+  } else {
+    logger::log_error(glue::glue("Wrong date {date}"))
+    stop()
   }
 
   if(instrument == "XFHSmini"){
@@ -546,6 +552,19 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   return(tibbler)
 }
+
+# Check if format is in NL format.
+IsDate_NL <- function(mydate, date.format = "%d-%m-%y") {
+  tryCatch(!is.na(as.Date(mydate, date.format)),
+           error = function(err) {FALSE})
+}
+
+# Check if date is of US format.
+IsDate_US <- function(mydate, date.format = "%m/%d/%y") {
+  tryCatch(!is.na(as.Date(mydate, date.format)),
+           error = function(err) {FALSE})
+}
+
 
 # get_platelayout_data() -------------------------------------------------
 #' Get plate layout data.
