@@ -222,17 +222,31 @@ get_xf_rate <- function(filepath_seahorse){
 #' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_buffer <- function(filepath_seahorse){
+  tryCatch({
 
-  logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
+    logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
 
-  bufferfactor_info <- get_platelayout_data(filepath_seahorse,
-                                            my_sheet = "Assay Configuration",
-                                            my_range = "B96:N104",
-                                            my_param = "bufferfactor")
 
-  logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
+    bufferfactor_info <- get_platelayout_data(filepath_seahorse,
+                                              my_sheet = "Assay Configuration",
+                                              my_range = "B96:N104",
+                                              my_param = "bufferfactor")
 
-  return(bufferfactor_info)
+    check_excel_positions(meta_df, pos_vector, name_vector)
+
+    logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
+
+    return(bufferfactor_info)
+
+  # The code you want run
+  }, warning = function(war) {
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err), "\n")
+    stop()
+  }
+  )
 }
 
 # get_xf_pHcal ------------------------------------------------------------
@@ -378,6 +392,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
 }
 
+
 # get_assay_info ----------------------------------------------------
 #' Get assay information.
 #'
@@ -419,6 +434,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
                         col_names = c("parameter", "value"),
                         range = "A1:B83"
   )
+
+
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
 
 
@@ -553,18 +570,17 @@ get_xf_assayinfo <- function(filepath_seahorse,
   return(tibbler)
 }
 
-# Check if format is in NL format.
 IsDate_NL <- function(mydate, date.format = "%d-%m-%y") {
+  logger::log_info("Check if format is in NL format.")
   tryCatch(!is.na(as.Date(mydate, date.format)),
            error = function(err) {FALSE})
 }
 
-# Check if date is of US format.
 IsDate_US <- function(mydate, date.format = "%m/%d/%y") {
+  logger::log_info("Check if date is of US format.")
   tryCatch(!is.na(as.Date(mydate, date.format)),
            error = function(err) {FALSE})
 }
-
 
 # get_platelayout_data() -------------------------------------------------
 #' Get plate layout data.
@@ -700,7 +716,7 @@ get_originalRateTable <- function(filepath_seahorse){
   error = function(err) {
     cat("ERROR :", conditionMessage(err), "\n")
     log_error(conditionMessage(err), "\n")
-    break
+    stop()
   }
   )
 
@@ -821,5 +837,4 @@ read_xfplate <- function(filepath_seahorse) {
 
 
 }
-
 
