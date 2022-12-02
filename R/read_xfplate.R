@@ -232,8 +232,6 @@ get_xf_buffer <- function(filepath_seahorse){
                                               my_range = "B96:N104",
                                               my_param = "bufferfactor")
 
-    check_excel_positions(meta_df, pos_vector, name_vector)
-
     logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
 
     return(bufferfactor_info)
@@ -416,6 +414,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
                              norm_available,
                              xls_ocr_backgroundcorrected) {
 
+  tryCatch({
+
   logger::log_info("Collecting assay information")
 
   if (instrument == "XFHSmini"){
@@ -434,6 +434,13 @@ get_xf_assayinfo <- function(filepath_seahorse,
                         col_names = c("parameter", "value"),
                         range = "A1:B83"
   )
+
+  pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
+  name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
+                  "ksv", "Ksv Temp Correction", "Corrected Ksv", "Calculated FO",
+                  "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
+
+  tf <- check_excel_positions(meta_df, pos_vector, name_vector)
 
 
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
@@ -568,6 +575,15 @@ get_xf_assayinfo <- function(filepath_seahorse,
   logger::log_info("Finished collecting assay information.")
 
   return(tibbler)
+
+  # The code you want run
+}, warning = function(war) {
+  logger::log_warn(conditionMessage(war), "\n")
+},
+error = function(err) {
+  logger::log_error(conditionMessage(err))
+}
+)
 }
 
 IsDate_NL <- function(mydate, date.format = "%d-%m-%y") {
@@ -580,6 +596,29 @@ IsDate_US <- function(mydate, date.format = "%m/%d/%y") {
   logger::log_info("Check if date is of US format.")
   tryCatch(!is.na(as.Date(mydate, date.format)),
            error = function(err) {FALSE})
+}
+
+check_excel_positions <- function(df, pos_vector, name_vector){
+  logger::log_info("Check if excel df contains data name on certain position.")
+  tf_values <- mapply(function(pos_vector, name_vector) {
+    true_false <- name_vector %in% df[[1]][pos_vector]
+    if(true_false == FALSE){return(FALSE)} else{
+      return(TRUE)
+    }
+  }, pos_vector, name_vector)
+
+  tf <- check_tf_list(tf_values)
+
+  return(tf)
+}
+
+check_tf_list <- function(tf_values){
+  if(all((tf_values)) == FALSE){
+    logger::log_error("Sheet doesn't contain all values.")
+    stop()
+  } else{
+    return(TRUE)
+  }
 }
 
 # get_platelayout_data() -------------------------------------------------
