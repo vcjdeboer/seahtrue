@@ -108,9 +108,14 @@ xf_plate_pr_assay_info_rules <- validator(
   xf_plate_pr_raw_df_rules <- as.data.frame(xf_plate_pr_raw_rules)
   xf_plate_pr_assay_info_df_rules <- as.data.frame(xf_plate_pr_assay_info_rules)
 
-  # Get key (rule name) and give a specific id
-  rule_id_xf_plate_pr_raw <- add_rule_id(xf_plate_pr_raw_df_rules)
-  rule_id_xf_plate_pr_assay_info <- add_rule_id(xf_plate_pr_assay_info_df_rules)
+  # Give each rule dataframe an id to work with, required to add rule descriptions.
+  rule_id_xf_plate_pr_raw <- xf_plate_pr_raw_df_rules %>%
+    select(name) %>%
+    mutate(id = row_number())
+
+  # Create a list with key value pairs. Keys are column column values, Values are the corresponding ids.
+  # These will be used to generate the description.
+  rule_id_xf_plate_pr_raw <- setNames(as.list(rule_id_xf_plate_pr_raw$id), rule_id_xf_plate_pr_raw$name)
 
   ### Add label and description for well character rule ####
 rules_description(xf_plate_pr_raw_rules,
@@ -333,7 +338,6 @@ rules_description(xf_plate_pr_raw_rules,
                   lbl='pH_bkgd missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$ph_bkg_miss_values)
-
 
 # ###pH_em_corr_corr_bkg####
 
