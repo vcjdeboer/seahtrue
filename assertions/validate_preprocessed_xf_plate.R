@@ -117,18 +117,6 @@ xf_plate_pr_assay_info_rules <- validator(
   # These will be used to generate the description.
   rule_id_xf_plate_pr_raw <- setNames(as.list(rule_id_xf_plate_pr_raw$id), rule_id_xf_plate_pr_raw$name)
 
-  ### Add label and description for well character rule ####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl = "well character",
-                  descr = "Well must be type character",
-                  rule_id_xf_plate_pr_raw$well_character)
-
-  ### Add label and description for well field length rule ####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="well field length",
-                  descr="Well has a field length of 3.",
-                  rule_id_xf_plate_pr_raw$well_field_length)
-
   ### Add label and description for well mssing values rule ####
 rules_description(xf_plate_pr_raw_rules,
                   lbl="well_missing_values",
@@ -159,11 +147,6 @@ rules_description(xf_plate_pr_raw_rules,
 
 # ###tick####
 rules_description(xf_plate_pr_raw_rules,
-                  lbl="tick numeric",
-                  descr="Tick must be numeric.",
-                  rule_id_xf_plate_pr_raw$tick_numeric)
-
-rules_description(xf_plate_pr_raw_rules,
                   lbl="tick_min 0",
                   descr="Check if tick is minimum 0 (if it's below 0 give an error).",
                   rule_id_xf_plate_pr_raw$tick_min_0)
@@ -173,43 +156,22 @@ rules_description(xf_plate_pr_raw_rules,
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$tick_miss_val)
 
-# ###timescale####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="timescale numeric",
-                  descr="Timescale must be numeric.",
-                  rule_id_xf_plate_pr_raw$timescale_numeric)
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="timescale missing values",
-                  descr="The functions all_complete() test for missing values or combinations thereof in records.",
-                  rule_id_xf_plate_pr_raw$timescale_miss_val)
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="timescale_min_0",
-                  descr="Check if timescale has minimum of 1.",
-                  rule_id_xf_plate_pr_raw$timescale_min_0)
-
-# ###minutes####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="minutes numeric",
-                  descr="Minutes must be numeric",
-                  rule_id_xf_plate_pr_raw$minutes_numeric)
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="minutes missing values",
-                  descr="The functions all_complete() test for missing values or combinations thereof in records.",
-                  rule_id_xf_plate_pr_raw$minutes_miss_values)
-
 # ###group####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl="group character",
-                  descr="Group must be character",
-                  rule_id_xf_plate_pr_raw$group_character)
 
 rules_description(xf_plate_pr_raw_rules,
                   lbl="group missing values",
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$group_miss_values)
+
+rules_description(xf_plate_pr_raw_rules,
+                  lbl="group contains background",
+                  descr="Checks if column contains Background values.",
+                  rule_id_xf_plate_pr_raw$group_contains_background)
+
+rules_description(xf_plate_pr_raw_rules,
+                  lbl="min_group",
+                  descr="Check if column contains minimum 2 groups.",
+                  rule_id_xf_plate_pr_raw$min_group)
 
 # ###interval####
 rules_description(xf_plate_pr_raw_rules,
@@ -235,34 +197,17 @@ rules_description(xf_plate_pr_raw_rules,
 
 # ###O2_em_corr####
 rules_description(xf_plate_pr_raw_rules,
-                  lbl='O2_em_corr numeric',
-                  descr="O2_em_corr has to be numeric",
-                  rule_id_xf_plate_pr_raw$O2_em_corr_numeric)
-
-
-rules_description(xf_plate_pr_raw_rules,
                   lbl='O2_em_corr miss values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$O2_em_corr_miss_values)
 
 # ###pH_em_corr####
 rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_em_corr numeric',
-                  descr="pH_em_corr has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_numeric)
-
-rules_description(xf_plate_pr_raw_rules,
                   lbl='pH_em_corr missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$pH_em_corr_miss_values)
 
 # ###O2_mmHg####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='O2_mmHg numeric',
-                  descr="O2_mmHg has to be numeric",
-                  rule_id_xf_plate_pr_raw$O2_mmHg_numeric)
-
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='O2_mmHg missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
@@ -272,80 +217,38 @@ rules_description(xf_plate_pr_raw_rules,
 rules_description(xf_plate_pr_raw_rules,
                   lbl='pH numeric',
                   descr="pH has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_numeric)
-
+                  rule_id_xf_plate_pr_raw$pH_numeric)
 
 rules_description(xf_plate_pr_raw_rules,
                   lbl='pH missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$pH_em_corr_miss_values)
 
-# ###pH_em_corr_corr####
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_em_corr_corr numeric',
-                  descr="pH_em_corr_corr has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_corr_numeric)
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_em_corr_corr missing values',
-                  descr="The functions all_complete() test for missing values or combinations thereof in records.",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_corr_miss_values)
-
 # ###O2_em_corr_bkg####
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='O2_em_corr_bkg numeric',
-                  descr="O2_em_corr_bkg has to be numeric",
-                  rule_id_xf_plate_pr_raw$O2_em_corr_bkg_numeric)
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='O2_em_corr_bkg missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$O2_em_corr_bkg_miss_values)
 
 # ###pH_em_corr_bkg####
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_em_corr_bkg numeric',
-                  descr="pH_em_corr_bkg has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_bkg_numeric)
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='pH_em_corr_bkg missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$pH_em_corr_bkg_miss_values)
 
 # ###O2_mmHg_bkg####
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='O2_mmHg_bkg numeric',
-                  descr="O2_mmHg_bkg has to be numeric",
-                  rule_id_xf_plate_pr_raw$O2_mmHg_bkg_numeric)
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='O2_mmHg_bkg missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$O2_mmHg_bkg_miss_values)
 
 # ###pH_bkgd####
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_bkgd numeric',
-                  descr="pH_bkgd has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_bkg_numeric)
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='pH_bkgd missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$ph_bkg_miss_values)
 
 # ###pH_em_corr_corr_bkg####
-
-rules_description(xf_plate_pr_raw_rules,
-                  lbl='pH_em_corr_corr_bkg numeric',
-                  descr="pH_em_corr_corr_bk has to be numeric",
-                  rule_id_xf_plate_pr_raw$pH_em_corr_corr_bkg_numeric)
-
 rules_description(xf_plate_pr_raw_rules,
                   lbl='pH_em_corr_corr_bkg missing values',
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
