@@ -1,35 +1,21 @@
 # Create a list of data quality demands with the validator() function.
 # Rules for prepossessed seahorse data, "Raw" tibble.
 xf_plate_pr_raw_rules <- validator(
-    # Rules for well
-    well_character = is.character(well),
-    ### well_field_length = field_length(well, n=3),
     well_miss_values = all_complete(well),
     well_number = all(grepl("^[A-H](0[1-9]|1[0-1])\b$|$", well)),
 
     # Rules for measurement
-    measurement_integer = is.integer(measurement),
     measurement_min_1 = all(measurement >= 1),
     measurement_miss_values = all_complete(measurement),
 
     # Rules for tick
-    tick_numeric = is.numeric(tick),
     tick_min_0 = all(tick >= 0),
     tick_miss_values = all_complete(tick),
 
-    # Rules for timescale
-    timescale_numeric = is.numeric(timescale),
-    timescale_miss_values = all_complete(timescale),
-    timescale_min_0 = all(timescale >= 0),
-
-    # Rules for minutes
-    minutes_numeric = is.numeric(minutes),
-    # grepl("^[0-9]*.[0-9]*$", minutes)
-    minutes_miss_values = all_complete(minutes),
-
     # Rules for group
-    group_character = is.character(group),
     group_miss_values = all_complete(group),
+    group_contains_background = all(exists_any(group=="Background")),
+    min_group = length(unique(group)) > 2,
 
     # # Rules for interval
     interval_numeric = is.numeric(interval),
@@ -40,43 +26,31 @@ xf_plate_pr_raw_rules <- validator(
     injection_miss_values = all_complete(injection),
 
     # Rules for O2_em_corr
-    O2_em_corr_numeric = is.numeric(O2_em_corr),
     O2_em_corr_miss_values = all_complete(O2_em_corr),
 
     # Rules for pH_em_corr
-    pH_em_corr_numeric = is.numeric(pH_em_corr),
     pH_em_corr_miss_values = all_complete(pH_em_corr),
 
     # Rules for O2_mmHg
-    O2_mmHg_numeric = is.numeric(O2_mmHg),
     O2_mmHg_corr_miss_values = all_complete(O2_mmHg),
 
     # Rules for pH
     pH_numeric = is.numeric(pH),
     pH_miss_values = all_complete(pH),
 
-    # Rules for pH_em_corr_corr
-    pH_em_corr_corr_numeric = is.numeric(pH_em_corr_corr),
-    pH_em_corr_corr_miss_values = all_complete(pH_em_corr_corr),
-
     # # Rules for O2_em_corr_bkg
-    O2_em_corr_bkg_numeric = is.numeric(O2_em_corr_bkg),
     O2_em_corr_bkg_miss_values = all_complete(O2_em_corr_bkg),
 
     # Rules for pH_em_corr_bkg
-    pH_em_corr_bkg_numeric = is.numeric(pH_em_corr_bkg),
     pH_em_corr_bkg_miss_values = all_complete(pH_em_corr_bkg),
 
     # Rules for O2_mmHg_bkg
-    O2_mmHg_bkg_numeric = is.numeric(O2_mmHg_bkg),
     O2_mmHg_bkg_miss_values = all_complete(O2_mmHg_bkg),
 
     # Rules for pH_bkgd
-    pH_bkg_numeric = is.numeric(pH_bkgd),
     ph_bkg_miss_values = all_complete(pH_bkgd),
 
     # Rules for pH_em_corr_corr_bkg
-    pH_em_corr_corr_bkg_numeric = is.numeric(pH_em_corr_corr_bkg),
     pH_em_corr_corr_bkg_miss_values = all_complete(pH_em_corr_corr_bkg)
   )
 
