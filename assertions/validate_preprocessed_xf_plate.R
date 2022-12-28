@@ -57,69 +57,51 @@ xf_plate_pr_raw_rules <- validator(
 # Rules for prepossessed seahorse data, "assay_info" tibble.
 xf_plate_pr_assay_info_rules <- validator(
   # Rules for F0
-  F0_double = is.double(F0),
   F0_miss_values = all_complete(F0),
   F0_min_1 = F0 >= 1,
 
   # Rules for V_C
-  V_C_double = is.double(V_C),
   VC_miss_values = all_complete(V_C),
 
   # Rules for O2_targetEmission
-  O2_targetEmission_double = is.double(O2_targetEmission),
   O2_targetEmission_miss_values =  all_complete(O2_targetEmission),
 
   # Rules for Tau_AC
-  Tau_AUC_double = is.double(Tau_AC),
   Tau_AC_miss_values = all_complete(Tau_AC),
 
   # Rules for Tau_W
-  Tau_W_double = is.double(Tau_W),
   Tau_W_miss_values = all_complete(Tau_W),
 
   # Rules for Tau_C
-  Tau_C_double = is.double(Tau_C),
   Tau_C_miss_values = all_complete(Tau_C),
 
   # Rules for Tau_P
-  Tau_P_double = is.double(Tau_P),
   Tau_P_miss_values = all_complete(Tau_P),
 
   # Rules for KSV
-  KSV_double = is.double(KSV),
   KSV_miss_values = all_complete(KSV),
 
   # Rules for gain1
-  gain1_double = is.double(gain1),
   gain_miss_values = all_complete(gain1),
 
   # Rules for gain2
-  gain_2_double = is.double(gain2),
   gain_2_miss_values = all_complete(gain2),
 
   # Rules for pH_0
-  pH_0_double = is.double(pH_0),
   pH_0_miss_values = all_complete(pH_0),
 
   # Rules for pH_targetEmission
-  pH_targetEmission_double = is.double(pH_targetEmission),
   pH_targetEmission_miss_values = all_complete(pH_targetEmission),
 
   # Rules for plate_id
-  plate_id_character = is.character(plate_id),
   plate_id_miss_values = all_complete(plate_id),
 
   # Rules for pH_targetEmission
-  pH_targetEmission_double = is.double(pH_targetEmission),
   pH_targetEmission_miss_values = all_complete(pH_targetEmission),
 
   # Rules for O2_0_mmHg
-  O2_0_mmHg_double = is.double(O2_0_mmHg),
   O2_0_mmHg_miss_values = all_complete(O2_0_mmHg),
 
-  # Rules for O2_0_mM
-  O2_0_mM_double = is.double(O2_0_mM),
-  O2_0_mM_miss_values = all_complete(O2_0_mM)
 )
 
   # Create a dataframe with rules
