@@ -813,9 +813,7 @@ read_xfplate <- function(filepath_seahorse) {
 
       logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
 
-      seahorse_sheets <- list("Assay Configuration", "Rate", "Rate (Columns)", "Rate (Plates)",
-                              "Baselined Rate", "Baselined Rate (Columns)", "Baselined Rate (Plates)",
-                              "Raw", "Calibration", "Operation Log")
+      seahorse_sheets <- list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log")
 
       logger::log_info("Defined seahorse sheet {seahorse_sheets}")
 
