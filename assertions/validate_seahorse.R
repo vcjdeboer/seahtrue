@@ -120,3 +120,20 @@ get_val_name <- function(xf_plate_pr){
   }
   )
 }
+
+# export rules to yaml file.
+export_val_yaml <- function(rules, yaml_rule_name){
+  out <- tryCatch(
+    {
+  validate::export_yaml(rules, file=here::here("assertions", glue::glue("{yaml_rule_name}.yaml")))
+    },
+  warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    cat("ERROR :", conditionMessage(err), "\n")
+    log_error(conditionMessage(err), "\n")
+  }
+  )
+}
