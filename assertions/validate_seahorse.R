@@ -101,6 +101,7 @@ rules_description <- function(rules, lbl, descr, id){
 get_val_name <- function(xf_plate_pr){
     out <- tryCatch(
       {
+    logger::log_info("Get name for yaml file and pdf validation file.")
     xf_pr = xf_plate_pr %>%
       substitute(.) %>%
       deparse(.)
@@ -125,6 +126,7 @@ get_val_name <- function(xf_plate_pr){
 export_val_yaml <- function(rules, yaml_rule_name){
   out <- tryCatch(
     {
+  logger::log_info("Export rules to yaml file, using corresponding unique names.")
   validate::export_yaml(rules, file=here::here("assertions", glue::glue("{yaml_rule_name}.yaml")))
     },
   warning = function(war) {
