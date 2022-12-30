@@ -1,7 +1,3 @@
-library(methods)
-library(logger)
-# source("scripts/organise/organise.R")
-
 #' Validate.R contains functions to validate the Seahorse (Excel) data.
 #' For checking whether a data set meets presumptions or expectations.
 #'
