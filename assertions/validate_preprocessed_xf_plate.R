@@ -100,7 +100,7 @@ xf_plate_pr_assay_info_rules <- validator(
   pH_targetEmission_miss_values = all_complete(pH_targetEmission),
 
   # Rules for O2_0_mmHg
-  O2_0_mmHg_miss_values = all_complete(O2_0_mmHg),
+  O2_0_mmHg_miss_values = all_complete(O2_0_mmHg)
 
 )
 
@@ -258,7 +258,7 @@ rules_description(xf_plate_pr_raw_rules,
 #'
 #' @param xf_plate_pr A preprocessed "Raw" data list (tibble).
 #' @description Check the preprocessed "Raw" data list against validation rules.
-#' @return TRUE when all validation steps pass. FALSE when there is a failure.
+#' @return Validation dataframe to check if sheet meets validation criteria.
 #'
 #' @examples validate_xf_plate_pr(xf_plate_pr)
 
@@ -266,17 +266,17 @@ validate_xf_plate_pr <- function(xf_plate_pr){
   tryCatch({
       if (exists("xf_plate_pr") && is.data.frame(get("xf_plate_pr")) == TRUE) {
 
+        # Source current script.
         source(rstudioapi::getSourceEditorContext()$path)
 
         logger::log_info("get name for yaml file and pdf validation file.")
 
+        # Get unique names to store rule sets in yaml file.
         val_name_list <- get_val_name(xf_plate_pr)
-        val_yaml_xf_pr_raw <- val_name_list[1]
-        val_yaml_xf_pr_assay_info <- val_name_list[2]
 
-        logger::log_info("export rules to yaml file.")
-        export_yaml(xf_plate_pr_raw_rules, file=here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")))
-        export_yaml(xf_plate_pr_assay_info_rules ,file=here::here("assertions", glue::glue("{val_yaml_xf_pr_assay_info}.yaml")))
+        # Export rules to yaml file, using corresponding unique names."
+        export_val_yaml(xf_plate_pr_raw_rules, val_name_list[1])
+        export_val_yaml(xf_plate_pr_assay_info_rules, val_name_list[2])
 
         raw_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")),
                                                      xf_plate_pr$raw_data[[1]])
@@ -284,47 +284,34 @@ validate_xf_plate_pr <- function(xf_plate_pr){
                                                      xf_plate_pr$assay_info[[1]])
 
         logger::log_info("check if plate_id is right format")
-        plate_id_rules <- validator(grepl("^V[0-9]{10}V$", plate_id))
+        plate_id_rules <- validate::validator(grepl("^V[0-9]{10}V$", plate_id))
         plate_id_validation_output <- validate::confront(xf_plate_pr, plate_id_rules)
 
+        # Collect all summary information.
         validation_summary_raw <- summarise_out(raw_validation_output)
         validation_summary_assay_info <- summarise_out(assay_info_validation_output)
         validation_plate_id_rules <- summarise_out(plate_id_validation_output)
 
-        plot_validation_output(raw_validation_output,
-                               here::here("assertions",
-                                          glue::glue("{val_yaml_xf_pr_raw}.pdf")))
-        plot_validation_output(assay_info_validation_output,
-                               here::here("assertions",
-                                          glue::glue("{val_yaml_xf_pr_assay_info}.pdf")))
-
-
-        # collect all information and put in list.
-        validate_xf_plate_pr_list = list()
-        validate_xf_plate_pr_list[[ "assay_info_pr_val" ]] <- list(meta(xf_plate_pr_assay_info_rules),
-                                                                   summary(xf_plate_pr_assay_info_rules))
-
-        validate_xf_plate_pr_list[[ "raw_pr_val" ]] <- list(meta(xf_plate_pr_raw_rules),
-                                                            summary(xf_plate_pr_raw_rules))
-
-
+        # Put summary in key value list.
         validation_summary_list <- list(validation_plate_id_rules,
                                         validation_summary_raw,
                                         validation_summary_assay_info)
 
-        logger::log_info("Check if no validation failures occur")
-        val_true_false <- c()
-        for(summary in validation_summary_list){
-          check_all_true <- check_all_true(summary)
-          check_all_true <- all(check_all_true)
-          val_true_false <- append(val_true_false, check_all_true)
-        }
+        validation_summary_list2 <- list()
+        validation_summary_list2[[ "Raw" ]] <- validation_summary_raw
+        validation_summary_list2[[ "Assay information" ]] <- validation_summary_assay_info
+        validation_summary_list2[["Plate id"]] <- validation_plate_id_rules
 
-        # can be true or false, depending on validation failures.
-        validation_pass <- as.logical(all(val_true_false))
+        # loop over key value list with summary information
+        # add True or FALSE based on passes and failures.
+        check_val_pass <- function(key,value) all(check_all_true(value))
 
-        logger::log_info(glue::glue("Validation failures don't exist for sheet : {validation_pass}"))
-        return(validation_pass)
+        validation_pass <- mapply(check_val_pass, key=names(validation_summary_list2), value=validation_summary_list2)
+
+        # Validation with passes and failures to dataframe.
+        pass_val_checks <- as.data.frame(validation_pass)
+
+        return(pass_val_checks)
       }
     },
 
