@@ -771,7 +771,7 @@ get_originalRateTable <- function(filepath_seahorse){
 #' @return TRUE when all input sheets exist. FALSE when sheets are missing.
 #'
 #' @examples
-#' check_excel_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration", "Rate"))
+#' check_excel_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
 check_excel_sheets <- function(filepath_seahorse, sheets){
   logger::log_info(glue::glue("Checking excel sheets for file: {filepath_seahorse}"))
 
