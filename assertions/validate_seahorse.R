@@ -79,17 +79,6 @@ summarise_out <- function(validation_output) {
   )
 }
 
-# Get key (rule name) and give a specific id
-add_rule_id <- function(rule_df){
-  rule_id <- list()
-  id = 0
-  for(value in rule_df$name){
-    id = id + 1
-    rule_id[[ value ]] <- id
-  }
-  return(rule_id)
-}
-
 ### Add label and description to rules ####
 rules_description <- function(rules, lbl, descr, id){
   validate::label(rules[id]) <- lbl
