@@ -136,8 +136,8 @@ for (rda_file in filepath){
     })
 
     test_that("type date", {
-      expect_type(xf_plate_pr$date, "date-time") # datetime must be double?
-      expect_type(xf_plate_pr$assay_info[[1]]$date_run, "date-time")
+      expect_type(xf_plate_pr$date, "double")
+      expect_type(xf_plate_pr$assay_info[[1]]$date_run, "double")
     })
 
   test_that("type logical or double", {
