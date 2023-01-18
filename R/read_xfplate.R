@@ -49,7 +49,6 @@ get_xf_raw <- function(filepath_seahorse){
 
     return(xf_raw)
 
-  # The code you want run
   }, warning = function(war) {
     logger::log_warn(conditionMessage(war), "\n")
   },
@@ -168,7 +167,6 @@ get_xf_flagged <- function(filepath_seahorse){
 
     return(flagged_vector)
 
-  # The code you want run
   }, warning = function(war) {
     logger::log_warn(conditionMessage(war), "\n")
   },
@@ -236,7 +234,6 @@ get_xf_buffer <- function(filepath_seahorse){
 
     return(bufferfactor_info)
 
-  # The code you want run
   }, warning = function(war) {
     logger::log_warn(conditionMessage(war), "\n")
   },
@@ -575,7 +572,6 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   return(tibbler)
 
-  # The code you want run
 }, warning = function(war) {
   logger::log_warn(conditionMessage(war), "\n")
 },
@@ -665,7 +661,6 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 
      return(df)
 
-    # The code you want run
   }, warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
     logger::log_warn(conditionMessage(war), "\n")
@@ -859,7 +854,6 @@ read_xfplate <- function(filepath_seahorse) {
       logger::log_error("The excel file doens't contain all seahorse sheets.")
     }
 
-  # The code you want run
   }, warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
     logger::log_warn(conditionMessage(war), "\n")
