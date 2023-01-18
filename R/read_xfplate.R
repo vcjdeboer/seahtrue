@@ -405,11 +405,11 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' @return List (tibble) with assay information.
 #'
 #' @examples
-#' get_xf_assayinfo(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
+#' get_xf_assayinfo(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
+#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
 get_xf_assayinfo <- function(filepath_seahorse,
-                             date_style = "US",
+                             date_style = "empty",
                              instrument = "XFe96",
                              norm_available,
                              xls_ocr_backgroundcorrected) {
@@ -499,23 +499,22 @@ get_xf_assayinfo <- function(filepath_seahorse,
   O2_0_mmHg <- 151.6900241
   O2_0_mM <- 0.214
 
-  logger::log_info("Checking date formats.")
-  date_time <- meta_df$value[meta_df$parameter == "Last Run"]
-
-  date <- strsplit(meta_df$value[meta_df$parameter == "Last Run"], " +")[[1]][1]
-  time <- strsplit(meta_df$value[meta_df$parameter == "Last Run"], " +")[[1]][2:3]
-
-  if (IsDate_US(date) == "TRUE" & isTRUE(time[2] == "AM" || isTRUE(time[2] == "PM"))) {
-    logger::log_info(glue::glue("A date {date_time} was detected, in US format."))
+  if (date_style == "US"){
     date_run <- lubridate::mdy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    logger::log_info(glue::glue("Date {date_time} converted to {date_run}"))
-  } else if (IsDate_NL(date) == "TRUE") {
-    logger::log_info(glue::glue("A date {date_time} was detected, in NL format."))
+    logger::log_info("Converted date to US format.") # (Date-time column)
+    #be carefull with the data format in excel! either mdy or dmy
+  }
+
+  if (date_style == "NL"){
     date_run <- lubridate::dmy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    logger::log_info(glue::glue("Date {date_time} converted to {date_run}"))
-  } else {
-    logger::log_error(glue::glue("Wrong date {date}"))
-    stop()
+    logger::log_info("Converted date to US format.") # (Date-time column)
+    #be carefull with the data format in excel! either mdy or dmy
+  }
+
+  if (date_style == "empty"){
+    date_run <- meta_df$value[meta_df$parameter == "Last Run"] # (Character instead of date-time column)
+    logger::log_info("Date-style is empty, no date conversion was performed.")
+    #be carefull with the data format in excel! either mdy or dmy
   }
 
   if(instrument == "XFHSmini"){
