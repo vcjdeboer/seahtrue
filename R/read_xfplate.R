@@ -829,10 +829,8 @@ check_sheets <- function(filepath_excel, sheets_predicted, call = caller_env()){
 
     excel_sheets <- readxl::excel_sheets(filepath_excel)
 
-    counter = 0
     for (value in sheets_predicted) {
       x <- sheets_predicted[[2]]
-      counter = counter + 1
       stopifnot(value %in% excel_sheets)
     }
 
