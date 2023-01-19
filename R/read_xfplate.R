@@ -17,9 +17,8 @@
 #' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 
 get_xf_raw <- function(filepath_seahorse){
-  tryCatch({
     logger::log_info("Collecting data from 'Raw' sheet")
-
+  tryCatch({
     xf_raw <- readxl::read_excel(filepath_seahorse,
                          sheet = "Raw",
                          col_types = c("numeric", # Measurment
@@ -54,11 +53,10 @@ get_xf_raw <- function(filepath_seahorse){
   },
   error = function(err) {
     logger::log_error(conditionMessage(err), "\n")
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
     stop()
-
   }
   )
+
 }
 
 # get_xf_norm -------------------------------------------------------------
@@ -77,7 +75,7 @@ get_xf_raw <- function(filepath_seahorse){
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_norm <- function(filepath_seahorse){
-  tryCatch({
+  try_fetch({
     logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
 
     norm_info <- get_platelayout_data(filepath_seahorse,
@@ -805,18 +803,12 @@ read_xfplate <- function(filepath_seahorse) {
 
   tryCatch({
 
-      logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
+    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
 
-      seahorse_sheets <- list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log")
+      check_required(filepath_seahorse)
+      path_not_found(filepath_seahorse)
+      check_sheets(filepath_seahorse, list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
 
-      logger::log_info("Defined seahorse sheet {seahorse_sheets}")
-
-      sheets_exist <- check_excel_sheets(filepath_seahorse, seahorse_sheets)
-
-      logger::log_info(glue::glue("Check sheets against excel file: {filepath_seahorse}"))
-      logger::log_info(glue::glue("Sheets exist: {sheets_exist}"))
-
-      if(sheets_exist == TRUE){
       #read data
       xf_raw <- get_xf_raw(filepath_seahorse)
       xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
@@ -850,21 +842,49 @@ read_xfplate <- function(filepath_seahorse) {
 
       return(xf)
 
-    } else{
-      logger::log_error("The excel file doens't contain all seahorse sheets.")
-    }
 
   }, warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
     logger::log_warn(conditionMessage(war), "\n")
   },
   error = function(err) {
-    cat("ERROR :", conditionMessage(err), "\n")
-    logger::log_error(conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err))
     logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
   }
   )
 
-
 }
 
+path_not_found <- function(file_path, call = caller_env()){
+  try_fetch({
+    logger::log_info(glue::glue("Check if file {file_path} exist."))
+    read_excel(file_path)
+  },
+  error = function(cnd) {
+    cli::cli_abort("Can't find path to excel file.", parent = cnd, call = call)
+    cli::cli_alert_info("Check path to excel file.")
+  }
+  )
+}
+
+check_sheets <- function(filepath_excel, sheets_predicted, call = caller_env()){
+  try_fetch({
+    logger::log_info(glue::glue("Checking excel sheets for file: {filepath_excel}"))
+
+    excel_sheets <- readxl::excel_sheets(filepath_excel)
+
+    counter = 0
+    for (value in sheets_predicted) {
+      x <- sheets_predicted[[2]]
+      counter = counter + 1
+      stopifnot(value %in% excel_sheets)
+    }
+
+    logger::log_info(glue::glue("Cheets exists."))
+  },
+  error = function(cnd) {
+    cli::cli_abort("Can't find sheet {x}.", parent = cnd, call = call)
+    cli::cli_alert_info("Check your excel file.")
+  }
+  )
+}
