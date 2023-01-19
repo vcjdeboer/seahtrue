@@ -579,18 +579,6 @@ error = function(err) {
 )
 }
 
-IsDate_NL <- function(mydate, date.format = "%d-%m-%y") {
-  logger::log_info("Check if format is in NL format.")
-  tryCatch(!is.na(as.Date(mydate, date.format)),
-           error = function(err) {FALSE})
-}
-
-IsDate_US <- function(mydate, date.format = "%m/%d/%y") {
-  logger::log_info("Check if date is of US format.")
-  tryCatch(!is.na(as.Date(mydate, date.format)),
-           error = function(err) {FALSE})
-}
-
 check_excel_positions <- function(df, pos_vector, name_vector){
   logger::log_info("Check if excel df contains data name on certain position.")
   tf_values <- mapply(function(pos_vector, name_vector) {
