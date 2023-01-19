@@ -753,38 +753,6 @@ get_originalRateTable <- function(filepath_seahorse){
 
 }
 
-# Check if sheets exists in excel file.
-#'
-#' @param filepath_seahorse: Absolute path to the Seahorse Excel file.
-#' This Excel file is converted from the assay result file (.asyr) downloaded from
-#' the Agilent Seahorse XF Wave software.
-#' @param sheets list of sheet to check against the seahorse excel file.
-#'
-#' @return TRUE when all input sheets exist. FALSE when sheets are missing.
-#'
-#' @examples
-#' check_excel_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
-check_excel_sheets <- function(filepath_seahorse, sheets){
-  logger::log_info(glue::glue("Checking excel sheets for file: {filepath_seahorse}"))
-
-  excel_sheets <- readxl::excel_sheets(filepath_seahorse)
-
-  sheet_exist = c()
-
-  for(sheet in sheets){
-    if (sheet %in% excel_sheets) {
-      sheet_exist <- append(sheet_exist, TRUE)
-    }
-    else {
-      sheet_exist <- append(sheet_exist, FALSE)
-    }
-  }
-
-  sheet_exist <- as.logical(all(sheet_exist))
-
-  return(sheet_exist)
-}
-
 # read_xfplate() -------------------------------------------------------
 #' Read necessary Seahorse plate data from Seahorse Excel file.
 #'
