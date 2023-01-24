@@ -1,0 +1,160 @@
+---
+title: "Calculate background reference"
+output: html_document
+date: "2023-01-23"
+---
+
+## Setup
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Source code from other .R scripts.
+source(here::here("R", "process_background_wells.R"))
+source(here::here("R", "preprocess_xfplate.R"))
+source(here::here("R", "read_xfplate.R"))
+
+library(bayestestR)
+library(tidyverse)
+
+```
+
+**Path**: <br />
+Set path to the seahorse excel file.
+
+**File location**: <br />
+The $\color{red}{\text{here}}$ function from the here package makes sure that the file location is relative to your project root.
+
+```{r set_path_to_seahorse_file}
+
+filepath_seahorse <- paste0(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+
+```
+
+## Get background area under curve.
+
+This is a quality control function for "Background" references.
+
+**Usage**: <br />
+Provide a **path to seahorse file** that has only **medium samples**. <br />
+
+**Medium samples**: <br />
+- Samples contain only culture medium. <br />
+- Derived from culture medium plate experiment or historic data. <br />
+- Typically this is a seahorse run similar to the experimental run (with same injection strategy).
+
+```{r get_bkg_area_under_curve}
+  # read xf plate with path.
+my_qc_ref <- read_xfplate(filepath_seahorse) %>% 
+  # preprocess script.
+  preprocess_xfplate() %>%
+  # get the raw dataframe.
+  dplyr::pull(raw_data) %>%
+  # with pluck you get inside the tibble.
+  purrr::pluck(1) %>%
+  # filter on background groups.
+  dplyr::filter(group == "Background") %>%
+  # execute function to get background area under curve.
+  get_BKGD_auc(
+    total_df = .,
+    var = "O2_em_corr",
+    targetEMS = 12500
+  )
+
+print(my_qc_ref)
+```
+
+### Table 1: Are Under Curve. 
+Table 1 shows the following data: <br />
+1. **Area Under Curve 1** (AUC 1) <br />
+2. **Area Under Curve 2** (AUC 2) <br />
+Using the "trapezoid" method, the curves are formed by connecting all points by a direct line (composite trapezoid rule). <br />
+3. **The deviation from target Fluorescence Emission**: <br />
+12500 (Au)
+
+This is done for **each measurement**.
+
+## Get well and plate stats
+
+Calculate the plate and well stats. <br />
+Summarize these stats with $\color{red}{\text{skimr}}$.
+
+```{r calculate_qc_ref}
+
+calculate_qc_ref <- function(my_qc_ref_df){
+  #calculate plate stats
+  plate_stats <- my_qc_ref_df %>%
+    summarize(Maximum = max(dev_fromTarget),
+              Minimum = min(dev_fromTarget),
+              'Range(F-L)' = Maximum-Minimum)
+
+  #calculate well stats
+  well_stats <- my_qc_ref_df %>%
+    group_by(well) %>%
+    summarize(Maximum = max(dev_fromTarget),
+              Minimum = min(dev_fromTarget),
+              First = first(dev_fromTarget),
+              Last = last(dev_fromTarget),
+              'Range(M-M)' = Maximum-Minimum,
+              'Range(F-L)' = Last-First)
+
+  #adjusted skim function
+  my_skim <- skimr::skim_with(numeric = skimr::sfl(iqr = IQR,
+                                                   p0 = NULL,
+                                                   p50 = NULL,
+                                                   p100 = NULL,
+                                                   mean = NULL,
+                                                   sd = NULL,
+                                                   hist = NULL))
+
+  #get the stats for the complete PBMC dataset - plate stats
+  qc_plate <- my_skim(plate_stats) %>%
+    skimr::yank("numeric") %>%
+    tibble::as_tibble()
+
+  #get the stats for the complete PBMC dataset - well stats
+  qc_well <- well_stats %>%
+    ungroup() %>%
+    select(-well) %>%
+    my_skim() %>%
+    skimr::yank("numeric") %>%
+    tibble::as_tibble()
+
+  qc_ref_list <- list(qc_well = qc_well,
+                      qc_plate = qc_plate)
+
+  return(qc_ref_list)
+
+}
+
+my_qc_ref <- calculate_qc_ref(my_qc_ref)
+
+```
+
+
+### Table 2: Well stats
+```{r well_stats}
+print(my_qc_ref[1])
+```
+
+This table shows a **summary** of **well statistics**, created by skimr.
+
+### Table 3: Plate stats
+```{r plate stats}
+print(my_qc_ref[2])
+```
+
+This table shows a **summary** of **plate statistics**, created by skimr.
+
+## Save well and plate stats
+
+```{r save_well_stats}
+qc_well_ref_PBMC <- my_qc_ref[1]
+usethis::use_data(qc_well_ref_PBMC, 
+                  overwrite = 'TRUE')
+```
+```{r save_plate_stats}
+qc_plate_ref_PBMC <- my_qc_ref[2]
+usethis::use_data(qc_plate_ref_PBMC, 
+                  overwrite = 'TRUE')
+```
