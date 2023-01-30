@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(dplyr)
 ```
 
 ## R Markdown
@@ -46,8 +47,7 @@ source(here::here("R", "process_background_wells.R"))
 **Load dataset 1**: Plate stats
 ```{r load_plate_stats}
 load(here::here("data", "qc_plate_ref_PBMC.rda"))
-data("qc_plate_ref_PBMC", envir = environment())
-my_qc_plate_ref <- qc_plate_ref_PBMC
+my_qc_plate_ref <- qc_plate_ref_PBMC[[1]]
 
 print(my_qc_plate_ref)
 ```
@@ -55,8 +55,7 @@ print(my_qc_plate_ref)
 ```{r load_well_stats}
 load(here::here("data", "qc_well_ref_PBMC.rda"))
 
-data("qc_well_ref_PBMC", envir = environment())
-my_qc_well_ref <-qc_well_ref_PBMC
+my_qc_well_ref <- qc_well_ref_PBMC[[1]]
 
 print(my_qc_well_ref)
 ```
@@ -79,7 +78,6 @@ preprocessed seahorse xf plate  <br />
 
 Flag background wells based on score. 
 ```{r flaged_bkgd_wells, echo=FALSE}
-
 flag_bkgd_wells <- function(well_scores, score_cutoff) {
   well_scores <- well_scores %>%
     dplyr::mutate(
@@ -96,30 +94,32 @@ flag_bkgd_wells <- function(well_scores, score_cutoff) {
 
   return(flagged_bkgd_wells)
 }
-
 ```
 
 ```{r set_flagged_wells, echo=FALSE}
-  # calculate scores and flagged wells
-  qc_scores <- get_bkgd_qc_scores(
-    xf_plate_pr %>%
-      dplyr::pull(raw_data) %>%
-      purrr::pluck(1),
-    my_qc_well_ref,
-    my_qc_plate_ref
-  )
+my_qc_well_ref <-qc_well_ref_PBMC
+my_qc_plate_ref <-qc_plate_ref_PBMC
 
-  O2_flagged_bkgd_wells <- flag_bkgd_wells(qc_scores$well_scores,
-    score_cutoff = 10
-  )
-  
-  # add flagged wells to assay info
-  assay_info_list <- as.list(preprocessed_xfplate$assay_info[[1]])
-  assay_info_list <- assay_info_list %>%
-    purrr::list_merge(O2_flagged_bkgd_wells = O2_flagged_bkgd_wells)
+# calculate scores and flagged wells
+qc_scores <- get_bkgd_qc_scores(
+  xf_plate_pr %>%
+    dplyr::pull(raw_data) %>%
+    purrr::pluck(1),
+  my_qc_well_ref[[1]],
+  my_qc_plate_ref[[1]]
+)
 
-  preprocessed_xfplate$assay_info <- list(assay_info_list)
+O2_flagged_bkgd_wells <- flag_bkgd_wells(qc_scores$well_scores,
+  score_cutoff = 10
+)
+
+print(O2_flagged_bkgd_wells)
+
+# add flagged wells to assay info
+assay_info_list <- as.list(xf_plate_pr$assay_info[[1]])
+assay_info_list <- assay_info_list %>%
+  purrr::list_merge(O2_flagged_bkgd_wells = O2_flagged_bkgd_wells)
+
+xf_plate_pr$assay_info <- list(assay_info_list)
 
 ```
-
-
