@@ -191,3 +191,11 @@ get_score <- function(df, qc, var){
   return(score)
 }
 
+
+get_plate_scores <- function(df, qc_plate){
+  df$max_score <- get_score(df, qc_plate, "Maximum")
+  df$min_score <- get_score(df, qc_plate, "Minimum")
+  df$rangeFL_score <- get_score(df, qc_plate, "Range(F-L)")
+  df$total_score <- df$max_score + df$min_score +df$rangeFL_score
+  return(df)
+}
