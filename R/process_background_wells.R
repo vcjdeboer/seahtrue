@@ -78,7 +78,15 @@ get_BKGD_auc <- function(total_df, var, targetEMS) {
   return(AUC_bkgd)
 }
 
-get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref, score_cutoff) {
+#' Get background quality scores.
+#'
+#' @param my_plate_df The preprocessed Raw data sheet of the Seahorse Excel file (converted from .asyr)
+#' @param qc_well_ref The stats for the complete PBMC dataset - well stats
+#' @param qc_plate_ref The stats for the complete PBMC dataset - plate stats.
+#'
+#' @return list with well scores and plate scores.
+#'
+get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref) {
 
   #calculate auc, auc2 and dev_from_target for Group Background
   bkgd_qc_target <- get_BKGD_auc(my_plate_df,
@@ -106,9 +114,11 @@ get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref, score_cut
     dplyr::ungroup() %>%
     dplyr::select(well,total_score) #minimum score = 6 -> max = 18
 
+
   #calculate scores for wells
   plate_scores_target <- get_plate_scores(qc_plate_target, qc_plate_ref) %>%
     dplyr::select(total_score) #minimum score = 3 -> max = 9
+
 
   #generate output list
   total_score_output_list <- list(ref_bkgd_qc = "qc_well_ref_PBMC", #this should be the name of the ref set
@@ -119,6 +129,12 @@ get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref, score_cut
 
 }
 
+#' Getting well scores
+#'
+#' @param df Stat summaries for NEW PLATES - well
+#' @param qc_well The stats for the complete PBMC dataset - well stats
+#'
+#' @return df with scores
 get_well_scores <- function(df, qc_well){
 
   df$max_score <-  0
@@ -165,7 +181,13 @@ get_well_scores <- function(df, qc_well){
 }
 
 
-#functions for calculating the scores per plate
+# Functions for calculating the scores per plate.
+#'
+#' @param df Stat summaries for NEW PLATES - well
+#' @param qc The stats for the complete PBMC dataset - well stats
+#' @param var Name of the variable
+#'
+#' @return scores per plate
 get_score <- function(df, qc, var){
 
   qc <- qc %>% dplyr::filter(skim_variable == var)
@@ -174,7 +196,7 @@ get_score <- function(df, qc, var){
   iqr <- qc$iqr[[1]]
 
   x <- df %>%
-    dplyr::dplyr::pull(all_of(var))
+    dplyr::pull(all_of(var))
 
   score = 3
   if(dplyr::between(x, Q25, Q75)){
@@ -192,6 +214,13 @@ get_score <- function(df, qc, var){
 }
 
 
+#' Getting plate scores
+#'
+#' @param df Stat summaries for NEW PLATES - well.
+#' @param qc_plate The stats for the complete PBMC dataset - plate stats.
+#'
+#' @return df with scores
+#'
 get_plate_scores <- function(df, qc_plate){
   df$max_score <- get_score(df, qc_plate, "Maximum")
   df$min_score <- get_score(df, qc_plate, "Minimum")
