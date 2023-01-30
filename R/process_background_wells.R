@@ -118,3 +118,49 @@ get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref, score_cut
   return(total_score_output_list)
 
 }
+
+get_well_scores <- function(df, qc_well){
+
+  df$max_score <-  0
+  df$min_score <-  0
+  df$rangeFL_score <-  0
+  df$first_score <-  0
+  df$last_score <-  0
+  df$rangeMM_score <-  0
+
+  for(w in 1:nrow(df)){
+    df$max_score[w] <- get_score(df %>% slice(w),
+                                 qc_well,
+                                 "Maximum")
+
+    df$min_score[w] <- get_score(df %>% slice(w),
+                                 qc_well,
+                                 "Minimum")
+
+    df$rangeFL_score[w] <- get_score(df %>% slice(w),
+                                     qc_well,
+                                     "Range(F-L)")
+
+    df$first_score[w] <- get_score(df %>% slice(w),
+                                   qc_well,
+                                   "First")
+
+    df$last_score[w] <- get_score(df %>% slice(w),
+                                  qc_well,
+                                  "Last")
+
+    df$rangeMM_score[w] <- get_score(df %>% slice(w),
+                                     qc_well,
+                                     "Range(M-M)")
+  }
+  df$total_score <- df$max_score +
+    df$min_score +
+    df$rangeFL_score +
+    df$first_score +
+    df$last_score +
+    df$rangeMM_score
+
+  return(df)
+
+}
+
