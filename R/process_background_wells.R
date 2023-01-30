@@ -164,3 +164,30 @@ get_well_scores <- function(df, qc_well){
 
 }
 
+
+#functions for calculating the scores per plate
+get_score <- function(df, qc, var){
+
+  qc <- qc %>% dplyr::filter(skim_variable == var)
+  Q25 <- qc$p25[[1]]
+  Q75 <- qc$p75[[1]]
+  iqr <- qc$iqr[[1]]
+
+  x <- df %>%
+    dplyr::dplyr::pull(all_of(var))
+
+  score = 3
+  if(dplyr::between(x, Q25, Q75)){
+    score = 1
+  }
+  if(dplyr::between(x,
+                    Q25-1.5*iqr,
+                    Q25) |
+     dplyr::between(x,
+                    Q75,Q75 +
+                    1.5*iqr)){
+    score = 2
+  }
+  return(score)
+}
+
