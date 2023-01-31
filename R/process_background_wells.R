@@ -228,3 +228,29 @@ get_plate_scores <- function(df, qc_plate){
   df$total_score <- df$max_score + df$min_score +df$rangeFL_score
   return(df)
 }
+
+
+calc_background_O2_col <- function(plate_df, O2_flagged_bkgd_wells){
+
+  background_O2 <- plate_df %>%
+    dplyr::select(group,
+                  well,
+                  measurement,
+                  timescale,
+                  O2_em_corr,
+                  O2_mmHg) %>%
+    dplyr::filter(!well %in% O2_flagged_bkgd_wells) %>%
+    dplyr::filter(group == "Background") %>%
+    dplyr::group_by(measurement,
+                    timescale) %>%
+    dplyr::summarize(
+      O2_em_corr_bkg = mean(O2_em_corr),
+      O2_mmHg_bkg = mean(O2_mmHg),
+    )
+
+  plate_df <- plate_df %>%
+    dplyr::left_join(background_O2, by = c("measurement", "timescale"))
+
+
+  return(plate_df$O2_em_corr_bkg)
+}
