@@ -254,6 +254,8 @@ rules_description(xf_plate_pr_raw_rules,
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",
                   rule_id_xf_plate_pr_raw$pH_em_corr_corr_bkg_miss_values)
 
+
+
 #' Validate preprocessed data.
 #'
 #' @param xf_plate_pr A preprocessed "Raw" data list (tibble).
@@ -264,70 +266,78 @@ rules_description(xf_plate_pr_raw_rules,
 
 validate_xf_plate_pr <- function(xf_plate_pr){
   tryCatch({
-      if (exists("xf_plate_pr") && is.data.frame(get("xf_plate_pr")) == TRUE) {
+    if (exists("xf_plate_pr") && is.data.frame(get("xf_plate_pr")) == TRUE) {
 
-        # Source current script.
-        source(rstudioapi::getSourceEditorContext()$path)
+      logger::log_info("get name for yaml file and pdf validation file.")
 
-        logger::log_info("get name for yaml file and pdf validation file.")
+      val_name_list <- get_val_name(xf_plate_pr)
+      val_yaml_xf_pr_raw <- val_name_list[1]
+      val_yaml_xf_pr_assay_info <- val_name_list[2]
 
-        # Get unique names to store rule sets in yaml file.
-        val_name_list <- get_val_name(xf_plate_pr)
+      logger::log_info("export rules to yaml file.")
+      export_yaml(xf_plate_pr_raw_rules,
+                  file=here::here("assertions",
+                                  glue::glue("{val_yaml_xf_pr_raw}.yaml")))
 
-        # Export rules to yaml file, using corresponding unique names."
-        export_val_yaml(xf_plate_pr_raw_rules, val_name_list[1])
-        export_val_yaml(xf_plate_pr_assay_info_rules, val_name_list[2])
+      export_yaml(xf_plate_pr_assay_info_rules ,
+                  file=here::here("assertions",
+                                  glue::glue("{val_yaml_xf_pr_assay_info}.yaml")))
 
-        raw_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")),
-                                                     xf_plate_pr$raw_data[[1]])
-        assay_info_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_assay_info}.yaml")),
-                                                     xf_plate_pr$assay_info[[1]])
+      raw_validation_output <- validate_yaml_rules(here::here("assertions", glue::glue("{val_yaml_xf_pr_raw}.yaml")),
+                                                   data$raw_data[[1]])
 
-        logger::log_info("check if plate_id is right format")
-        plate_id_rules <- validate::validator(grepl("^V[0-9]{10}V$", plate_id))
-        plate_id_validation_output <- validate::confront(xf_plate_pr, plate_id_rules)
+      assay_info_validation_output <- validate_yaml_rules(here::here("assertions",
+                                                                     glue::glue("{val_yaml_xf_pr_assay_info}.yaml")),
+                                                          data$assay_info[[1]])
 
-        # Collect all summary information.
-        validation_summary_raw <- summarise_out(raw_validation_output)
-        validation_summary_assay_info <- summarise_out(assay_info_validation_output)
-        validation_plate_id_rules <- summarise_out(plate_id_validation_output)
 
-        # Put summary in key value list.
-        validation_summary_list <- list(validation_plate_id_rules,
-                                        validation_summary_raw,
-                                        validation_summary_assay_info)
+      logger::log_info("check if plate_id is right format")
+      plate_id_rules <- validator(grepl("^V[0-9]{10}V$", plate_id))
+      plate_id_validation_output <- validate::confront(data, plate_id_rules)
 
-        validation_summary_list2 <- list()
-        validation_summary_list2[[ "Raw" ]] <- validation_summary_raw
-        validation_summary_list2[[ "Assay information" ]] <- validation_summary_assay_info
-        validation_summary_list2[["Plate id"]] <- validation_plate_id_rules
+      # Collect all summary information.
+      validation_summary_raw <- summarise_out(raw_validation_output)
+      validation_summary_assay_info <- summarise_out(assay_info_validation_output)
+      validation_plate_id_rules <- summarise_out(plate_id_validation_output)
 
-        # loop over key value list with summary information
-        # add True or FALSE based on passes and failures.
-        check_val_pass <- function(key,value) all(check_all_true(value))
+      validation_summary_list <- list(validation_plate_id_rules,
+                                      validation_summary_raw,
+                                      validation_summary_assay_info)
 
-        validation_pass <- mapply(check_val_pass, key=names(validation_summary_list2), value=validation_summary_list2)
+      # Put summary in key value list.
+      validation_summary_list2 <- list()
+      validation_summary_list2[[ "Raw" ]] <- validation_summary_raw
+      validation_summary_list2[[ "Assay information" ]] <- validation_summary_assay_info
+      validation_summary_list2[["Plate id"]] <- validation_plate_id_rules
 
-        # Validation with passes and failures to dataframe.
-        pass_val_checks <- as.data.frame(validation_pass)
+      # loop over key value list with summary information
+      # add True or FALSE based on passes and failures.
+      check_val_pass <- function(key,value) all(check_all_true(value))
 
-        return(pass_val_checks)
-      }
-    },
+      validation_pass <- mapply(check_val_pass, key=names(validation_summary_list2), value=validation_summary_list2)
 
-    warning = function(war) {
-      cat("WARNING :", conditionMessage(war), "\n")
-      logger::log_warn(conditionMessage(war), "\n")
-    },
-    error = function(err) {
-      cat("ERROR :", conditionMessage(err), "\n")
-      logger::log_error(conditionMessage(err), "\n")
-      logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
-      break
+      # Validation with passes and failures to dataframe.
+      pass_val_checks <- as.data.frame(validation_pass)
+
+      return(pass_val_checks)
     }
+  },
 
-)
+  warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    cat("ERROR :", conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err), "\n")
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    stop()
+  }
+
+  )
 }
+
+
 
 check_all_true <- function(validate_summary){
   by(validate_summary[4], seq_len(nrow(validate_summary[4])),
