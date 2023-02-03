@@ -18,7 +18,7 @@
 
 get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
-  tryCatch({
+
     xf_raw <- readxl::read_excel(filepath_seahorse,
                          sheet = "Raw",
                          col_types = c("numeric", # Measurment
@@ -48,15 +48,6 @@ get_xf_raw <- function(filepath_seahorse){
 
     return(xf_raw)
 
-  }, warning = function(war) {
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err), "\n")
-    stop()
-  }
-  )
-
 }
 
 # get_xf_norm -------------------------------------------------------------
@@ -75,7 +66,7 @@ get_xf_raw <- function(filepath_seahorse){
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_norm <- function(filepath_seahorse){
-  try_fetch({
+
     logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
 
     norm_info <- get_platelayout_data(filepath_seahorse,
@@ -95,15 +86,6 @@ get_xf_norm <- function(filepath_seahorse){
     logger::log_info("Finished collection normalisation info from 'Assay Configuration' sheet.")
 
     return(xf_norm)
-
-  }, warning = function(war) {
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err), "\n")
-    stop()
-  }
-  )
 }
 
 # get_xf_flagged() -----------------------------------------------------
@@ -121,8 +103,6 @@ get_xf_norm <- function(filepath_seahorse){
 #' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_flagged <- function(filepath_seahorse){
-
-  tryCatch({
 
     logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
@@ -164,15 +144,6 @@ get_xf_flagged <- function(filepath_seahorse){
     logger::log_info("Finished collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
     return(flagged_vector)
-
-  }, warning = function(war) {
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err), "\n")
-    stop()
-  }
-  )
 }
 
 
@@ -218,7 +189,6 @@ get_xf_rate <- function(filepath_seahorse){
 #' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_xf_buffer <- function(filepath_seahorse){
-  tryCatch({
 
     logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
 
@@ -232,14 +202,6 @@ get_xf_buffer <- function(filepath_seahorse){
 
     return(bufferfactor_info)
 
-  }, warning = function(war) {
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err), "\n")
-    stop()
-  }
-  )
 }
 
 # get_xf_pHcal ------------------------------------------------------------
@@ -409,8 +371,6 @@ get_xf_assayinfo <- function(filepath_seahorse,
                              norm_available,
                              xls_ocr_backgroundcorrected) {
 
-  tryCatch({
-
   logger::log_info("Collecting assay information")
 
   if (instrument == "XFHSmini"){
@@ -570,13 +530,6 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   return(tibbler)
 
-}, warning = function(war) {
-  logger::log_warn(conditionMessage(war), "\n")
-},
-error = function(err) {
-  logger::log_error(conditionMessage(err))
-}
-)
 }
 
 check_excel_positions <- function(df, pos_vector, name_vector){
@@ -622,8 +575,6 @@ check_tf_list <- function(tf_values){
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
 
-  tryCatch({
-
       df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
 
       colnames(df)[1] <- "firstCol"
@@ -647,17 +598,6 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 
      return(df)
 
-  }, warning = function(war) {
-    cat("WARNING :", conditionMessage(war), "\n")
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    cat("ERROR :", conditionMessage(err), "\n")
-    logger::log_error(conditionMessage(err), "\n")
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
-  }
-  )
-
 }
 
 # get_originalRateTable() -------------------------------------------------
@@ -678,8 +618,6 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 #' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 get_originalRateTable <- function(filepath_seahorse){
-
-  tryCatch({
 
     logger::log_info("Collecting OCR from 'Rate' sheet.")
 
@@ -727,17 +665,6 @@ get_originalRateTable <- function(filepath_seahorse){
     logger::log_info("Finished collecting OCR from 'Rate' sheet.")
 
     return(original_rate_df_list)
-
-  }, warning = function(war) {
-    cat("WARNING :", conditionMessage(war), "\n")
-    log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    cat("ERROR :", conditionMessage(err), "\n")
-    log_error(conditionMessage(err), "\n")
-    stop()
-  }
-  )
 
 }
 
