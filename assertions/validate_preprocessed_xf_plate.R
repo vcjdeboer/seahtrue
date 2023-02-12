@@ -269,13 +269,11 @@ validate_xf_plate_pr <- function(xf_plate_pr){
     if (exists("xf_plate_pr") && is.data.frame(get("xf_plate_pr")) == TRUE) {
 
       # 1. Create yaml paths for validation rules.
-      raw_yaml_path <- val_yaml_path(col_name =
-                                       xf_plate_pr$raw_data %>%
+      raw_yaml_path <- val_yaml_path(xf_plate_pr$raw_data %>%
                                        substitute(.) %>%
                                        deparse(.))
 
-      assay_yaml_path <- val_yaml_path(col_name =
-                                         xf_plate_pr$assay_info %>%
+      assay_yaml_path <- val_yaml_path(xf_plate_pr$assay_info %>%
                                          substitute(.) %>%
                                          deparse(.))
 
