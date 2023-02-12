@@ -305,7 +305,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
     measurement_info <- dplyr::filter(info_sh, command_name == "Measure")
     measurement_info$interval <- measurement_info$command_index -1
     measurement_info$measurement <- 1:nrow(measurement_info)
-    measurement_info <- measurement_info %>% select(measurement, interval, injection=instruction_name)
+    measurement_info <- measurement_info %>% dplyr::select(measurement, interval, injection=instruction_name)
   }
 
   if (injscheme == "manual"){
@@ -688,11 +688,12 @@ read_xfplate <- function(filepath_seahorse) {
 
     logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
 
+      # validation
       check_required(filepath_seahorse)
       path_not_found(filepath_seahorse)
       check_sheets(filepath_seahorse, list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
 
-      #read data
+      # read data
       xf_raw <- get_xf_raw(filepath_seahorse)
       xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
       xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
@@ -741,7 +742,7 @@ read_xfplate <- function(filepath_seahorse) {
 path_not_found <- function(file_path, call = caller_env()){
   try_fetch({
     logger::log_info(glue::glue("Check if file {file_path} exist."))
-    read_excel(file_path)
+    readxl::read_excel(file_path)
   },
   error = function(cnd) {
     cli::cli_abort("Can't find path to excel file.", parent = cnd, call = call)
