@@ -13,18 +13,18 @@ validate_yaml_rules <- function(rules_yaml, data_frame) {
       logger::log_info('Validating yaml file...')
       # create a list of data quality demands with the validator() function
       all_rules <- validate::validator(.file = rules_yaml)
-      # Confront the data with those rules and save the output into a variable called out
+      # Confront the data with those rules and save the output into a variable called out.
       out <- validate::confront(data_frame, all_rules)
       logger::log_info('Validation finished.')
       return(out)
     },
     warning = function(war) {
       cat("WARNING :", conditionMessage(war), "\n")
-      log_warn(conditionMessage(war), "\n")
+      logger::log_warn(conditionMessage(war), "\n")
     },
     error = function(err) {
       cat("ERROR :", conditionMessage(err), "\n")
-      log_error(conditionMessage(err), "\n")
+      logger::log_error(conditionMessage(err), "\n")
     }
   )
 }
@@ -33,7 +33,7 @@ validate_yaml_rules <- function(rules_yaml, data_frame) {
 #'
 #' @param validation_out: the output of the validation.
 #' @param pdf_path: path to the output pdf file, which plots the validation.
-#' @export
+#' @return None
 #'
 plot_validation_output <- function(validation_out, pdf_path) {
   out <- tryCatch(
@@ -65,7 +65,9 @@ summarise_out <- function(validation_output) {
   out <- tryCatch(
     {
       logger::log_info('Summarising validation output')
-      validation_summary <- validate::summary(validation_output)
+
+      validation_summary <- tibble::as_tibble(validate::summary(validation_output))
+
       return(validation_summary)
     },
     warning = function(war) {
@@ -86,7 +88,12 @@ rules_description <- function(rules, lbl, descr, id){
 }
 
 
-# get name for yaml file and pdf validation file.
+#' Get name for yaml file and pdf validation file.
+#'
+#' @param xf_plate_pr A preprocessed seahorse dataframe.
+#'
+#' @return List with names for pdf and yaml files.
+
 get_val_name <- function(xf_plate_pr){
     out <- tryCatch(
       {
@@ -95,36 +102,104 @@ get_val_name <- function(xf_plate_pr){
       substitute(.) %>%
       deparse(.)
 
-    val_yaml_xf_pr_raw = gsub(" ", "", paste("validate", "_", xf_pr, "_", "raw"))
+    val_yaml_xf_pr_raw = gsub(" ", "",
+                              paste("validate", "_", xf_pr, "_", "raw"))
     val_yaml_xf_pr_assay_info = gsub(" ", "", paste("validate", "_", xf_pr, "_", "assay_info"))
 
     return(list(val_yaml_xf_pr_raw, val_yaml_xf_pr_assay_info))
       },
   warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
-    log_warn(conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
   },
   error = function(err) {
     cat("ERROR :", conditionMessage(err), "\n")
-    log_error(conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err), "\n")
   }
   )
 }
 
-# export rules to yaml file.
-export_val_yaml <- function(rules, yaml_rule_name){
+#' Export rules to yaml file.
+#'
+#' @param rules Validation criteria.
+#'
+#' @return None
+export_val_yaml <- function(rules, yaml_rule_path){
   out <- tryCatch(
     {
   logger::log_info("Export rules to yaml file, using corresponding unique names.")
-  validate::export_yaml(rules, file=here::here("assertions", glue::glue("{yaml_rule_name}.yaml")))
+  validate::export_yaml(rules, yaml_rule_path)
     },
   warning = function(war) {
     cat("WARNING :", conditionMessage(war), "\n")
-    log_warn(conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
   },
   error = function(err) {
     cat("ERROR :", conditionMessage(err), "\n")
-    log_error(conditionMessage(err), "\n")
+    logger::log_error(conditionMessage(err), "\n")
   }
   )
 }
+
+#' Create path to validation file.
+#'
+#' @param df_col_name Name of column + dataframe ("df$col").
+#'
+#' @return Path to yaml file
+
+val_yaml_path <- function(df_col_name){
+
+  df_col_name = gsub("\\$", "_", df_col_name)
+
+  val_yaml_path = here::here("assertions",
+                             glue::glue("{df_col_name}.yaml"))
+
+  return(val_yaml_path)
+
+}
+
+#' Provide validate summary and check on failures. Log failures to user.
+#'
+#' @param rule Name of rule set.
+#' @param summary Summary related to rule set.
+#'
+#' @return "Passed" or "Failed" for a specific rule set.
+
+check_fails <- function(rule, summary){
+
+  failures <- summary %>%
+    dplyr::select(name, fails) %>%
+    dplyr::mutate(rule) %>%
+    dplyr::filter(fails == 1)
+
+  if (nrow(failures > 0)){
+
+    validation <- "Failed"
+
+     x <- purrr::map2(.x = as.list(failures$name),
+                      .y = as.list(failures$rule),
+                      .f = log_rule_fail)
+
+    logger::log_info("The validation checks failed for the preprocessed seahorse dataset.
+    To solve these failure(s), check the related column in your seahorse Excel file for the given rule.")
+
+  } else {
+
+    validation <- "Passed"
+
+    logger::log_info(glue(
+      "PASS: The preprocessed seahorse dataset pass validation checks for rule set {rule}."))
+  }
+
+  return(validation)
+}
+
+#' Log validation failures.
+#'
+#' @param name List with names of rules for validation.
+#' @param rule List with names of for each rule set.
+
+log_rule_fail <- function(name, rule){
+  logger::log_error(glue("FAIL {name} at RULE '{rule}'
+                        Validation for preprocessed seahorse dataset failed."))
+  }
