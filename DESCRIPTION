@@ -25,7 +25,8 @@ Imports:
     tidyr,
     lubridate,
     stringr,
-    tibble
+    tibble,
+    validate
 RoxygenNote: 7.2.1
 Depends: 
     R (>= 2.10)
