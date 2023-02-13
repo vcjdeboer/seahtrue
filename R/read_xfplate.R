@@ -689,7 +689,7 @@ read_xfplate <- function(filepath_seahorse) {
     logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
 
       # validation
-      check_required(filepath_seahorse)
+      rlang::check_required(filepath_seahorse)
       path_not_found(filepath_seahorse)
       check_sheets(filepath_seahorse, list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
 
@@ -752,7 +752,7 @@ path_not_found <- function(file_path, call = caller_env()){
 }
 
 check_sheets <- function(filepath_excel, sheets_predicted, call = caller_env()){
-  try_fetch({
+  rlang::try_fetch({
     logger::log_info(glue::glue("Checking excel sheets for file: {filepath_excel}"))
 
     excel_sheets <- readxl::excel_sheets(filepath_excel)
