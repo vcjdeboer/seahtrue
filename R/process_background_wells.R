@@ -245,12 +245,11 @@ calc_background_O2_col <- function(plate_df, O2_flagged_bkgd_wells){
                     timescale) %>%
     dplyr::summarize(
       O2_em_corr_bkg = mean(O2_em_corr),
-      O2_mmHg_bkg = mean(O2_mmHg),
+      O2_mmHg_bkg = mean(O2_mmHg)
     )
 
   plate_df <- plate_df %>%
-    dplyr::left_join(background_O2, by = c("measurement", "timescale"))
-
+    dplyr::left_join(background_O2)
 
   return(plate_df$O2_em_corr_bkg)
 }
