@@ -42,7 +42,7 @@ get_BKGD_auc <- function(total_df, var, targetEMS) {
       group,
       timescale,
       tick,
-      emission = tidyr::all_of(var)
+      emission = tidyselect::all_of(var)
     )
 
   df <- df[!is.na(df$emission), ]
@@ -252,4 +252,22 @@ calc_background_O2_col <- function(plate_df, O2_flagged_bkgd_wells){
     dplyr::left_join(background_O2)
 
   return(plate_df$O2_em_corr_bkg)
+}
+
+calc_background_pH_col <- function(plate_df, pH_flagged_bkgd_wells){
+
+  background_pH <- plate_df %>%
+    select(group, well, measurement, timescale, pH, pH_em_corr) %>%
+    filter(!well %in% pH_flagged_bkgd_wells) %>%
+    filter(group == "Background") %>%
+    group_by(measurement, timescale) %>%
+    summarize(
+      pH_em_corr_bkg = mean(pH_em_corr),
+      pH_bkg = mean(pH),
+    )
+
+  plate_df <- plate_df %>%
+    left_join(background_pH, by = c("measurement", "timescale"))
+
+  return(plate_df$pH_bkg)
 }
