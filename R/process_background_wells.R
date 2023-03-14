@@ -271,3 +271,21 @@ calc_background_pH_col <- function(plate_df, pH_flagged_bkgd_wells){
 
   return(plate_df$pH_bkg)
 }
+
+set_bkgd_well_flags <- function(preprocessed_xfplate, my_qc_well_ref, my_qc_plate_ref){
+
+  #calculate scores and flagged wells
+  qc_scores <- get_bkgd_qc_scores(preprocessed_xfplate %>% pull(raw_data) %>% pluck(1),
+                                  my_qc_well_ref[[1]],
+                                  my_qc_plate_ref[[1]])
+  O2_flagged_bkgd_wells <- flag_bkgd_wells(qc_scores$well_scores , score_cutoff= 10)
+
+  #add flagged wells to assay info
+  assay_info_list <- as.list(preprocessed_xfplate$assay_info[[1]])
+  assay_info_list <- assay_info_list %>%
+    purrr::list_merge(O2_flagged_bkgd_wells = O2_flagged_bkgd_wells)
+
+  preprocessed_xfplate$assay_info <- list(assay_info_list)
+
+  return(preprocessed_xfplate)
+}
