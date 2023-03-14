@@ -289,3 +289,21 @@ set_bkgd_well_flags <- function(preprocessed_xfplate, my_qc_well_ref, my_qc_plat
 
   return(preprocessed_xfplate)
 }
+
+flag_bkgd_wells <- function(well_scores, score_cutoff) {
+  well_scores <- well_scores %>%
+    dplyr::mutate(
+      flagged =
+        dplyr::case_when(
+          total_score > score_cutoff ~ TRUE, # CUTOFF = 9, score 6-9: green, 10-12: orange, 13 - 18 red
+          TRUE ~ FALSE
+        )
+    )
+
+  flagged_bkgd_wells <- well_scores %>%
+    dplyr::filter(flagged == TRUE) %>%
+    dplyr::pull(well)
+
+  return(flagged_bkgd_wells)
+
+}
