@@ -83,18 +83,18 @@ Create preprocessed dataset:
 ```{r preprocessed_xfplate, echo=FALSE}
 
 ## read and preprocess
-xf_plate_pr <-
+preprocessed_xfplate <-
   filepath_seahorse %>%
   read_xfplate() %>%
   preprocess_xfplate()
 
-usethis::use_data(xf_plate_pr, 
+usethis::use_data(preprocessed_xfplate, 
                   overwrite = 'TRUE')
 
-load(here::here("data", "xf_plate_pr.rda"))
-xf_plate_pr <- xf_plate_pr
+load(here::here("data", "preprocessed_xfplate.rda"))
+preprocessed_xfplate <- preprocessed_xfplate
 
-print(xf_plate_pr)
+print(preprocessed_xfplate)
 ```
 ## flagged wells
 
@@ -121,7 +121,7 @@ my_qc_plate_ref <- qc_plate_ref_PBMC
 
 # calculate scores and flagged wells
 qc_scores <- get_bkgd_qc_scores(
-  xf_plate_pr %>%
+  preprocessed_xfplate %>%
     dplyr::pull(raw_data) %>%
     purrr::pluck(1),
   my_qc_well_ref[[1]],
@@ -182,12 +182,12 @@ Note: flagged wells column is located at the last column.
 ```{r add_flagged_bkgd_wells, echo=FALSE}
 
 # add flagged wells to assay info
-assay_info_list <- as.list(xf_plate_pr$assay_info[[1]])
+assay_info_list <- as.list(preprocessed_xfplate$assay_info[[1]])
 assay_info_list <- assay_info_list %>%
   purrr::list_merge(O2_flagged_bkgd_wells = O2_flagged_bkgd_wells)
 
-xf_plate_pr$assay_info <- list(assay_info_list)
+preprocessed_xfplate$assay_info <- list(assay_info_list)
 
-print(xf_plate_pr$assay_info)
+print(preprocessed_xfplate$assay_info)
 
 ```
