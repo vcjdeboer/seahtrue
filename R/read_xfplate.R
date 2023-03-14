@@ -272,7 +272,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
     measurement_info <- dplyr::filter(info_sh, command_name == "Measure")
     measurement_info$interval <- measurement_info$command_index -1
     measurement_info$measurement <- 1:nrow(measurement_info)
-    measurement_info <- measurement_info %>% select(measurement, interval, injection=instruction_name)
+    measurement_info <- measurement_info %>% dplyr::select(measurement, interval, injection=instruction_name)
   }
 
   if (injscheme == "manual"){
@@ -554,7 +554,7 @@ get_originalRateTable <- function(filepath_seahorse){
   if (corrected_allready == TRUE){
     colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
     original_rate_df <- original_rate_df %>%
-      mutate(OCR_wave = 0, ECAR_wave = 0)
+      dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
 
     original_rate_df <- original_rate_df %>%
       dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)

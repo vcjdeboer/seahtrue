@@ -95,7 +95,7 @@ get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref) {
 
   #calculate stat summaries for NEW target plate - plate
   qc_plate_target <- bkgd_qc_target %>%
-    summarize(Maximum = max(dev_fromTarget),
+    dplyr::summarize(Maximum = max(dev_fromTarget),
               Minimum = min(dev_fromTarget),
               'Range(F-L)' = Maximum-Minimum)
 
@@ -257,17 +257,17 @@ calc_background_O2_col <- function(plate_df, O2_flagged_bkgd_wells){
 calc_background_pH_col <- function(plate_df, pH_flagged_bkgd_wells){
 
   background_pH <- plate_df %>%
-    select(group, well, measurement, timescale, pH, pH_em_corr) %>%
-    filter(!well %in% pH_flagged_bkgd_wells) %>%
-    filter(group == "Background") %>%
-    group_by(measurement, timescale) %>%
-    summarize(
+    dplyr::select(group, well, measurement, timescale, pH, pH_em_corr) %>%
+    dplyr::filter(!well %in% pH_flagged_bkgd_wells) %>%
+    dplyr::filter(group == "Background") %>%
+    dplyr::group_by(measurement, timescale) %>%
+    dplyr::summarize(
       pH_em_corr_bkg = mean(pH_em_corr),
       pH_bkg = mean(pH),
     )
 
   plate_df <- plate_df %>%
-    left_join(background_pH, by = c("measurement", "timescale"))
+    dplyr::left_join(background_pH, by = c("measurement", "timescale"))
 
   return(plate_df$pH_bkg)
 }

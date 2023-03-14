@@ -84,14 +84,14 @@ Summarize these stats with $\color{red}{\text{skimr}}$.
 calculate_qc_ref <- function(my_qc_ref_df){
   #calculate plate stats
   plate_stats <- my_qc_ref_df %>%
-    summarize(Maximum = max(dev_fromTarget),
+    dplyr::summarize(Maximum = max(dev_fromTarget),
               Minimum = min(dev_fromTarget),
               'Range(F-L)' = Maximum-Minimum)
 
   #calculate well stats
   well_stats <- my_qc_ref_df %>%
-    group_by(well) %>%
-    summarize(Maximum = max(dev_fromTarget),
+    dplyr::group_by(well) %>%
+    dplyr::summarize(Maximum = max(dev_fromTarget),
               Minimum = min(dev_fromTarget),
               First = first(dev_fromTarget),
               Last = last(dev_fromTarget),
@@ -114,8 +114,8 @@ calculate_qc_ref <- function(my_qc_ref_df){
 
   #get the stats for the complete PBMC dataset - well stats
   qc_well <- well_stats %>%
-    ungroup() %>%
-    select(-well) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-well) %>%
     my_skim() %>%
     skimr::yank("numeric") %>%
     tibble::as_tibble()
