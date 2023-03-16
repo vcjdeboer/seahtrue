@@ -32,13 +32,13 @@ check_column_names <- function(df, df_columns_list){
 }
 
 # Test files --------------------------------------------------------------
-filepath <- list("20191219 SciRep PBMCs donor A.xlsx",
-                 "20200110 SciRep PBMCs donor B.xlsx",
-                 "20200110 SciRep PBMCs donor C.xlsx")
+seahorse_files <- list("20191219 SciRep PBMCs donor A.xlsx",
+                       "20200110 SciRep PBMCs donor B.xlsx",
+                       "20200110 SciRep PBMCs donor C.xlsx")
 
 # testthat: Test 'Raw' data --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test 'Raw' data derived from Seahorse XFe96 analyser 'Raw' Excel datasheet.", {
     # check return
     xf_raw <- expect_type(get_xf_raw(filepath_seahorse), "list")
@@ -70,8 +70,8 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test 'Normalization' data --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test normalization list with 'Normalization values' derived from the Assay configuration sheet.", {
     xf_norm <- expect_type(get_xf_norm(filepath_seahorse), "list")
     expect_type(xf_norm[[1]]$well, "character")
@@ -88,19 +88,19 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test unselected 'flagged wells' data Assay Configuration sheet. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Tests for unselected (flagged) wells derived from Assay configuration sheet.", {
-    flagged <- get_xf_flagged(here::here(filepath_seahorse))
+    flagged <- get_xf_flagged(filepath_seahorse)
     expect_type(flagged, "character")
   })
 }
 
 # testthat: Test the original rate data. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test original rate data table", {
-    xf_rate_list <- get_xf_rate(here::here(filepath_seahorse))
+    xf_rate_list <- get_xf_rate(filepath_seahorse)
     expect_equal(ncol(xf_rate_list[[1]]), 8)
     expect_type(xf_rate_list[[1]], "list")
     expect_type(xf_rate_list[[2]], "logical")
@@ -117,10 +117,10 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test buffer factor (capacity) info. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test buffer factor (capacity) info", {
-    bufferfactor_info <- get_xf_buffer(here::here(filepath_seahorse))
+    bufferfactor_info <- get_xf_buffer(filepath_seahorse)
     expect_type(bufferfactor_info, "list")
     expect_type(bufferfactor_info$well, "character")
     expect_type(bufferfactor_info$bufferfactor, "double")
@@ -129,10 +129,10 @@ for (seahorse_file in filepath){
   }
 
 # testthat: Test the pH calibration emission data.. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test the pH calibration emission data.", {
-  pH_calibration <- get_xf_pHcal(here::here(filepath_seahorse))
+  pH_calibration <- get_xf_pHcal(filepath_seahorse)
   expect_type(pH_calibration, "list")
   expect_equal(nchar(pH_calibration$well[1]), 3)
   expect_type(pH_calibration$pH_cal_em, "double") # actually integer
@@ -142,10 +142,10 @@ for (seahorse_file in filepath){
 
 # testthat: Get O2 calibration emission. --------------------------------------------------------------
 
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test O2 calibration emission.", {
-    O2_calibration <- get_xf_O2cal(here::here(filepath_seahorse))
+    O2_calibration <- get_xf_O2cal(filepath_seahorse)
     expect_type(O2_calibration, "list")
     expect_type(O2_calibration$well, "character")
     expect_type(O2_calibration$O2_cal_em, "double") # actually integer
@@ -154,10 +154,10 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test injection information. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test injection information.", {
-    measurement_info <- get_xf_inj(here::here(filepath_seahorse))
+    measurement_info <- get_xf_inj(filepath_seahorse)
     expect_type(measurement_info$measurement, "integer")
     expect_type(measurement_info$interval, "double") #actually integer
     expect_type(measurement_info$injection, "character")
@@ -166,10 +166,10 @@ for (seahorse_file in filepath){
 }
 
 # # testthat: Test assay information. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test assay information.", {
-    tibbler <- get_xf_assayinfo(here::here(filepath_seahorse), instrument = "XFe96", norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
+    tibbler <- get_xf_assayinfo(filepath_seahorse, instrument = "XFe96", norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
     expect_length(tibbler, 23)
     expect_type(tibbler, "list")
     expect_type(tibbler$V_C, "double")
@@ -187,7 +187,7 @@ for (seahorse_file in filepath){
     expect_type(tibbler$O2_targetEmission, "double") # actually integer
     expect_type(tibbler$plate_id, "character")
     expect_type(tibbler$cartridge_barcode, "character")
-    expect_type(tibbler$date_run, "double") # actually date-time
+    expect_type(tibbler$date_run, "character") # actually date-time
     expect_type(tibbler$assay_name, "character")
     expect_type(tibbler$instrument_serial, "character") # actually integer
     expect_type(tibbler$O2_0_mmHg, "double")
@@ -198,10 +198,10 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Get plate layout data. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Get plate layout data.", {
-    df <- get_platelayout_data(here::here(filepath_seahorse), "Assay Configuration", "B84:N92", "cell_n")
+    df <- get_platelayout_data(filepath_seahorse, "Assay Configuration", "B84:N92", "cell_n")
     expect_length(df, 2)
     expect_type(df, "list")
     expect_equal(nchar(df$well[1]), 3)
@@ -210,10 +210,10 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test get the OCR from the excel file --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test get the OCR from the excel file.", {
-    original_rate_df_list <- get_originalRateTable(here::here(filepath_seahorse))
+    original_rate_df_list <- get_originalRateTable(filepath_seahorse)
     expect_length(original_rate_df_list, 2)
     expect_length(original_rate_df_list[[1]], 8)
     expect_type(original_rate_df_list[[1]]$measurement, "double") # actually integer
@@ -228,19 +228,13 @@ for (seahorse_file in filepath){
 }
 
 # testthat: Test read necessary Seahorse plate data from Seahorse Excel file. --------------------------------------------------------------
-for (seahorse_file in filepath){
-  filepath_seahorse <- here::here("inst", "extdata", seahorse_file)
+for (seahorse_file in seahorse_files){
+  filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that(" Test read necessary Seahorse plate data from Seahorse Excel file.", {
-    xf <- read_xfplate(here::here(filepath_seahorse))
+    xf <- read_xfplate(filepath_seahorse)
     expect_length(xf, 10)
     expect_type(xf, "list")
     check_column_names(xf, list("raw", "rate", "assayinfo", "inj", "pHcal",
                                  "O2cal", "norm", "buffer", "flagged", "filepath_seahorse"))
   })
 }
-
-# testthat: Test xfplate data --------------------------------------------------------------
-# # Check if a data tibble is returned, and check data tibble. (Note: tibble has type list)
-# test_that("a data tibble is returned (list format)", {
-#   xf <- expect_type(read_xfplate("/cloud/project/data-raw/seahorse_raw_test_data.xlsx"), "list")
-# })

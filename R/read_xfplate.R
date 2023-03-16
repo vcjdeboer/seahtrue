@@ -739,8 +739,8 @@ read_xfplate <- function(filepath_seahorse) {
 
 }
 
-path_not_found <- function(file_path, call = caller_env()){
-  try_fetch({
+path_not_found <- function(file_path, call = rlang::caller_env()){
+  rlang::try_fetch({
     logger::log_info(glue::glue("Check if file {file_path} exist."))
     readxl::read_excel(file_path)
   },
@@ -751,7 +751,7 @@ path_not_found <- function(file_path, call = caller_env()){
   )
 }
 
-check_sheets <- function(filepath_excel, sheets_predicted, call = caller_env()){
+check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_env()){
   rlang::try_fetch({
     logger::log_info(glue::glue("Checking excel sheets for file: {filepath_excel}"))
 
@@ -762,7 +762,7 @@ check_sheets <- function(filepath_excel, sheets_predicted, call = caller_env()){
       stopifnot(value %in% excel_sheets)
     }
 
-    logger::log_info(glue::glue("Cheets exists."))
+    logger::log_info(glue::glue("Sheets exists."))
   },
   error = function(cnd) {
     cli::cli_abort("Can't find sheet {x}.", parent = cnd, call = call)
