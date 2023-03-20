@@ -33,10 +33,12 @@ xf_plate_pr_raw_rules <- validator(
 
     # Rules for O2_mmHg
     O2_mmHg_corr_miss_values = all_complete(O2_mmHg),
+    O2_mmHg_range = all(in_range(O2_mmHg, min=70, max=170)),
 
     # Rules for pH
     pH_numeric = is.numeric(pH),
     pH_miss_values = all_complete(pH),
+    pH_range = all(in_range(pH, min=6.5, max=8)),
 
     # # Rules for O2_em_corr_bkg
     O2_em_corr_bkg_miss_values = all_complete(O2_em_corr_bkg),
@@ -286,23 +288,23 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 
       # 3. Validate your dataset, using the created yaml files.
       raw_validation_output <- validate_yaml_rules(raw_yaml_path,
-                                                   xf_plate_pr)
+                                                   xf_plate_pr$raw_data[[1]])
 
       assay_validation_output <- validate_yaml_rules(assay_yaml_path,
-                                                     xf_plate_pr)
+                                                     xf_plate_pr$assay_info[[1]])
 
-      # Extra: Validate plate id (Note: no yaml file created.)
-      plate_id_validation_output <- check_plate_id()
+
+      # # Extra: Validate plate id (Note: no yaml file created.)
+      plate_id_validation_output <- check_plate_id(xf_plate_data$plate_id)
 
       # 4. Get summary information with validation rules information.
       rule_summary <- tibble::tibble(
          rules = c("Raw",
-                   "Assay Information",
-                   "Plate ID"),
+                   "Plate ID",
+                   "Assay Information"),
       summary = purrr::map(
         .x = list(raw_validation_output,
-                  assay_validation_output,
-                  plate_id_validation_output),
+                  assay_validation_output),
         .f = summarise_out
         )
       )
