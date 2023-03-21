@@ -2,32 +2,25 @@
 # Since they serve as helpers to multiple functions, placing them in R/utils.R makes them easier to re-discover
 # when you return to your package after a long break.
 
-
-between_min_max <- function(col_1, col_2, min, max){
-  false_list <- list()
-  true_false = between(as.numeric(col_2), min, max)
-  if(true_false == FALSE){
-    false_list <- append(false_list, col_1)
-    false_list <- append(false_list, col_2)
-    false_list <- append(false_list, true_false)
-    false_list <- append(false_list, glue::glue(paste("Given column value for {col_1} {col_2} is not between {min} and {max}.")))
-    return(false_list)
-  }}
-
-check_range <- function(col_1, col_2, min, max){
-
-  # loop over 2 columns, check if value between min and max.
-  x <- map2(.x = col_1,
-            .y = col_2,
-            ~between_min_max(.x, as.numeric(.y), min, max))
-
-  # remove NULL values from nested list.
-  x[sapply(x, is.null)] <- NULL
-
-  for(value in x){
-    cli::cli_alert_warning(value[4])
+check_range <- function(data, column_name, range) {
+  # Check if dataset has required columns
+  if (!all(c("well", column_name) %in% names(data))) {
+    stop(paste("Input dataset must have 'well' and", column_name, "columns"))
   }
 
-  return(x)
-}
+  # Check if values are within range
+  out_of_range <- data[[column_name]] < range[1] | data[[column_name]] > range[2]
 
+  # If any values are out of range, give warning message with cli package
+  if (any(out_of_range)) {
+    map2(data$well[out_of_range], data[[column_name]][out_of_range], ~ {
+      well_name <- .x
+      value <- .y
+      message <- glue::glue("{column_name} value {value} for well {well_name} is out of range ({range[1]} - {range[2]})")
+      cli::cli_alert_warning(message)
+    })
+  }
+
+  # Return dataset
+  return(data)
+}
