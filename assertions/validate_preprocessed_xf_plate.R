@@ -295,16 +295,18 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 
 
       # # Extra: Validate plate id (Note: no yaml file created.)
-      plate_id_validation_output <- check_plate_id(xf_plate_data$plate_id)
+      plate_id_validation_output <- check_plate_id(xf_plate_pr$plate_id[[1]])
 
       # 4. Get summary information with validation rules information.
       rule_summary <- tibble::tibble(
          rules = c("Raw",
-                   "Plate ID",
-                   "Assay Information"),
+                   "Assay Information",
+                   "Plate ID"),
       summary = purrr::map(
         .x = list(raw_validation_output,
-                  assay_validation_output),
+                  assay_validation_output,
+                  plate_id_validation_output),
+
         .f = summarise_out
         )
       )
@@ -331,17 +333,22 @@ validate_xf_plate_pr <- function(xf_plate_pr){
   error = function(err) {
     cat("ERROR :", conditionMessage(err), "\n")
     logger::log_error(conditionMessage(err), "\n")
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    logger::log_info(glue::glue("Quiting analysis with sheet:"))
     stop()
   }
 
   )
 }
 
+
+
 check_plate_id <- function (plate_id){
+
   logger::log_info("check if plate_id is right format")
   plate_id_rules <- validate::validator(grepl("^V[0-9]{10}V$", plate_id))
-  plate_id_validation_output <- validate::confront(data,
+
+  plate_id_validation_output <- validate::confront(plate_id,
                                                    plate_id_rules)
+
   return(plate_id_validation_output)
 }
