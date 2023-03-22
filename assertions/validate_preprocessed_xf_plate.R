@@ -295,7 +295,7 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 
 
       # # Extra: Validate plate id (Note: no yaml file created.)
-      plate_id_validation_output <- check_plate_id(xf_plate_pr$plate_id[[1]])
+      plate_id_validation_output <- check_plate_id(xf_plate_pr)
 
       # 4. Get summary information with validation rules information.
       rule_summary <- tibble::tibble(
@@ -341,14 +341,18 @@ validate_xf_plate_pr <- function(xf_plate_pr){
 }
 
 
+check_plate_id <- function (xf_plate_pr){
 
-check_plate_id <- function (plate_id){
+  plate_id_rules <- validator(
+    plate_id_pattern = grepl("^V[0-9]{10}V$", plate_id)
+    )
+
+  xf_plate_pr_plate_id_rules <- as.data.frame(plate_id_rules)
 
   logger::log_info("check if plate_id is right format")
-  plate_id_rules <- validate::validator(grepl("^V[0-9]{10}V$", plate_id))
 
-  plate_id_validation_output <- validate::confront(plate_id,
-                                                   plate_id_rules)
+  plate_id_validation_output <- validate::confront(xf_plate_pr,
+                                                    plate_id_rules)
 
   return(plate_id_validation_output)
 }
