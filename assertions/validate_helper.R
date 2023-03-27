@@ -202,4 +202,59 @@ check_fails <- function(rule, summary){
 log_rule_fail <- function(name, rule){
   logger::log_error(glue("FAIL {name} at RULE '{rule}'
                         Validation for preprocessed seahorse dataset failed."))
+}
+
+#' Helper: Check if values of a given column are within a specified range.
+#'
+#' @param col_1 Column well which contains "A01, "A02" etc.
+#' @param col_2 Column that will be validated on a specific range.
+#' @param min min Minimum range
+#' @param max Maximum range
+#'
+#' @return List with col_1, col_2 and a message which shows if value of col_2 is in range.
+#'
+#' @examples
+between_min_max <- function(col_1, col_2, min, max){
+  col_value_out_of_range <- list()
+  true_false = dplyr::between(as.numeric(col_2), min, max)
+  if(true_false == FALSE){
+    col_value_out_of_range <- append(col_value_out_of_range, col_1)
+    col_value_out_of_range <- append(col_value_out_of_range, col_2)
+    col_value_out_of_range <- append(col_value_out_of_range, glue::glue(paste("Given column value for {col_1} {col_2} is not between {min} and {max}.")))
+    return(col_value_out_of_range)
   }
+  else{return(NULL)
+    }
+  }
+
+#' Check if values of a given column are within a specified range.
+#'
+#' @param col_1 Column well which contains "A01, "A02" etc.
+#' @param col_2 Column that will be validated on a specific range.
+#' @param min Minimum range
+#' @param max Maximum range
+#'
+#' @return Nested tibble which contains [[1]] well [[2]] col_2 value [[3]] out_of_range value (FALSE) [[4]] String with warning message.
+#'
+#' @examples check_range(data$raw_data[[1]]$well, data$raw_data[[1]]$O2_mmHg, min=70, max = 180)
+check_range <- function(col_1, col_2, min, max){
+
+  # loop over 2 columns, check if value between min and max.
+  col_value_out_of_range <- purrr::map2(.x = col_1,
+                                        .y = col_2,
+                                        ~between_min_max(.x,
+                                                         as.numeric(.y),
+                                                         min,
+                                                         max))
+
+  # remove NULL values from nested list.
+  col_value_out_of_range[sapply(col_value_out_of_range, is.null)] <- NULL
+
+
+  for(value in col_value_out_of_range){
+    cli::cli_alert_warning(value[3])
+  }
+
+  return(col_value_out_of_range)
+}
+
