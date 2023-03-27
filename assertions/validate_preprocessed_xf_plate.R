@@ -2,7 +2,7 @@
 # Rules for prepossessed seahorse data, "Raw" tibble.
 xf_plate_pr_raw_rules <- validator(
     well_miss_values = all_complete(well),
-    well_number = all(grepl("^[A-H](0[1-9]|1[0-1])\b$|$", well)),
+    well_number = all(grepl("^[A-H](0[1-9]|1[0-2]", well)),
 
     # Rules for measurement
     measurement_min_1 = all(measurement >= 1),
