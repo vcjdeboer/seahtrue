@@ -33,7 +33,7 @@ xf_plate_pr_raw_rules <- validator(
 
     # Rules for O2_mmHg
     O2_mmHg_corr_miss_values = all_complete(O2_mmHg),
-    O2_mmHg_range = all(in_range(O2_mmHg, min=70, max=170)),
+    O2_mmHg_range = all(in_range(O2_mmHg, min=70, max=180)),
 
     # Rules for pH
     pH_numeric = is.numeric(pH),
