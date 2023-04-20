@@ -20,7 +20,7 @@ library(readxl)
 #' @description
 #' This function uses seahorse excel data that was read beforehand (reading step)
 #' The function will edit the "Raw" (With data from the "Raw" sheet) data tibble that was produced.
-#' Our "Raw" tibble will edited to create our new preprocessed "Raw" dataset.
+#' Our "Raw" tibble will be edited to create our new preprocessed "Raw" dataset.
 #'   * changing columns names
 #'   * adding new time columns
 #'   * adding injection info columns
