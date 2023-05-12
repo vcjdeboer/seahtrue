@@ -1,8 +1,4 @@
-# This is a common place to define small utilities that are used inside multiple package functions.
-# Since they serve as helpers to multiple functions, placing them in R/utils.R makes them easier to re-discover
-# when you return to your package after a long break.
-
-check_excel_positions <- function(df, pos_vector, name_vector){
+check_meta_df_positions <- function(df, pos_vector, name_vector){
 
   logger::log_info("Check if excel df contains data name on certain position.")
   tf_values <- mapply(function(pos_vector, name_vector) {
