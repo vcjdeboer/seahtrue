@@ -119,7 +119,7 @@ xf_plate_pr_assay_info_rules <- validator(
   # These will be used to generate the description.
   rule_id_xf_plate_pr_raw <- setNames(as.list(rule_id_xf_plate_pr_raw$id), rule_id_xf_plate_pr_raw$name)
 
-  ### Add label and description for well mssing values rule ####
+  ### Add label and description for well missing values rule ####
 rules_description(xf_plate_pr_raw_rules,
                   lbl="well_missing_values",
                   descr="The functions all_complete() test for missing values or combinations thereof in records.",

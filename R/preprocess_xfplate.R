@@ -230,7 +230,7 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 ## calc_background() -------------------------------------------------------
 
 calc_background <- function(plate_df){
-  background <- XFe96data %>%
+  background <- plate_df %>%
     select(group, well, measurement, timescale, O2_em_corr,
            pH_em_corr, O2_mmHg, pH, pH_em_corr_corr) %>%
     filter(group == "Background") %>%

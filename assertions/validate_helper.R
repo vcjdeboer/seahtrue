@@ -3,7 +3,7 @@
 #'
 #' @description
 #' validate_yaml_rules uses a dataframe and yaml rules to validate values.
-#' @param rules_yaml: yaml file which contains the rules that are nessecary for validation.
+#' @param rules_yaml: yaml file which contains the rules that are necessary for validation.
 #' @param data_frame: dataframe with values to be validated.
 #' @return: output of the validation.
 #'
