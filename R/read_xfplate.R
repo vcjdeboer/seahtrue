@@ -47,7 +47,6 @@
     logger::log_info("Finished collecting data from 'Raw' sheet.")
 
     return(xf_raw)
-
 }
 
 # get_xf_norm -------------------------------------------------------------
@@ -58,7 +57,7 @@
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
-#' @return List consisting [1] well names and the corresponding normalization values and
+#' @return List consisting of [1] well names and the corresponding normalization values and
 #' [2] check if normalization data is available (TRUE/FALSE).
 #'
 #' @examples
@@ -580,8 +579,8 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param 
 #' Get the OCR from the excel file
 #'
 #' @details
-#' [2]If rate data was not already corrected a background subtraction was performed and the second element of this list contains TRUE (logical).
-#' [2]If rate data was already corrected there is no need for background subtraction
+#' [2]If rate data was not already corrected, a background subtraction was performed and the second element of this list contains TRUE (logical).
+#' [2]If rate data was already corrected, there is no need for background subtraction
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
