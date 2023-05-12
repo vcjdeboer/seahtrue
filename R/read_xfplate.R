@@ -16,7 +16,7 @@
 #' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 
-get_xf_raw <- function(filepath_seahorse){
+ get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
 
     xf_raw <- readxl::read_excel(filepath_seahorse,
@@ -395,11 +395,10 @@ get_xf_assayinfo <- function(filepath_seahorse,
                   "ksv", "Ksv Temp Correction", "Corrected Ksv", "Calculated FO",
                   "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
 
-  tf <- check_excel_positions(meta_df, pos_vector, name_vector)
-
+  # Assertion to check if meta_df contains Seahorse constants on the right locations.
+  tf <- check_meta_df_positions(meta_df, pos_vector, name_vector)
 
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
-
 
   # read Assay Configuration sheet gain1
   gain1 <- readxl::read_excel(filepath_seahorse,
@@ -422,6 +421,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
                                    range = "B4"
   )
 
+  # read pH target emission cells
   pH_target_emission <- readxl::read_excel(filepath_seahorse,
                                    sheet = "Calibration",
                                    col_names = FALSE,
@@ -529,30 +529,6 @@ get_xf_assayinfo <- function(filepath_seahorse,
   logger::log_info("Finished collecting assay information.")
 
   return(tibbler)
-
-}
-
-check_excel_positions <- function(df, pos_vector, name_vector){
-  logger::log_info("Check if excel df contains data name on certain position.")
-  tf_values <- mapply(function(pos_vector, name_vector) {
-    true_false <- name_vector %in% df[[1]][pos_vector]
-    if(true_false == FALSE){return(FALSE)} else{
-      return(TRUE)
-    }
-  }, pos_vector, name_vector)
-
-  tf <- check_tf_list(tf_values)
-
-  return(tf)
-}
-
-check_tf_list <- function(tf_values){
-  if(all((tf_values)) == FALSE){
-    logger::log_error("Sheet doesn't contain all values.")
-    stop()
-  } else{
-    return(TRUE)
-  }
 }
 
 # get_platelayout_data() -------------------------------------------------
@@ -676,7 +652,6 @@ get_originalRateTable <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return xf list with all necessary Seahorse data.
-#' @export
 #'
 #' @examples
 #' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
@@ -686,12 +661,10 @@ read_xfplate <- function(filepath_seahorse) {
 
   tryCatch({
 
-    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file: {filepath_seahorse}"))
+    rlang::check_required(filepath_seahorse)
 
-      # validation
-      rlang::check_required(filepath_seahorse)
-      path_not_found(filepath_seahorse)
-      check_sheets(filepath_seahorse, list("Assay Configuration", "Rate", "Raw", "Calibration", "Operation Log"))
+    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
+                                {filepath_seahorse}"))
 
       # read data
       xf_raw <- get_xf_raw(filepath_seahorse)
@@ -737,36 +710,4 @@ read_xfplate <- function(filepath_seahorse) {
   }
   )
 
-}
-
-path_not_found <- function(file_path, call = rlang::caller_env()){
-  rlang::try_fetch({
-    logger::log_info(glue::glue("Check if file {file_path} exist."))
-    readxl::read_excel(file_path)
-  },
-  error = function(cnd) {
-    cli::cli_abort("Can't find path to excel file.", parent = cnd, call = call)
-    cli::cli_alert_info("Check path to excel file.")
-  }
-  )
-}
-
-check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_env()){
-  rlang::try_fetch({
-    logger::log_info(glue::glue("Checking excel sheets for file: {filepath_excel}"))
-
-    excel_sheets <- readxl::excel_sheets(filepath_excel)
-
-    for (value in sheets_predicted) {
-      x <- sheets_predicted[[2]]
-      stopifnot(value %in% excel_sheets)
-    }
-
-    logger::log_info(glue::glue("Sheets exists."))
-  },
-  error = function(cnd) {
-    cli::cli_abort("Can't find sheet {x}.", parent = cnd, call = call)
-    cli::cli_alert_info("Check your excel file.")
-  }
-  )
 }
