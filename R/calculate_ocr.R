@@ -181,7 +181,7 @@ sternVolmer <- function(x, KSV, F0){
 }
 
 #data
-my_data_pbmc <<- load("/cloud/project/data/my_pbmc_data.rda")
+my_data_pbmc <<- load(here::here("data", "my_pbmc_data.rda"))
 
 #script
 processed <- data %>%
