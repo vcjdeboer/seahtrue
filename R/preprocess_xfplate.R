@@ -261,7 +261,7 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 }
 
 ## calc_background() -------------------------------------------------------
-=======
+
 #' Calculate backgrounds
 #'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
