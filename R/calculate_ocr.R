@@ -10,11 +10,11 @@ substract_O2_bkgd <- function(O2, O2_bkgd, O2_0_mmHg){
 
 add_extraTicks_new_2<- function(well_df, O2_var){
 
-  well_df <- well_df %>% arrange(timescale)
+  well_df <- well_df %>% dplyr::arrange(timescale)
 
-  well_df$O2 <- well_df %>% pull(.data[[O2_var]])
+  well_df$O2 <- well_df %>% dplyr::pull(.data[[O2_var]])
 
-  ticksPerMeasure <- well_df %>% group_by(measurement) %>% summarize(n = n())
+  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = n())
   tickStart <- cumsum(ticksPerMeasure$n)+1
   tickEnd <- tickStart -1
   tickStart <- c(1, tickStart)
@@ -35,7 +35,7 @@ add_extraTicks_new_2<- function(well_df, O2_var){
 
   O2 <- well_df$O2
   for (i in 1:length(tickEnd_withoutLast)){
-    well_df <- well_df %>% add_row(
+    well_df <- well_df %>% dplyr::add_row(
       O2 =
         O2[tickStart_withoutFirst[i]] -
         (O2[tickStart_withoutFirst[i]]-O2[tickEnd_withoutLast[i]]) *
@@ -62,13 +62,13 @@ call_OCRticks <- function(well_df){
   kernelSize <- 7 #kernel size that is used for the polynomial calcs, this means that 3 at beginning and end are not calculated
   offsetOCR <- (kernelSize -1)/2 # minus one because that is the actual row that is calculated
 
-  ticksPerMeasure <- well_df %>% group_by(measurement) %>% summarize(n = n())
+  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = n())
   tickStart <- cumsum(ticksPerMeasure$n)+1
   tickEnd <- tickStart -1
   tickStart <- c(1, tickStart) #?
   tickStart <- tickStart[-length(tickStart)] #? why three different tickStarts?
 
-  well_df <- well_df %>% mutate(OCRisvalid = FALSE)
+  well_df <- well_df %>% dplyr::mutate(OCRisvalid = FALSE)
   totalMeasurements <- length(unique(well_df$measurement))
   for (x in 1:(totalMeasurements-1)) {
     well_df$OCRisvalid[(tickStart[x]+offsetOCR):(tickEnd[x]-offsetOCR)] <- TRUE
@@ -80,7 +80,8 @@ call_OCRticks <- function(well_df){
 } #called in calculate_OCR
 
 calculate_OCR_new <- function(well_df, assay_info_df){
-
+  rlang::try_fetch(
+    {
   Tau_W <- assay_info_df$Tau_W
   Tau_AC <- assay_info_df$Tau_AC
   Tau_P <- assay_info_df$Tau_P
@@ -166,12 +167,21 @@ calculate_OCR_new <- function(well_df, assay_info_df){
   df <- call_OCRticks(df)
 
   df <- df[df$OCRisvalid==TRUE,] %>% select(measurement, OCR) %>%
-    group_by(measurement) %>%
-    summarize(ocr = mean(OCR))
+    dplyr::group_by(measurement) %>%
+    dplyr::summarize(ocr = mean(OCR))
 
   #df_vector <- as.vector(unlist(df$OCR_mean))
 
-  return(df)
+  return(df)   }, warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err))
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    stop()
+  }
+  )
 
 }
 
@@ -179,6 +189,7 @@ sternVolmer <- function(x, KSV, F0){
 
   sternVolmer =(1/KSV)*((F0/x)-1)
 }
+
 
 #data
 my_data_pbmc <<- load(here::here("data", "my_pbmc_data.rda"))
