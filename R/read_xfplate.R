@@ -396,7 +396,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
                   "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
 
   # Assertion to check if meta_df contains Seahorse constants on the right locations.
-  tf <- check_meta_df_positions(meta_df, pos_vector, name_vector)
+  tf <- check_excel_positions(meta_df, pos_vector, name_vector)
 
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
 
