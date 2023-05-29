@@ -548,7 +548,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
 #' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
 
-get_platelayout_data <- function(filepath_seahorse, my_sheet,my_range, my_param ){
+get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param ){
 
       df <- readxl::read_excel(filepath_seahorse, sheet = my_sheet, range = my_range)
 
@@ -746,3 +746,54 @@ read_xfplate <- function(filepath_seahorse) {
   )
 
 }
+
+
+#additional utility functions
+# check_excel_positions() -------------------------------------------------------
+#' Used as util function in get_xf_assayinfo()
+#'
+#' @param df The meta_df that was read from Assay Configuration sheet.
+#' @param pos_vector  a vector of cell positions that should be checked
+#' @param name_vector a vector with the strings that should be at the positions
+#' that were given in 'pos_vector'
+#'
+#' @return either TRUE or FALSE depending on if the check passed or failed
+#'
+#' @examples
+#' pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
+#' name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
+#'                 "ksv", "Ksv Temp Correction", "Corrected Ksv", "Calculated FO",
+#'                 "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
+#' meta_df <- readxl::read_excel(filepath_seahorse,
+#'  sheet = "Assay Configuration",
+#'  col_names = c("parameter", "value"),
+#'  range = "A1:B83"
+#'
+#' check_excel_positions(meta_df, pos_vector, name_vector)
+
+
+
+check_excel_positions <- function(df, pos_vector, name_vector){
+
+  logger::log_info("Check if excel df contains data name on certain position.")
+  tf_values <- mapply(function(pos_vector, name_vector) {
+    true_false <- name_vector %in% df[[1]][pos_vector]
+    if(true_false == FALSE){return(FALSE)} else{
+      return(TRUE)
+    }
+  }, pos_vector, name_vector)
+
+  check_tf_list <- function(tf_values){
+    if(all((tf_values)) == FALSE){
+      logger::log_error("Sheet doesn't contain all values.")
+      stop()
+    } else{
+      return(TRUE)
+    }
+  }
+
+  tf <- check_tf_list(tf_values)
+
+  return(tf)
+}
+
