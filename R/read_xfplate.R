@@ -602,11 +602,6 @@ get_originalRateTable <- function(filepath_seahorse){
     check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
       dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
 
-  if (corrected_allready == TRUE){
-    colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
-    original_rate_df <- original_rate_df %>%
-      dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
-
     if (check_background == 0) {
       corrected_allready <- TRUE
     } else {
