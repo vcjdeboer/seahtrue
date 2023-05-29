@@ -599,25 +599,57 @@ get_originalRateTable <- function(filepath_seahorse){
     original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
 
     # because rate data can be either background corrected or not this should be checked first
-    check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
-      dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
+    # first verify whether a "Background" group exists in the  original_rate_df
 
-    if (check_background == 0) {
-      corrected_allready <- TRUE
-    } else {
-      corrected_allready <-  FALSE
-    }
+     if ("Background" %in% {original_rate_df$Group %>% unique()}) {
+
+       logger::log_info("A background group was found in the RATE sheet")
+
+
+       check_background <- original_rate_df %>%
+         dplyr::filter(Group == "Background") %>%
+         dplyr::select(OCR) %>%
+         dplyr::summarise(mean = mean(OCR)) %>%
+         dplyr::pull(mean)
+
+       if (check_background == 0) {
+         corrected_allready <- TRUE
+       } else {
+         corrected_allready <-  FALSE
+       }
+
+     } else {
+
+       #in case when there is no Background group we work with the original data
+       # that is in the input file "Rate" sheet
+       # please note that there will be warning logged, but the columns will be
+       # labeled incorrectly as if the data is background corrected
+
+       logger::log_info("WARNING: no background group was found in the 'Rate' sheet")
+
+       corrected_allready <-  TRUE
+
+     }
+
 
     if (corrected_allready == TRUE){
-      colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
+      colnames(original_rate_df) <-
+        c("measurement","well", "group",
+          "time_wave", "OCR_wave_bc",
+          "ECAR_wave_bc", "PER_wave_bc")
       original_rate_df <- original_rate_df %>%
         mutate(OCR_wave = 0, ECAR_wave = 0)
 
       original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+        dplyr::select(measurement, well, group,
+                      time_wave, OCR_wave, OCR_wave_bc,
+                      ECAR_wave, ECAR_wave_bc)
 
     } else{
-      colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave", "ECAR_wave", "PER_wave")
+      colnames(original_rate_df) <-
+        c("measurement","well", "group",
+          "time_wave", "OCR_wave",
+          "ECAR_wave", "PER_wave")
 
       #do background substraction for wave table
       background <- original_rate_df %>%
@@ -626,13 +658,17 @@ get_originalRateTable <- function(filepath_seahorse){
         dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
                   bkg_ECAR_wave = mean(ECAR_wave)
         )
-      original_rate_df <- dplyr::left_join(original_rate_df, background, by = c("measurement"), copy = TRUE)
+      original_rate_df <- dplyr::left_join(original_rate_df,
+                                           background,
+                                           by = c("measurement"), copy = TRUE)
 
       original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
       original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
 
       original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
+        dplyr::select(measurement, well, group,
+                      time_wave, OCR_wave, OCR_wave_bc,
+                      ECAR_wave, ECAR_wave_bc)
     }
 
     original_rate_df_list <- list(original_rate_df, corrected_allready)
