@@ -785,9 +785,11 @@ check_excel_positions <- function(df, pos_vector, name_vector){
 
   check_tf_list <- function(tf_values){
     if(all((tf_values)) == FALSE){
-      logger::log_error("Sheet doesn't contain all values.")
+      logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
       stop()
     } else{
+      logger::log_error("'Assay Configuration' sheet contains all values.")
+
       return(TRUE)
     }
   }
