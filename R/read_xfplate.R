@@ -467,7 +467,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   if (date_style == "empty"){
     date_run <- meta_df$value[meta_df$parameter == "Last Run"] # (Character instead of date-time column)
-    logger::log_info("Date-style is empty, no date conversion was performed.")
+    logger::log_info("Date-style is empty, no date conversion was performed. Format is 'string' instead of 'date'.")
     #be carefull with the data format in excel! either mdy or dmy
   }
 
