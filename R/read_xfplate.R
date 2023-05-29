@@ -455,13 +455,13 @@ get_xf_assayinfo <- function(filepath_seahorse,
 
   if (date_style == "US"){
     date_run <- lubridate::mdy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    logger::log_info("Converted date to US format.") # (Date-time column)
+    logger::log_info("Converted date to US format (US = mdy_hm, NL = dmy_hm).") # (Date-time column)
     #be carefull with the data format in excel! either mdy or dmy
   }
 
   if (date_style == "NL"){
     date_run <- lubridate::dmy_hm(meta_df$value[meta_df$parameter == "Last Run"])
-    logger::log_info("Converted date to US format.") # (Date-time column)
+    logger::log_info("Converted date to NL format (US = mdy_hm, NL = dmy_hm).") # (Date-time column)
     #be carefull with the data format in excel! either mdy or dmy
   }
 
