@@ -1,21 +1,57 @@
-# preprocess_xfplate
-# vincent de boer
-# september 24th, 2022
 
-library(readxl)
-
-# MAIN FUNCTION preprocess_xfplate ------------------------------------
-
-#' Preprocessing the plate data that was read in funs_read_plate_data.R
+#' Preprocessing the seahorse plate data that was read.
 #'
-#' @param xf_raw List (tibble) that contains 'Raw' Seahorse information.
-#' @param xf_pHcal List (tibble) that contains well and the corresponding pH calibration emission info.
-#' @param xf_inj A list (tibble) that contains injection information.
-#' @param xf_assayinfo List (tibble) with assay information.
-#' @param xf_buffer List (tibble) that contains well and bufferfactor.
-#' @param xf_norm List consisting [1] well names and the corresponding normalization values and
-#' [2] check if normalization data is available (TRUE/FALSE).
-#' @param xf_flagged Vector that contains wells that were "unselected" (flagged).
+#' @description
+#' This function performs the preprocessing of the xf_raw and the xf_rate tibbles
+#' and generates the final output nested tibble
+#'
+#' @param xf list with all necessary seahorse data.
+#'
+#' @return xf_plate_pr is returned this is a nested tibble with the following columns:
+#'  * plate_id = plate_id (from assay configuration sheet)
+#'  * filepath_seahorse = the original input file and its path on local drive
+#'  * date = date that seahorse was run (from assay configuration sheet)
+#'  * assay_info = parameters from Assay Configuration sheet
+#'  * injection_info = info from Operation log sheet
+#'  * raw_data = preprocessed raw data from Raw sheet
+#'  * rate_data = preprocessed rate data from Rate sheet
+#'
+#'
+#' @examples
+#' preprocess_xfplate(xf)
+
+preprocess_xfplate <- function(xf){
+
+  # Use our xf list with all the necessary Seahorse data to fill this data tibble.
+  xf_raw_pr <- preprocess_xf_raw(xf$raw,
+                                 xf$pHcal,
+                                 xf$inj,
+                                 xf$assayinfo,
+                                 xf$buffer,
+                                 xf$norm,
+                                 xf$flagged)
+
+  xf_rate_pr <- preprocess_xf_rate(xf$rate,
+                                   xf$norm,
+                                   xf$flagged)
+
+  #output all plate data
+  xf_plate_pr <- xf_raw_pr %>%
+    dplyr::group_by(plate_id) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(filepath_seahorse = xf$filepath_seahorse,
+                  date = xf$assayinfo$date_run,
+                  assay_info = list(tibble::tibble(xf$assayinfo)),
+                  rate_data = list(tibble::tibble(xf_rate_pr)),
+                  injection_info = list(tibble::tibble(xf$inj))) %>%
+    dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
+                  raw_data = data, rate_data)
+
+  return(xf_plate_pr)
+}
+
+
+#' Preprocess xf raw
 #'
 #' @description
 #' This function uses seahorse excel data that was read using functions from read_xfplate.r
@@ -28,6 +64,15 @@ library(readxl)
 #'   * adding flagged, norm and bufferfactor
 #'   * calculating background data
 #'   * calculating raw pH emission data
+#'
+#' @param xf_raw List (tibble) that contains 'Raw' Seahorse information.
+#' @param xf_pHcal List (tibble) that contains well and the corresponding pH calibration emission info.
+#' @param xf_inj A list (tibble) that contains injection information.
+#' @param xf_assayinfo List (tibble) with assay information.
+#' @param xf_buffer List (tibble) that contains well and bufferfactor.
+#' @param xf_norm List consisting [1] well names and the corresponding normalization values and
+#' [2] check if normalization data is available (TRUE/FALSE).
+#' @param xf_flagged Vector that contains wells that were "unselected" (flagged).
 #'
 #' @note The returned preprocessed "Raw" tibble doesn't only contain data of the "Raw" sheet,
 #' but for example also data from the "Assay Configuration sheet".
@@ -51,8 +96,7 @@ preprocess_xf_raw <- function(xf_raw,
                               xf_flagged) {
 
 
-  # Read_excel guesses numeric types as double. Not all data is of type double,
-  # some data has to be converted to integer.
+  # convert the original integer column to integers again, instead of double
   xf_raw_pr <- xf_raw %>%
     tibble::as_tibble() %>%
     dplyr::mutate(across(c(Measurement,
@@ -109,7 +153,7 @@ preprocess_xf_raw <- function(xf_raw,
 }
 
 
-#' Preprocess the xf_rate
+#' Preprocess xf_rate
 #'
 #' @description This function edits the xf_rate tibble to create a preprocessed tibble.
 #' The rate df contains OCR and ECAR information from the seahorse excel file.
@@ -138,45 +182,7 @@ preprocess_xf_rate <- function(xf_rate,
   return(OCR_from_excel)
 }
 
-#' Preprocessing the seahorse plate data that was read.
-#'
-#' @param xf list with all necessary seahorse data.
-#'
-#' @return Data tibble containing preprocessed data.
-#' @export
-#'
-#' @examples
-#' preprocess_xfplate(xf)
 
-preprocess_xfplate <- function(xf){
-
-  # Use our xf list with all the necessary Seahorse data to fill this data tibble.
-  xf_raw_pr <- preprocess_xf_raw(xf$raw,
-                                 xf$pHcal,
-                                 xf$inj,
-                                 xf$assayinfo,
-                                 xf$buffer,
-                                 xf$norm,
-                                 xf$flagged)
-
-  xf_rate_pr <- preprocess_xf_rate(xf$rate,
-                                   xf$norm,
-                                   xf$flagged)
-
-  #output all plate data
-  xf_plate_pr <- xf_raw_pr %>%
-    dplyr::group_by(plate_id) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(filepath_seahorse = xf$filepath_seahorse,
-           date = xf$assayinfo$date_run,
-           assay_info = list(tibble::tibble(xf$assayinfo)),
-           rate_data = list(tibble::tibble(xf_rate_pr)),
-           injection_info = list(tibble::tibble(xf$inj))) %>%
-    dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
-           raw_data = data, rate_data)
-
-  return(xf_plate_pr)
-}
 
 # DEPENDENT FUNCTIONS ---------------------------------------------------------------
 
