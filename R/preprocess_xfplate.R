@@ -18,20 +18,26 @@ library(readxl)
 #' @param xf_flagged Vector that contains wells that were "unselected" (flagged).
 #'
 #' @description
-#' This function uses seahorse excel data that was read beforehand (reading step)
-#' The function will edit the "Raw" (With data from the "Raw" sheet) data tibble that was produced.
-#' Our "Raw" tibble will be edited to create our new preprocessed "Raw" dataset.
+#' This function uses seahorse excel data that was read using functions from read_xfplate.r
+#' The function will preprocess and merge data into the xf_raw data tibble, to produce
+#' the xf_raw_pr tibble by:
 #'   * changing columns names
 #'   * adding new time columns
 #'   * adding injection info columns
 #'   * add plate_id column
+#'   * adding flagged, norm and bufferfactor
 #'   * calculating background data
 #'   * calculating raw pH emission data
 #'
 #' @note The returned preprocessed "Raw" tibble doesn't only contain data of the "Raw" sheet,
 #' but for example also data from the "Assay Configuration sheet".
 #'
-#' @return A preprocessed "Raw" data list (tibble).
+#' @return A preprocessed "Raw" data list (tibble). With the following columns:
+#'
+#' plate_id, well, measurement, tick, timescale, minutes, group, interval, injection,
+#' O2_em_corr, pH_em_corr, O2_mmHg, pH, pH_em_corr_corr, O2_em_corr_bkg,
+#' pH_em_corr_bkg, O2_mmHg_bkg, pH_bkgd, pH_em_corr_corr_bkg, bufferfactor,
+#' cell_n, flagged_well
 #'
 #' @examples
 #' preprocess_xf_raw(xf$raw, xf$pHcal, xf$inj, xf$assayinfo, xf$buffer, xf$norm, xf$flagged)
@@ -179,8 +185,8 @@ preprocess_xfplate <- function(xf){
 #' Rename the columns of the Raw data sheet.
 #'
 #' @description
-#' This function renames the columns of the dataframe that was
-#' read beforehand. read_excel from the WAVE excel output file, excel sheet "Raw".
+#' This function renames the columns of the xf_raw dataframe that was
+#' read using read_excel from the WAVE excel input file.
 #'
 #' @note This function is called at the preprocess script.
 #'
@@ -221,7 +227,7 @@ rename_columns <- function(xf_raw_pr) {
 #' @note This function is called at the preprocess script.
 #'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
-#' @return A new dataframe with new columns added  to \code{xf_raw_pr}. New columns
+#' @return A new dataframe with new columns added  to xf_raw_pr. New columns
 #'  are: "totalMinutes", "minutes", "timescale".
 #'
 convert_timestamp <- function(xf_raw_pr) {
@@ -253,6 +259,8 @@ convert_timestamp <- function(xf_raw_pr) {
 #' @param pH_em_corr pH corrected emission derived from the seahorse "Raw" sheet.
 #' @param pH_cal_em pH emission derived from the seahorse "Calibration" sheet.
 #' @param pH_targetEmission pH target emission derived from the seahorse "Calibration" sheet.
+#'
+#' @return a vector with corrected pH_em_corr 'pH_em_corr_corr'
 
 correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 
@@ -264,7 +272,13 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 
 #' Calculate backgrounds
 #'
+#' @description Calculates all pH and O2 background gorup means of all wells
+#' assigned to the 'Background' group
+#'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
+#'
+#' @return A new dataframe  'background' with for each measurement the mean background for:
+#' O2_em_corr, pH_em_corr, O2_mmHg, pH and pH_em_corr_corr
 #'
 calc_background <- function(xf_raw_pr){
 
