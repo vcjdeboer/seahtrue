@@ -1,5 +1,5 @@
 
-#' Preprocessing the seahorse plate data that was read.
+#' Preprocessing the seahorse plate data that was read in read_xfplate.r
 #'
 #' @description
 #' This function performs the preprocessing of the xf_raw and the xf_rate tibbles
@@ -7,7 +7,7 @@
 #'
 #' @param xf list with all necessary seahorse data.
 #'
-#' @return xf_plate_pr is returned this is a nested tibble with the following columns:
+#' @return xf_plate_pr is returned this is a nested tibble with the following 7 columns:
 #'  * plate_id = plate_id (from assay configuration sheet)
 #'  * filepath_seahorse = the original input file and its path on local drive
 #'  * date = date that seahorse was run (from assay configuration sheet)
@@ -15,7 +15,7 @@
 #'  * injection_info = info from Operation log sheet
 #'  * raw_data = preprocessed raw data from Raw sheet
 #'  * rate_data = preprocessed rate data from Rate sheet
-#'
+#'  One assay (one plate), contains all data in one row
 #'
 #' @examples
 #' preprocess_xfplate(xf)
