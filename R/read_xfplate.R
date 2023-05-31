@@ -1,6 +1,72 @@
-# read_xfplate.r
-# Vincent de Boer
-# September 24th, 2022
+
+
+# read_xfplate() -------------------------------------------------------
+#' Read necessary Seahorse plate data from Seahorse Excel file.
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return xf list with all necessary Seahorse data.
+#'
+#' @examples
+#' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+read_xfplate <- function(filepath_seahorse) {
+
+  tryCatch({
+
+    rlang::check_required(filepath_seahorse)
+
+    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
+                                {filepath_seahorse}"))
+
+    # read data
+    xf_raw <- get_xf_raw(filepath_seahorse)
+    xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
+    xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
+    xf_buffer <- get_xf_buffer(filepath_seahorse)
+    xf_inj <- get_xf_inj(filepath_seahorse)
+    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
+    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
+    xf_flagged <- get_xf_flagged(filepath_seahorse)
+    xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
+                                     norm_available = xf_norm[[2]],
+                                     xls_ocr_backgroundcorrected =xf_rate[[2]])
+    xf_norm <- xf_norm[[1]]
+    xf_rate <- xf_rate[[1]]
+
+    # make the output list
+    xf <- list(
+      raw = xf_raw,
+      rate = xf_rate,
+      assayinfo = xf_assayinfo,
+      inj = xf_inj,
+      pHcal = xf_pHcal,
+      O2cal = xf_O2cal,
+      norm = xf_norm,
+      flagged = xf_flagged,
+      buffer = xf_buffer,
+      filepath_seahorse = filepath_seahorse
+    )
+
+    logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
+
+    return(xf)
+
+
+  }, warning = function(war) {
+    cat("WARNING :", conditionMessage(war), "\n")
+    logger::log_warn(conditionMessage(war), "\n")
+  },
+  error = function(err) {
+    logger::log_error(conditionMessage(err))
+    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+  }
+  )
+
+}
 
 # get_xf_raw() --------------------------------------------------------------
 #' Get the data of the Seahorse 'Raw'-sheet
@@ -679,73 +745,7 @@ get_originalRateTable <- function(filepath_seahorse){
 
 }
 
-# read_xfplate() -------------------------------------------------------
-#' Read necessary Seahorse plate data from Seahorse Excel file.
-#'
-#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
-#' This Excel file is converted from the assay result file (.asyr) downloaded from
-#' the Agilent Seahorse XF Wave software.
-#'
-#' @return xf list with all necessary Seahorse data.
-#'
-#' @examples
-#' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
-read_xfplate <- function(filepath_seahorse) {
 
-  tryCatch({
-
-    rlang::check_required(filepath_seahorse)
-
-    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
-                                {filepath_seahorse}"))
-
-      # read data
-      xf_raw <- get_xf_raw(filepath_seahorse)
-      xf_rate <- get_xf_rate(filepath_seahorse) #outputs list of 2
-      xf_norm <- get_xf_norm(filepath_seahorse) #outputs list of 2
-      xf_buffer <- get_xf_buffer(filepath_seahorse)
-      xf_inj <- get_xf_inj(filepath_seahorse)
-      xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-      xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-      xf_flagged <- get_xf_flagged(filepath_seahorse)
-      xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
-                                       norm_available = xf_norm[[2]],
-                                       xls_ocr_backgroundcorrected =xf_rate[[2]])
-      xf_norm <- xf_norm[[1]]
-      xf_rate <- xf_rate[[1]]
-
-      # make the output list
-      xf <- list(
-        raw = xf_raw,
-        rate = xf_rate,
-        assayinfo = xf_assayinfo,
-        inj = xf_inj,
-        pHcal = xf_pHcal,
-        O2cal = xf_O2cal,
-        norm = xf_norm,
-        flagged = xf_flagged,
-        buffer = xf_buffer,
-        filepath_seahorse = filepath_seahorse
-      )
-
-      logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
-
-      return(xf)
-
-
-  }, warning = function(war) {
-    cat("WARNING :", conditionMessage(war), "\n")
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err))
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
-  }
-  )
-
-}
 
 
 #additional utility functions
