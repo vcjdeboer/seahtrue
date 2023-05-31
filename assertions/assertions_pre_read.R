@@ -1,6 +1,17 @@
 # Assertion seahorse xf_plate
 # Use this function before reading the xf_plate.
-val_xfplate <- function(filepath_seahorse){
+
+#' This is a wrapper function around path_not_found and check_sheets
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return TRUE or FALSE, based the existence of the filepath and sheets in excel file
+#'
+#' @examples validate_xf_input(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+
+validate_xf_input <- function(filepath_seahorse){
   # check if arguments function are present.
   rlang::check_required(filepath_seahorse)
   # Check if file with specific file path exists.
@@ -64,7 +75,6 @@ check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_
     excel_sheets <- readxl::excel_sheets(filepath_excel)
 
     for (value in sheets_predicted) {
-      x <- sheets_predicted[[2]]
       stopifnot(value %in% excel_sheets)
     }
 
@@ -72,7 +82,7 @@ check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_
     return(TRUE)
   },
   error = function(cnd) {
-    cli::cli_abort("Can't find sheet {x}.", parent = cnd, call = call)
+    cli::cli_abort("Can't find sheet {value}.", parent = cnd, call = call)
     cli::cli_alert_info("Check your excel file.")
   }
   )
