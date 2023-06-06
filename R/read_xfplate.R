@@ -129,7 +129,6 @@ get_xf_flagged <- function(filepath_seahorse){
                                  "I" = "07", "J" = "08", "K" = "09", "L" = "10", "M" = "11", "N" = "12"))
     new_col_names <-   unlist(stringr::str_split(new_col_names, "---"))
 
-
     new_row_names <- flagged_df %>%
       dplyr::pull(address) %>% substr(2,3) %>%
       stringr::str_c(collapse = "---") %>%
@@ -140,9 +139,14 @@ get_xf_flagged <- function(filepath_seahorse){
     # output the wells that were "unselected" (flagged)
     flagged_vector <- paste0(new_row_names, new_col_names)
 
+    flagged_tibble <- tibble::tibble(
+      well = flagged_vector,
+      flag = TRUE
+    )
+
     logger::log_info("Finished collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
-    return(flagged_vector)
+    return(flagged_tibble)
 }
 
 
@@ -439,6 +443,10 @@ get_xf_assayinfo <- function(filepath_seahorse,
   KSV <- KSV_corrected
 
   pH_0 <- as.double(meta_df$value[meta_df$parameter == "Calibration pH"])
+  pH_plateVolume <- as.double(meta_df$value[meta_df$parameter == "Plate Volume"])
+  pH_kVol <- as.double(meta_df$value[meta_df$parameter == "kVol"])
+
+
   plate_id <- meta_df$value[meta_df$parameter == "Plate Barcode"]
   cartridge_barcode <- meta_df$value[meta_df$parameter == "Cartridge Barcode"]
   assay_name <- meta_df$value[meta_df$parameter == "Assay Name"]
@@ -486,6 +494,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       gain1,
       gain2,
       pH_0,
+      pH_plateVolume,
+      pH_kVol,
       pH_targetEmission,
       O2_targetEmission,
       plate_id,
@@ -510,6 +520,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       gain1,
       gain2,
       pH_0,
+      pH_plateVolume,
+      pH_kVol,
       pH_targetEmission,
       O2_targetEmission,
       plate_id,
@@ -602,11 +614,6 @@ get_originalRateTable <- function(filepath_seahorse){
     check_background <- original_rate_df %>% dplyr::filter(Group == "Background") %>% dplyr::select(OCR) %>%
       dplyr::summarise(mean = mean(OCR)) %>% dplyr::pull(mean)
 
-  if (corrected_allready == TRUE){
-    colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
-    original_rate_df <- original_rate_df %>%
-      dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
-
     if (check_background == 0) {
       corrected_allready <- TRUE
     } else {
@@ -616,7 +623,7 @@ get_originalRateTable <- function(filepath_seahorse){
     if (corrected_allready == TRUE){
       colnames(original_rate_df) <- c("measurement","well", "group", "time_wave", "OCR_wave_bc", "ECAR_wave_bc", "PER_wave_bc")
       original_rate_df <- original_rate_df %>%
-        mutate(OCR_wave = 0, ECAR_wave = 0)
+        dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
 
       original_rate_df <- original_rate_df %>%
         dplyr::select(measurement, well, group, time_wave, OCR_wave, OCR_wave_bc, ECAR_wave, ECAR_wave_bc)
@@ -661,7 +668,10 @@ get_originalRateTable <- function(filepath_seahorse){
 #' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
 #' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
-read_xfplate <- function(filepath_seahorse) {
+
+read_xfplate <- function(filepath_seahorse,
+                         date_style = "US",
+                         instrument = "XFe96") {
 
   tryCatch({
 
@@ -680,8 +690,10 @@ read_xfplate <- function(filepath_seahorse) {
       xf_O2cal <- get_xf_O2cal(filepath_seahorse)
       xf_flagged <- get_xf_flagged(filepath_seahorse)
       xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
+                                       date_style = date_style,
+                                       instrument = instrument,
                                        norm_available = xf_norm[[2]],
-                                       xls_ocr_backgroundcorrected =xf_rate[[2]])
+                                       xls_ocr_backgroundcorrected = xf_rate[[2]])
       xf_norm <- xf_norm[[1]]
       xf_rate <- xf_rate[[1]]
 

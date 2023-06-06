@@ -2,8 +2,6 @@
 # vincent de boer
 # september 24th, 2022
 
-library(readxl)
-
 # MAIN FUNCTION preprocess_xfplate ------------------------------------
 
 #' Preprocessing the plate data that was read in funs_read_plate_data.R
@@ -96,7 +94,7 @@ preprocess_xf_raw <- function(xf_raw,
   xf_raw_pr <- xf_raw_pr %>% dplyr::select(
     plate_id, well, measurement, tick, timescale, minutes, group, interval, injection,
     O2_em_corr, pH_em_corr, O2_mmHg, pH, pH_em_corr_corr, O2_em_corr_bkg,
-    pH_em_corr_bkg, pH_bkgd, pH_em_corr_corr_bkg, bufferfactor, cell_n, flagged_well
+    pH_em_corr_bkg, O2_mmHg_bkg, pH_bkgd, pH_em_corr_corr_bkg, bufferfactor, cell_n, flagged_well
   )
 
   return(xf_raw_pr)
@@ -138,7 +136,6 @@ preprocess_xf_rate <- function(xf_rate,
 #'
 #' @return Data tibble containing preprocessed data.
 #' @export
-#'
 #' @examples
 #' preprocess_xfplate(xf)
 
@@ -276,6 +273,7 @@ calc_background <- function(xf_raw_pr){
       measurement,
       O2_em_corr_bkg = mean(O2_em_corr),
       pH_em_corr_bkg = mean(pH_em_corr),
+      O2_mmHg_bkg = mean(O2_mmHg),
       pH_bkgd = mean(pH),
       pH_em_corr_corr_bkg = mean(pH_em_corr_corr)
     )

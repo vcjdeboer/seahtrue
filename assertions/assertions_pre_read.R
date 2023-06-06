@@ -54,7 +54,7 @@ path_not_found <- function(filepath_seahorse){
 #' @param sheets_predicted
 #'
 #' @return TRUE or FALSE, based on existence of the required Seahorse sheets.
-#' @examples check_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration","Rate","Rw", "Calibration","Operation Log"))
+#' @examples check_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
 check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_env()){
   rlang::try_fetch({
 

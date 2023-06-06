@@ -13,20 +13,20 @@
 plot_raw_BKGD <- function(var, xf_raw_pr, O2_targetEmission, pH_targetEmission, flnme){
   logger::log_info("Plot Raw background. Visualizes the fluorescent emission (Au) of each background well against time.")
 
-  theme_maxTick <<- function(){
-    ggplot2::theme_classic(base_size = 10) %+replace%
+  theme_maxTick <- function(){
+    ggplot2::theme_classic(base_size = 15) %+replace%
       ggplot2::theme(panel.grid.minor.x = element_blank(),
-            panel.grid.major.x = element_blank(),
-            panel.grid.minor.y = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.border = element_blank(),
-            axis.ticks.x = element_line(),
-            axis.ticks.y = element_line(),
-            axis.line.y = element_line(),
-            legend.text = element_text(size = rel(1)),
-            legend.title = element_text(size = rel(1)),
-            axis.title.x = element_text(size = rel(1)),
-            axis.title.y = element_text(size = rel(1), angle = 90)
+                     panel.grid.major.x = element_blank(),
+                     panel.grid.minor.y = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.border = element_blank(),
+                     axis.ticks.x = element_line(),
+                     axis.ticks.y = element_line(),
+                     axis.line.y = element_line(),
+                     legend.text = element_text(size = rel(0.7)),
+                     legend.title = element_text(size = rel(0.7)),
+                     axis.title.x = element_text(size = rel(0.8)),
+                     axis.title.y = element_text(size = rel(0.8), angle = 90)
       )
   }
 
@@ -55,7 +55,6 @@ plot_raw_BKGD <- function(var, xf_raw_pr, O2_targetEmission, pH_targetEmission, 
                    plot.subtitle = element_text(hjust = 0.5, size = 10))
 
   return(ggiraph::girafe(ggobj = gg_plot))
-
 
 }
 
@@ -370,7 +369,7 @@ plot_group_emissions <- function(var, xf_raw_pr, O2_targetEmission, pH_targetEmi
   gg <- ggplot2::ggplot(data = df,
                mapping = ggplot2::aes(x = measurement, y = emission, group = measurement))+
     ggiraph::geom_line_interactive(ggplot2::aes(x = measurement, y = emission, group = well, data_id = df$well, tooltip = df$well))+
-    ggplot2:geom_point(data = mean_O2_em_corr, mapping = ggplot2::aes(x = measurement,
+    ggplot2::geom_point(data = mean_O2_em_corr, mapping = ggplot2::aes(x = measurement,
                                                      y = m_em),
                color = "#293352")+
     ggplot2::geom_errorbar(data = mean_O2_em_corr, mapping = ggplot2::aes(x = measurement,
