@@ -93,7 +93,7 @@ calculate_qc_ref <- function(my_qc_ref_df){
     dplyr::group_by(well) %>%
     dplyr::summarize(Maximum = max(dev_fromTarget),
               Minimum = min(dev_fromTarget),
-              First = first(dev_fromTarget),
+              First = dplyr::first(dev_fromTarget),
               Last = last(dev_fromTarget),
               'Range(M-M)' = Maximum-Minimum,
               'Range(F-L)' = Last-First)

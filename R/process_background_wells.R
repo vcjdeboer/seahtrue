@@ -104,8 +104,8 @@ get_bkgd_qc_scores <- function(my_plate_df, qc_well_ref, qc_plate_ref) {
     dplyr::group_by(well) %>%
     dplyr::summarize(Maximum = max(dev_fromTarget),
               Minimum = min(dev_fromTarget),
-              First = first(dev_fromTarget),
-              Last = last(dev_fromTarget),
+              First = dplyr::first(dev_fromTarget),
+              Last = dplyr::last(dev_fromTarget),
               'Range(M-M)' = Maximum-Minimum,
               'Range(F-L)' = Last-First)
 
@@ -145,27 +145,27 @@ get_well_scores <- function(df, qc_well){
   df$rangeMM_score <-  0
 
   for(w in 1:nrow(df)){
-    df$max_score[w] <- get_score(df %>% slice(w),
+    df$max_score[w] <- get_score(df %>% dplyr::slice(w),
                                  qc_well,
                                  "Maximum")
 
-    df$min_score[w] <- get_score(df %>% slice(w),
+    df$min_score[w] <- get_score(df %>% dplyr::slice(w),
                                  qc_well,
                                  "Minimum")
 
-    df$rangeFL_score[w] <- get_score(df %>% slice(w),
+    df$rangeFL_score[w] <- get_score(df %>% dplyr::slice(w),
                                      qc_well,
                                      "Range(F-L)")
 
-    df$first_score[w] <- get_score(df %>% slice(w),
+    df$first_score[w] <- get_score(df %>% dplyr::slice(w),
                                    qc_well,
                                    "First")
 
-    df$last_score[w] <- get_score(df %>% slice(w),
+    df$last_score[w] <- get_score(df %>% dplyr::slice(w),
                                   qc_well,
                                   "Last")
 
-    df$rangeMM_score[w] <- get_score(df %>% slice(w),
+    df$rangeMM_score[w] <- get_score(df %>% dplyr::slice(w),
                                      qc_well,
                                      "Range(M-M)")
   }
@@ -196,7 +196,7 @@ get_score <- function(df, qc, var){
   iqr <- qc$iqr[[1]]
 
   x <- df %>%
-    dplyr::pull(all_of(var))
+    dplyr::pull(tidyselect::all_of(var))
 
   score = 3
   if(dplyr::between(x, Q25, Q75)){
@@ -275,7 +275,7 @@ calc_background_pH_col <- function(plate_df, pH_flagged_bkgd_wells){
 set_bkgd_well_flags <- function(preprocessed_xfplate, my_qc_well_ref, my_qc_plate_ref){
 
   #calculate scores and flagged wells
-  qc_scores <- get_bkgd_qc_scores(preprocessed_xfplate %>% pull(raw_data) %>% pluck(1),
+  qc_scores <- get_bkgd_qc_scores(preprocessed_xfplate %>% dplyr::pull(raw_data) %>% purrr::pluck(1),
                                   my_qc_well_ref[[1]],
                                   my_qc_plate_ref[[1]])
   O2_flagged_bkgd_wells <- flag_bkgd_wells(qc_scores$well_scores , score_cutoff= 10)

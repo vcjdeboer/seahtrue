@@ -535,10 +535,8 @@ plot_allWells_firstTicks <- function(var, xf_raw_pr, O2_targetEmission, pH_targe
     df <- df %>% dplyr::group_by(well,measurement) %>%
       dplyr::slice(which.min(tick))
 
-    df <- df %>% dplyr::group_by(well,measurement)
-
     df <- df %>%
-      dplyr::filter(str_detect(well, glue::glue("^{well_letter}")))
+      dplyr::filter(stringr::str_detect(well, glue::glue("^{well_letter}")))
 
     if (var == "O2_em_corr"){targetEMS<-  O2_targetEmission} else {targetEMS <- pH_targetEmission}
 
