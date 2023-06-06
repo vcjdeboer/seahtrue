@@ -189,36 +189,6 @@ sternVolmer <- function(x, KSV, F0){
 }
 
 
-#data
-my_data_pbmc <<- load(here::here("data", "my_pbmc_data.rda"))
-
-#script
-processed <- data %>%
-  mutate(pr_raw_data = purrr::map2(raw_data,
-                            assay_info,
-                            ~mutate(.x,
-                                    O2 = sternVolmer(.x$O2_em_corr, .y$KSV, .y$F0),
-                                    O2_bkgd = sternVolmer(.x$O2_em_corr_bkg, .y$KSV, .y$F0),
-                                    O2_M_mmHg = substract_O2_bkgd(O2, O2_bkgd, .y$O2_0_mmHg)))) %>%
-  mutate(ocr_without_meta = purrr::map2(pr_raw_data,
-                    assay_info,
-                    ~{.x %>%
-                        split(f = as.factor(.$well)) %>%
-                        purrr::map2(rep(list(.y), length(.)),
-                             ~{add_extraTicks_new_2(.x, "O2_M_mmHg") %>% calculate_OCR_new(.y)}) %>%
-                        bind_rows(.id = "well")})) %>%
-  mutate(ocr = purrr::map2(raw_data,
-                    ocr_without_meta,
-                    ~{.x %>%
-                      distinct(well, measurement, .keep_all = TRUE) %>%
-                      select(well, measurement,
-                              group, interval, bufferfactor,
-                              cell_n, flagged_well) %>%
-                      left_join(.y, by= c("well", "measurement"))})) %>%
-  select(-ocr_without_meta)
-
-
-
 
 
 
