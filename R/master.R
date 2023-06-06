@@ -1,4 +1,10 @@
-library(tidyverse)
+library(dplyr)
+
+source(here::here("R", "preprocess_xfplate.R"))
+source(here::here("R", "read_xfplate.R"))
+source(here::here("R", "utils.R"))
+source(here::here("R", "process_background_wells.R"))
+source(here::here("R", "calculate_ocr.R"))
 
 # step 1 ------------------------------------------------------------------
 
