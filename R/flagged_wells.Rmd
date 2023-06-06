@@ -36,6 +36,7 @@ library(dplyr)
 source(here::here("R", "process_background_wells.R"))
 source(here::here("R", "preprocess_xfplate.R"))
 source(here::here("R", "read_xfplate.R"))
+source(here::here("R", "utils.R"))
 ```
 
 **File location**: <br />
@@ -45,7 +46,7 @@ The $\color{red}{\text{here}}$ function from the here package makes sure that th
 Set path to the seahorse excel file.
 ```{r set_path_to_seahorse_file}
 
-filepath_seahorse <- paste0(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+filepath_seahorse <- here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx")
 
 ```
 

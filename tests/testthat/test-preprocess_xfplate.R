@@ -1,17 +1,26 @@
-# # Test files --------------------------------------------------------------
+# Load seahorse xf dataset -------
+# xf_donor_A <- here::here("tests", "testthat", "xf_donor_A.rda")
+# xf_donor_B <- here::here("tests", "testthat", "xf_donor_B.rda")
+# xf_donor_C <- here::here("tests", "testthat", "xf_donor_C.rda")
+#
+# xf_donor_A <- testthat::test_path("xf_donor_A.rda")
+# xf_donor_B <- testthat::test_path("xf_donor_B.rda")
+# xf_donor_C <- testthat::test_path("xf_donor_C.rda")
 
-xf_donor_A <- here::here("data", "xf_donor_A.rda")
-xf_donor_B <- here::here("data", "xf_donor_B.rda")
-xf_donor_C <- here::here("data", "xf_donor_C.rda")
+load(testthat::test_path("xf_donor_A.rda"))
+load(testthat::test_path("xf_donor_B.rda"))
+load(testthat::test_path("xf_donor_C.rda"))
 
-load(xf_donor_A)
-load(xf_donor_B)
-load(xf_donor_C)
+donor_a <- xf_donor_A
+donor_b <- xf_donor_B
+donor_c <- xf_donor_C
 
-filepath <- list(xf_donor_A,
-                 xf_donor_B,
-                 xf_donor_C)
+filepath <- list(donor_a,
+                 donor_b,
+                 donor_c)
 
+
+# Perform checks on each seahorse xf dataset ----
 for (rda_file in filepath){
 
   local({
@@ -29,6 +38,7 @@ for (rda_file in filepath){
     xf_raw_pr = NULL
     OCR_from_excel = NULL
 
+    # Check if specific columns of the preprocessed datset are of type list -------
     test_that("type list", {
       # <<- to change the above variables (xf_plate_pr, xf_raw_pr, OCR_from_excel) outside of test_that.
       xf_plate_pr <<- expect_type(preprocess_xfplate(xf), "list")
@@ -40,6 +50,7 @@ for (rda_file in filepath){
       OCR_from_excel <<- expect_type(preprocess_xf_rate(xf$rate, xf$norm, xf$flagged), "list")
     })
 
+    # Check if specific columns of the preprocessed datset are of type character -------
     test_that("type character", {
       expect_type(xf_plate_pr$plate_id, "character")
       expect_type(xf_plate_pr$assay_info[[1]]$plate_id, "character")
@@ -59,6 +70,7 @@ for (rda_file in filepath){
       expect_type(xf_plate_pr$rate_data[[1]]$group, "character")
     })
 
+    # Check if specific columns of the preprocessed datset are of type double -------
     test_that("type double", {
       expect_type(xf_plate_pr$date, "double")
       expect_type(xf_raw_pr$timescale, "double")
@@ -102,8 +114,8 @@ for (rda_file in filepath){
       expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr_bkg, "double")
       expect_type(xf_plate_pr$raw_data[[1]]$O2_mmHg_bkg, "double")
       expect_type(xf_plate_pr$raw_data[[1]]$pH_bkgd, "double")
-      expect_type(xf_plate_pr$raw_data[[1]][18]$pH_em_corr_corr_bkg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]][19]$bufferfactor, "double")
+      expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr_corr_bkg, "double")
+      expect_type(xf_plate_pr$raw_data[[1]]$bufferfactor, "double")
       expect_type(xf_plate_pr$rate_data[[1]]$measurement, "double")
       expect_type(xf_plate_pr$rate_data[[1]]$time_wave, "double")
       expect_type(xf_plate_pr$rate_data[[1]]$OCR_wave, "double")
@@ -112,6 +124,7 @@ for (rda_file in filepath){
       expect_type(xf_plate_pr$rate_data[[1]]$ECAR_wave_bc, "double")
     })
 
+    # Check if specific columns of the preprocessed datset are of type integer -------
     test_that("type integer", {
       expect_type(xf_raw_pr$measurement, "integer")
       expect_type(xf_raw_pr$tick, "integer")
@@ -121,6 +134,7 @@ for (rda_file in filepath){
       expect_type(xf_plate_pr$rate_data[[1]]$measurement, "double") # actually an integer
     })
 
+    # Check if specific columns of the preprocessed datset are of type logical -------
     test_that("type logical", {
       expect_type(xf_raw_pr$flagged_well, "logical")
       expect_type(xf_plate_pr$assay_info[[1]]$KSV_tempCorrection, "logical")
@@ -128,6 +142,7 @@ for (rda_file in filepath){
       expect_type(xf_plate_pr$rate_data[[1]]$flagged_well, "logical")
     })
 
+    # Check if the preprocessed xf datasframe contains the right columnnames -------
     test_that("check column names", {
       check_column_names(xf_plate_pr, list("plate_id", "filepath_seahorse", "date", "assay_info", "injection_info", "raw_data", "rate_data"))
       check_column_names(xf_raw_pr, list("plate_id" , "well" , "measurement", "tick", "timescale", "minutes", "group", "injection", "O2_em_corr",
@@ -135,11 +150,13 @@ for (rda_file in filepath){
                                          "pH_bkgd", "pH_em_corr_corr_bkg", "cell_n", "flagged_well"))
     })
 
+    # Check if specific columns of the preprocessed datset are of type date -------
     test_that("type date", {
       expect_type(xf_plate_pr$date, "double")
       expect_type(xf_plate_pr$assay_info[[1]]$date_run, "double")
     })
 
+    # Check if specific columns of the preprocessed datset are of type logical -------
   test_that("type logical or double", {
       if (all(is.na(xf_plate_pr$raw_data[[1]]$cell_n)) == TRUE) {
         expect_type(xf_plate_pr$raw_data[[1]]$cell_n, "logical")

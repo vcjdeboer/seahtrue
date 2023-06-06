@@ -31,10 +31,9 @@ check_column_names <- function(df, df_columns_list){
   }
 }
 
-# Test files --------------------------------------------------------------
-seahorse_files <- list("20191219 SciRep PBMCs donor A.xlsx",
-                       "20200110 SciRep PBMCs donor B.xlsx",
-                       "20200110 SciRep PBMCs donor C.xlsx")
+
+seahorse_files <- testthat::test_path("20200110 SciRep PBMCs donor B.xlsx")
+
 
 # testthat: Test 'Raw' data --------------------------------------------------------------
 for (seahorse_file in seahorse_files){
@@ -128,7 +127,7 @@ for (seahorse_file in seahorse_files){
     })
   }
 
-# testthat: Test the pH calibration emission data.. --------------------------------------------------------------
+# testthat: Test the pH calibration emission data. --------------------------------------------------------------
 for (seahorse_file in seahorse_files){
   filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test the pH calibration emission data.", {
@@ -165,7 +164,7 @@ for (seahorse_file in seahorse_files){
   })
 }
 
-# # testthat: Test assay information. --------------------------------------------------------------
+# testthat: Test assay information. --------------------------------------------------------------
 for (seahorse_file in seahorse_files){
   filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test assay information.", {

@@ -4,7 +4,7 @@ library(tidyverse)
 
 ## set path to file
 path_to_fileName <-
-  paste0(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+  paste0(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 
 # step 2 ------------------------------------------------------------------
 

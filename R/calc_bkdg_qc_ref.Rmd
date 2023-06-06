@@ -27,7 +27,7 @@ The $\color{red}{\text{here}}$ function from the here package makes sure that th
 
 ```{r set_path_to_seahorse_file}
 
-filepath_seahorse <- paste0(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+filepath_seahorse <- paste0(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 
 ```
 
