@@ -2,6 +2,14 @@
 # Since they serve as helpers to multiple functions, placing them in R/utils.R makes them easier to re-discover
 # when you return to your package after a long break.
 
+#' Check if excel df contains data name on certain position.
+#'
+#' @param df Dataframe
+#' @param pos_vector Position of cell in dataframe
+#' @param name_vector Name of cell data frame
+#'
+#' @return True when all names of dataframe exists at the corresponding postion.
+#'
 check_excel_positions <- function(df, pos_vector, name_vector){
 
   logger::log_info("Check if excel df contains data name on certain position.")
@@ -17,6 +25,11 @@ check_excel_positions <- function(df, pos_vector, name_vector){
   return(tf)
 }
 
+#' Helper - Check if excel df contains data name on certain position.
+#'
+#' @param tf_values Values are true when cell exists on corresponding position. Otherwise value is false.
+#'
+#' @return True if when all names of dataframe exists at the corresponding position.
 check_tf_list <- function(tf_values){
   if(all((tf_values)) == FALSE){
     logger::log_error("Sheet doesn't contain all values.")
