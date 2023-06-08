@@ -1,10 +1,69 @@
-# preprocess_xfplate
-# vincent de boer
-# september 24th, 2022
-
 # MAIN FUNCTION preprocess_xfplate ------------------------------------
+#' Preprocessing the seahorse plate data that was read in read_xfplate.r
+#'
+#' @description
+#' This function performs the preprocessing of the xf_raw and the xf_rate tibbles
+#' and generates the final output nested tibble
+#'
+#' @param xf list with all necessary seahorse data.
+#'
+#' @return xf_plate_pr is returned this is a nested tibble with the following 7 columns:
+#'  * plate_id = plate_id (from assay configuration sheet)
+#'  * filepath_seahorse = the original input file and its path on local drive
+#'  * date = date that seahorse was run (from assay configuration sheet)
+#'  * assay_info = parameters from Assay Configuration sheet
+#'  * injection_info = info from Operation log sheet
+#'  * raw_data = preprocessed raw data from Raw sheet
+#'  * rate_data = preprocessed rate data from Rate sheet
+#'  One assay (one plate), contains all data in one row
+#'
+#' @examples
+#' preprocess_xfplate(xf)
 
-#' Preprocessing the plate data that was read in funs_read_plate_data.R
+preprocess_xfplate <- function(xf){
+
+  # Use our xf list with all the necessary Seahorse data to fill this data tibble.
+  xf_raw_pr <- preprocess_xf_raw(xf$raw,
+                                 xf$pHcal,
+                                 xf$inj,
+                                 xf$assayinfo,
+                                 xf$buffer,
+                                 xf$norm,
+                                 xf$flagged)
+
+  xf_rate_pr <- preprocess_xf_rate(xf$rate,
+                                   xf$norm,
+                                   xf$flagged)
+
+  #output all plate data
+  xf_plate_pr <- xf_raw_pr %>%
+    dplyr::group_by(plate_id) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(filepath_seahorse = xf$filepath_seahorse,
+                  date = xf$assayinfo$date_run,
+                  assay_info = list(tibble::tibble(xf$assayinfo)),
+                  rate_data = list(tibble::tibble(xf_rate_pr)),
+                  injection_info = list(tibble::tibble(xf$inj))) %>%
+    dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
+                  raw_data = data, rate_data)
+
+  return(xf_plate_pr)
+}
+
+
+#' Preprocess xf raw
+#'
+#' @description
+#' This function uses seahorse excel data that was read using functions from read_xfplate.r
+#' The function will preprocess and merge data into the xf_raw data tibble, to produce
+#' the xf_raw_pr tibble by:
+#'   * changing columns names
+#'   * adding new time columns
+#'   * adding injection info columns
+#'   * add plate_id column
+#'   * adding flagged, norm and bufferfactor
+#'   * calculating background data
+#'   * calculating raw pH emission data
 #'
 #' @param xf_raw List (tibble) that contains 'Raw' Seahorse information.
 #' @param xf_pHcal List (tibble) that contains well and the corresponding pH calibration emission info.
@@ -15,21 +74,15 @@
 #' [2] check if normalization data is available (TRUE/FALSE).
 #' @param xf_flagged Vector that contains wells that were "unselected" (flagged).
 #'
-#' @description
-#' This function uses seahorse excel data that was read beforehand (reading step)
-#' The function will edit the "Raw" (With data from the "Raw" sheet) data tibble that was produced.
-#' Our "Raw" tibble will be edited to create our new preprocessed "Raw" dataset.
-#'   * changing columns names
-#'   * adding new time columns
-#'   * adding injection info columns
-#'   * add plate_id column
-#'   * calculating background data
-#'   * calculating raw pH emission data
-#'
 #' @note The returned preprocessed "Raw" tibble doesn't only contain data of the "Raw" sheet,
 #' but for example also data from the "Assay Configuration sheet".
 #'
-#' @return A preprocessed "Raw" data list (tibble).
+#' @return A preprocessed "Raw" data list (tibble). With the following columns:
+#'
+#' plate_id, well, measurement, tick, timescale, minutes, group, interval, injection,
+#' O2_em_corr, pH_em_corr, O2_mmHg, pH, pH_em_corr_corr, O2_em_corr_bkg,
+#' pH_em_corr_bkg, O2_mmHg_bkg, pH_bkgd, pH_em_corr_corr_bkg, bufferfactor,
+#' cell_n, flagged_well
 #'
 #' @examples
 #' preprocess_xf_raw(xf$raw, xf$pHcal, xf$inj, xf$assayinfo, xf$buffer, xf$norm, xf$flagged)
@@ -43,8 +96,7 @@ preprocess_xf_raw <- function(xf_raw,
                               xf_flagged) {
 
 
-  # Read_excel guesses numeric types as double. Not all data is of type double,
-  # some data has to be converted to integer.
+  # convert the original integer column to integers again, instead of double
   xf_raw_pr <- xf_raw %>%
     tibble::as_tibble() %>%
     dplyr::mutate(across(c(Measurement,
@@ -101,7 +153,7 @@ preprocess_xf_raw <- function(xf_raw,
 }
 
 
-#' Preprocess the xf_rate
+#' Preprocess xf_rate
 #'
 #' @description This function edits the xf_rate tibble to create a preprocessed tibble.
 #' The rate df contains OCR and ECAR information from the seahorse excel file.
@@ -139,36 +191,6 @@ preprocess_xf_rate <- function(xf_rate,
 #' @examples
 #' preprocess_xfplate(xf)
 
-preprocess_xfplate <- function(xf){
-
-  # Use our xf list with all the necessary Seahorse data to fill this data tibble.
-  xf_raw_pr <- preprocess_xf_raw(xf$raw,
-                                 xf$pHcal,
-                                 xf$inj,
-                                 xf$assayinfo,
-                                 xf$buffer,
-                                 xf$norm,
-                                 xf$flagged)
-
-  xf_rate_pr <- preprocess_xf_rate(xf$rate,
-                                   xf$norm,
-                                   xf$flagged)
-
-  #output all plate data
-  xf_plate_pr <- xf_raw_pr %>%
-    dplyr::group_by(plate_id) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(filepath_seahorse = xf$filepath_seahorse,
-           date = xf$assayinfo$date_run,
-           assay_info = list(tibble::tibble(xf$assayinfo)),
-           rate_data = list(tibble::tibble(xf_rate_pr)),
-           injection_info = list(tibble::tibble(xf$inj))) %>%
-    dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
-           raw_data = data, rate_data)
-
-  return(xf_plate_pr)
-}
-
 # DEPENDENT FUNCTIONS ---------------------------------------------------------------
 
 ## rename_columns() --------------------------------------------------------
@@ -176,8 +198,8 @@ preprocess_xfplate <- function(xf){
 #' Rename the columns of the Raw data sheet.
 #'
 #' @description
-#' This function renames the columns of the dataframe that was
-#' read beforehand. read_excel from the WAVE excel output file, excel sheet "Raw".
+#' This function renames the columns of the xf_raw dataframe that was
+#' read using read_excel from the WAVE excel input file.
 #'
 #' @note This function is called at the preprocess script.
 #'
@@ -218,7 +240,7 @@ rename_columns <- function(xf_raw_pr) {
 #' @note This function is called at the preprocess script.
 #'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
-#' @return A new dataframe with new columns added  to \code{xf_raw_pr}. New columns
+#' @return A new dataframe with new columns added  to xf_raw_pr. New columns
 #'  are: "totalMinutes", "minutes", "timescale".
 #'
 convert_timestamp <- function(xf_raw_pr) {
@@ -250,6 +272,8 @@ convert_timestamp <- function(xf_raw_pr) {
 #' @param pH_em_corr pH corrected emission derived from the seahorse "Raw" sheet.
 #' @param pH_cal_em pH emission derived from the seahorse "Calibration" sheet.
 #' @param pH_targetEmission pH target emission derived from the seahorse "Calibration" sheet.
+#'
+#' @return a vector with corrected pH_em_corr 'pH_em_corr_corr'
 
 correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 
@@ -261,7 +285,13 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 
 #' Calculate backgrounds
 #'
+#' @description Calculates all pH and O2 background gorup means of all wells
+#' assigned to the 'Background' group
+#'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
+#'
+#' @return A new dataframe  'background' with for each measurement the mean background for:
+#' O2_em_corr, pH_em_corr, O2_mmHg, pH and pH_em_corr_corr
 #'
 calc_background <- function(xf_raw_pr){
 

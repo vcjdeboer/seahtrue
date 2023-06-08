@@ -1,10 +1,10 @@
 {
   "R": {
-    "Version": "4.2.1",
+    "Version": "4.2.2",
     "Repositories": [
       {
         "Name": "CRAN",
-        "URL": "http://rspm/default/latest"
+        "URL": "https://cran.rstudio.com"
       }
     ]
   },
@@ -19,18 +19,18 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-57",
+      "Version": "7.3-59",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "71476c1d88d1ebdf31580e5a257d5d31",
+      "Hash": "26570ae748e78cb2b0f56019dd2ba354",
       "Requirements": []
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.4-1",
+      "Version": "1.5-4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "699c47c606293bdfbc9fd78a93c9c8fe",
+      "Hash": "e779c7d9f35cc364438578f334cffee2",
       "Requirements": [
         "lattice"
       ]
@@ -92,17 +92,6 @@
       "Repository": "CRAN",
       "Hash": "543776ae6848fde2f48ff3816d0628bc",
       "Requirements": []
-    },
-    "bayestestR": {
-      "Package": "bayestestR",
-      "Version": "0.13.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "caecf6cf095962f3d6645ddab4c691e8",
-      "Requirements": [
-        "datawizard",
-        "insight"
-      ]
     },
     "bit": {
       "Package": "bit",
@@ -280,16 +269,6 @@
       "Repository": "CRAN",
       "Hash": "aecef50008ea7b57c76f1cb5c127fb02",
       "Requirements": []
-    },
-    "datawizard": {
-      "Package": "datawizard",
-      "Version": "0.6.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "6af559e24be9cec37516e37a00a6cfc3",
-      "Requirements": [
-        "insight"
-      ]
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -729,14 +708,6 @@
       "Hash": "6154ec2223172bce8162d4153cda21f7",
       "Requirements": []
     },
-    "insight": {
-      "Package": "insight",
-      "Version": "0.18.8",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "63e5c0b19f7a78e13cda42e1c3b03549",
-      "Requirements": []
-    },
     "isoband": {
       "Package": "isoband",
       "Version": "0.2.7",
@@ -787,10 +758,10 @@
     },
     "lattice": {
       "Package": "lattice",
-      "Version": "0.20-45",
+      "Version": "0.21-8",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b64cdbb2b340437c4ee047a1f4c4377b",
+      "Hash": "0b8a6d63c8770f02a8b5635f3c431e6b",
       "Requirements": []
     },
     "lifecycle": {
@@ -845,10 +816,10 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.8-40",
+      "Version": "1.8-42",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "c6b2fdb18cf68ab613bd564363e1ba0d",
+      "Hash": "3460beba7ccc8946249ba35327ba902a",
       "Requirements": [
         "Matrix",
         "nlme"
@@ -891,10 +862,10 @@
     },
     "nlme": {
       "Package": "nlme",
-      "Version": "3.1-157",
+      "Version": "3.1-162",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "dbca60742be0c9eddc5205e5c7ca1f44",
+      "Hash": "0984ce8da8da9ead8643c5cbbb60f83e",
       "Requirements": [
         "lattice"
       ]
@@ -1086,19 +1057,6 @@
       "Hash": "c9e8442ab69bc21c9697ecf856c1e6c7",
       "Requirements": []
     },
-    "repr": {
-      "Package": "repr",
-      "Version": "1.1.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "83f4b188b20fc3aa5e487db942b62e0b",
-      "Requirements": [
-        "base64enc",
-        "htmltools",
-        "jsonlite",
-        "pillar"
-      ]
-    },
     "reprex": {
       "Package": "reprex",
       "Version": "2.0.2",
@@ -1236,22 +1194,8 @@
       "Version": "2.1.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "8f138ff2c8fbea9e0a523f6c399c0386",
-      "Requirements": [
-        "cli",
-        "dplyr",
-        "knitr",
-        "magrittr",
-        "pillar",
-        "purrr",
-        "repr",
-        "rlang",
-        "stringr",
-        "tibble",
-        "tidyr",
-        "tidyselect",
-        "vctrs"
-      ]
+      "Hash": "044078dfd387c9a6e160103978d23be4",
+      "Requirements": []
     },
     "stringi": {
       "Package": "stringi",
