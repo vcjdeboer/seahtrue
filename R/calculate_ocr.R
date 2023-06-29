@@ -1,3 +1,5 @@
+library(dplyr)
+
 #functions
 substract_O2_bkgd <- function(O2, O2_bkgd, O2_0_mmHg){
 
@@ -12,7 +14,7 @@ add_extraTicks_new_2<- function(well_df, O2_var){
 
   well_df$O2 <- well_df %>% dplyr::pull(.data[[O2_var]])
 
-  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = dplyr::n())
+  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = n())
   tickStart <- cumsum(ticksPerMeasure$n)+1
   tickEnd <- tickStart -1
   tickStart <- c(1, tickStart)
@@ -60,7 +62,7 @@ call_OCRticks <- function(well_df){
   kernelSize <- 7 #kernel size that is used for the polynomial calcs, this means that 3 at beginning and end are not calculated
   offsetOCR <- (kernelSize -1)/2 # minus one because that is the actual row that is calculated
 
-  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = dplyr::n())
+  ticksPerMeasure <- well_df %>% dplyr::group_by(measurement) %>% dplyr::summarize(n = n())
   tickStart <- cumsum(ticksPerMeasure$n)+1
   tickEnd <- tickStart -1
   tickStart <- c(1, tickStart) #?
@@ -160,11 +162,11 @@ calculate_OCR_new <- function(well_df, assay_info_df){
 
   }
 
-  df <- df[df$extraTick==FALSE,] %>% dplyr::select(timescale, measurement,OCR)
+  df <- df[df$extraTick==FALSE,] %>% select(timescale, measurement,OCR)
 
   df <- call_OCRticks(df)
 
-  df <- df[df$OCRisvalid==TRUE,] %>% dplyr::select(measurement, OCR) %>%
+  df <- df[df$OCRisvalid==TRUE,] %>% select(measurement, OCR) %>%
     dplyr::group_by(measurement) %>%
     dplyr::summarize(ocr = mean(OCR))
 
