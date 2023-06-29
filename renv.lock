@@ -93,6 +93,17 @@
       "Hash": "543776ae6848fde2f48ff3816d0628bc",
       "Requirements": []
     },
+    "bayestestR": {
+      "Package": "bayestestR",
+      "Version": "0.13.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "61f643ea5ee9fe0e70ab0246340b3c2e",
+      "Requirements": [
+        "datawizard",
+        "insight"
+      ]
+    },
     "bit": {
       "Package": "bit",
       "Version": "4.0.5",
@@ -269,6 +280,16 @@
       "Repository": "CRAN",
       "Hash": "aecef50008ea7b57c76f1cb5c127fb02",
       "Requirements": []
+    },
+    "datawizard": {
+      "Package": "datawizard",
+      "Version": "0.7.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "001775ea47f92ef8e2916ed0cfa59735",
+      "Requirements": [
+        "insight"
+      ]
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -471,24 +492,6 @@
         "zip"
       ]
     },
-    "ggiraph": {
-      "Package": "ggiraph",
-      "Version": "0.8.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "602d3e92331816c7b68be832040595f3",
-      "Requirements": [
-        "Rcpp",
-        "ggplot2",
-        "htmltools",
-        "htmlwidgets",
-        "purrr",
-        "rlang",
-        "systemfonts",
-        "uuid",
-        "vctrs"
-      ]
-    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.4.0",
@@ -661,20 +664,6 @@
         "rlang"
       ]
     },
-    "htmlwidgets": {
-      "Package": "htmlwidgets",
-      "Version": "1.6.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f894e7b76e36258a483c602a786d7270",
-      "Requirements": [
-        "htmltools",
-        "jsonlite",
-        "knitr",
-        "rmarkdown",
-        "yaml"
-      ]
-    },
     "httr": {
       "Package": "httr",
       "Version": "1.4.4",
@@ -706,6 +695,14 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "6154ec2223172bce8162d4153cda21f7",
+      "Requirements": []
+    },
+    "insight": {
+      "Package": "insight",
+      "Version": "0.19.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b7a721ab3228268ed3a4ac3d585a09bf",
       "Requirements": []
     },
     "isoband": {
@@ -1189,14 +1186,6 @@
       "Hash": "044078dfd387c9a6e160103978d23be4",
       "Requirements": []
     },
-    "skimr": {
-      "Package": "skimr",
-      "Version": "2.1.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "044078dfd387c9a6e160103978d23be4",
-      "Requirements": []
-    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.7.8",
@@ -1224,16 +1213,6 @@
       "Repository": "RSPM",
       "Hash": "b227d13e29222b4574486cfcbde077fa",
       "Requirements": []
-    },
-    "systemfonts": {
-      "Package": "systemfonts",
-      "Version": "1.0.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "90b28393209827327de889f49935140a",
-      "Requirements": [
-        "cpp11"
-      ]
     },
     "testthat": {
       "Package": "testthat",
