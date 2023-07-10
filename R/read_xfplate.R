@@ -7,10 +7,12 @@
 #'
 #' @return xf list with all necessary Seahorse data.
 #'
+#' @export
+#'
 #' @examples
-#' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' read_xfplate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 read_xfplate <- function(filepath_seahorse) {
 
   tryCatch({
@@ -74,11 +76,15 @@ read_xfplate <- function(filepath_seahorse) {
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return xf_raw tibble (list) with 'Raw' Seahorse information.
+#``
+#' @keywords internal
+#' @import dplyr readxl
+#' @export
 #'
 #' @examples
-#' get_xf_raw(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_raw(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 
  get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
@@ -121,13 +127,17 @@ read_xfplate <- function(filepath_seahorse) {
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
+#'
 #' @return List consisting of [1] well names and the corresponding normalization values and
 #' [2] check if normalization data is available (TRUE/FALSE).
+
+#' @keywords internal
+#' @export
 #'
 #' @examples
-#' get_xf_norm(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_norm(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_norm <- function(filepath_seahorse){
 
     logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
@@ -161,10 +171,13 @@ get_xf_norm <- function(filepath_seahorse){
 #'
 #' @return Vector that contains wells that were "unselected" (flagged).
 #'
+#' @keywords internal
+#' @export
+#'
 #' @examples
-#' get_xf_flagged(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_flagged(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_flagged <- function(filepath_seahorse){
 
     logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
@@ -228,10 +241,14 @@ get_xf_flagged <- function(filepath_seahorse){
 #'
 #' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
 #'
+#' @keywords internal
+#' @export
+#
 #' @examples
-#' get_xf_rate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_rate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+
 get_xf_rate <- function(filepath_seahorse){
     #first item is table, second item is background_corrected logical
     xf_rate_list <- get_originalRateTable(filepath_seahorse)
@@ -248,13 +265,15 @@ get_xf_rate <- function(filepath_seahorse){
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
-#'
+
 #' @return List (tibble) that contains well and bufferfactor.
+#' @keywords internal
+#' @export
 #'
 #' @examples
-#' get_xf_buffer(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_buffer(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_buffer <- function(filepath_seahorse){
 
     logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
@@ -279,12 +298,16 @@ get_xf_buffer <- function(filepath_seahorse){
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
+
 #' @return List (tibble) that contains well and the corresponding pH calibration emission info.
 #'
+#' @keywords internal
+#' @export
+
 #' @examples
-#' get_xf_pHcal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_pHcal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_pHcal <- function(filepath_seahorse){
   logger::log_info("Collecting pH calibration emission data")
 
@@ -307,11 +330,12 @@ get_xf_pHcal <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return List (tibble) that contains wells and the corresponding O2 calibration emission.
-#'
+#' @keywords internal
+#' @export
 #' @examples
-#' get_xf_O2cal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_O2cal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_O2cal <- function(filepath_seahorse){
 
   logger::log_info("Collecting O2 calibration emission")
@@ -343,10 +367,13 @@ get_xf_O2cal <- function(filepath_seahorse){
 #'
 #' @return A list (tibble) that contains injection information.
 #'
+#' @keywords internal
+#' @export
+#'
 #' @examples
-#' get_xf_inj(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_inj(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
   logger::log_info("Collecting injection information")
@@ -415,7 +442,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 }
 
 
-# get_assay_info ----------------------------------------------------
+# get_xf_assayinfo ----------------------------------------------------
 #' Get assay information.
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
@@ -425,13 +452,14 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' @param instrument The type of seahorse analyzer. Can be "XFe96" or XFHSmini".
 #' @param norm_available requires xf_norm. Can be TRUE or FALSE.
 #' @param xls_ocr_backgroundcorrected requires original rate table. Can be TRUE or FALSE.
-#'
+#' @keywords internal
+#' @export
 #' @return List (tibble) with assay information.
 #'
 #' @examples
-#' get_xf_assayinfo(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
+#' get_xf_assayinfo(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
 get_xf_assayinfo <- function(filepath_seahorse,
                              date_style = "empty",
                              instrument = "XFe96",
@@ -618,11 +646,14 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #'
 #' @return data frame with plate layout data.
 #'
+#' @keywords internal
+#' @export
+#'
 #' @examples
-#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B84:N92", "cell_n")
-#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B96:N104", "bufferfactor")
-#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
-#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
+#' get_platelayout_data(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), "Assay Configuration", "B96:N104", "bufferfactor")
+#' get_platelayout_data(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), "Assay Configuration", "B84:N92", "cell_n")
+#' get_platelayout_data(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), "Calibration", "P16:AB24", "pH_cal_em")
+#' get_platelayout_data(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"), "Calibration", "B7:N15", "O2_cal_em")
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param ){
 

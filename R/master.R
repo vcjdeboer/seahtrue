@@ -17,22 +17,20 @@
 #'  * raw_data = preprocessed raw data from Raw sheet
 #'  * rate_data = preprocessed rate data from Rate sheet
 #'  One assay (one plate), contains all data in one row
-#'
-#'
+#' @keywords internal
+#' @export
 #'
 #' @examples
-#' filepath_seahorse <- system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue")
-#' filepath_seahorse <- system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue")
-#'
-#' run_seahtrue(filepath_seahorse)
+#' run_seahtrue(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 #'
 
 run_seahtrue <- function(filepath_seahorse){
-
   filepath_seahorse %T>%
     validate_xf_input() %>%
     read_xfplate() %>%
-    preprocess_xfplate() %>%
+    preprocess_xfplate() %T>%
     validate_preprocessed()
 }
 
