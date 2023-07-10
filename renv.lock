@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.2",
+    "Version": "4.2.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -471,24 +471,6 @@
         "zip"
       ]
     },
-    "ggiraph": {
-      "Package": "ggiraph",
-      "Version": "0.8.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "602d3e92331816c7b68be832040595f3",
-      "Requirements": [
-        "Rcpp",
-        "ggplot2",
-        "htmltools",
-        "htmlwidgets",
-        "purrr",
-        "rlang",
-        "systemfonts",
-        "uuid",
-        "vctrs"
-      ]
-    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.4.0",
@@ -659,20 +641,6 @@
         "ellipsis",
         "fastmap",
         "rlang"
-      ]
-    },
-    "htmlwidgets": {
-      "Package": "htmlwidgets",
-      "Version": "1.6.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f894e7b76e36258a483c602a786d7270",
-      "Requirements": [
-        "htmltools",
-        "jsonlite",
-        "knitr",
-        "rmarkdown",
-        "yaml"
       ]
     },
     "httr": {
@@ -1189,14 +1157,6 @@
       "Hash": "044078dfd387c9a6e160103978d23be4",
       "Requirements": []
     },
-    "skimr": {
-      "Package": "skimr",
-      "Version": "2.1.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "044078dfd387c9a6e160103978d23be4",
-      "Requirements": []
-    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.7.8",
@@ -1224,16 +1184,6 @@
       "Repository": "RSPM",
       "Hash": "b227d13e29222b4574486cfcbde077fa",
       "Requirements": []
-    },
-    "systemfonts": {
-      "Package": "systemfonts",
-      "Version": "1.0.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "90b28393209827327de889f49935140a",
-      "Requirements": [
-        "cpp11"
-      ]
     },
     "testthat": {
       "Package": "testthat",
