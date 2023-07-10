@@ -226,6 +226,151 @@ get_xf_flagged <- function(filepath_seahorse){
     return(flagged_tibble)
 }
 
+# get_originalRateTable() -------------------------------------------------
+#' Get the OCR from the excel file
+#'
+#' @details
+#' [2]If rate data was not already corrected, a background subtraction was performed and the second element of this list contains TRUE (logical).
+#' [2]If rate data was already corrected, there is no need for background subtraction
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#' @keywords internal
+#' @import dplyr readxl
+#' @export
+#' @examples
+#' get_originalRateTable(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+
+get_originalRateTable <- function(filepath_seahorse){
+
+  logger::log_info("Collecting OCR from 'Rate' sheet.")
+
+  original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
+
+  # because rate data can be either background corrected or not this should be checked first
+  # first verify whether a "Background" group exists in the  original_rate_df
+
+
+  if ("Background" %in% {original_rate_df$Group %>% unique()}) {
+
+    logger::log_info("A background group was found in the RATE sheet")
+
+
+    check_background <- original_rate_df %>%
+      dplyr::filter(Group == "Background") %>%
+      dplyr::select(OCR) %>%
+      dplyr::summarise(mean = mean(OCR)) %>%
+      dplyr::pull(mean)
+
+    if (check_background == 0) {
+      corrected_allready <- TRUE
+    } else {
+      corrected_allready <-  FALSE
+    }
+
+  } else {
+
+    #in case when there is no Background group we work with the original data
+    # that is in the input file "Rate" sheet
+    # please note that there will be warning logged, but the columns will be
+    # labeled incorrectly as if the data is background corrected
+
+    logger::log_info("WARNING: no background group was found in the 'Rate' sheet")
+
+    corrected_allready <-  TRUE
+
+  }
+
+  if (corrected_allready == TRUE){
+    colnames(original_rate_df) <-
+      c("measurement","well", "group",
+        "time_wave", "OCR_wave_bc",
+        "ECAR_wave_bc", "PER_wave_bc")
+    original_rate_df <- original_rate_df %>%
+      dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
+
+    original_rate_df <- original_rate_df %>%
+      dplyr::select(measurement, well, group,
+                    time_wave, OCR_wave, OCR_wave_bc,
+                    ECAR_wave, ECAR_wave_bc)
+
+  } else{
+    colnames(original_rate_df) <-
+      c("measurement","well", "group",
+        "time_wave", "OCR_wave",
+        "ECAR_wave", "PER_wave")
+
+    #do background substraction for wave table
+    background <- original_rate_df %>%
+      dplyr::filter(group=="Background") %>%
+      dplyr::group_by(measurement) %>%
+      dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
+                       bkg_ECAR_wave = mean(ECAR_wave)
+      )
+    original_rate_df <- dplyr::left_join(original_rate_df,
+                                         background,
+                                         by = c("measurement"), copy = TRUE)
+
+    original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
+    original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
+
+    original_rate_df <- original_rate_df %>%
+      dplyr::select(measurement, well, group,
+                    time_wave, OCR_wave, OCR_wave_bc,
+                    ECAR_wave, ECAR_wave_bc)
+  }
+
+  original_rate_df_list <- list(original_rate_df, corrected_allready)
+
+  logger::log_info("Finished collecting OCR from 'Rate' sheet.")
+
+  return(original_rate_df_list)
+
+}
+
+# Additional utility functions
+# check_excel_positions() -------------------------------------------------------
+#' Used as util function in get_xf_assayinfo()
+#'
+#' @param df The meta_df that was read from Assay Configuration sheet.
+#' @param pos_vector  a vector of cell positions that should be checked
+#' @param name_vector a vector with the strings that should be at the positions
+#' that were given in 'pos_vector'
+#'
+#' @return either TRUE or FALSE depending on if the check passed or failed
+#' @keywords internal
+#' @export
+
+check_excel_positions <- function(df, pos_vector, name_vector){
+
+  logger::log_info("Check if excel df contains data name on certain position.")
+  tf_values <- mapply(function(pos_vector, name_vector) {
+    true_false <- name_vector %in% df[[1]][pos_vector]
+    if(true_false == FALSE){return(FALSE)} else{
+      return(TRUE)
+    }
+  }, pos_vector, name_vector)
+
+  check_tf_list <- function(tf_values){
+    if(all((tf_values)) == FALSE){
+      logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
+      stop()
+    } else{
+      logger::log_error("'Assay Configuration' sheet contains all values.")
+
+      return(TRUE)
+    }
+  }
+
+  tf <- check_tf_list(tf_values)
+
+  return(tf)
+}
 
 # get_xf_rate -------------------------------------------------------------
 
@@ -682,157 +827,5 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param
 
 }
 
-# get_originalRateTable() -------------------------------------------------
-#' Get the OCR from the excel file
-#'
-#' @details
-#' [2]If rate data was not already corrected, a background subtraction was performed and the second element of this list contains TRUE (logical).
-#' [2]If rate data was already corrected, there is no need for background subtraction
-#'
-#' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
-#' This Excel file is converted from the assay result file (.asyr) downloaded from
-#' the Agilent Seahorse XF Wave software.
-#'
-#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
-#'
-#' @examples
-#' get_originalRateTable(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
-get_originalRateTable <- function(filepath_seahorse){
 
-    logger::log_info("Collecting OCR from 'Rate' sheet.")
-
-    original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
-
-    # because rate data can be either background corrected or not this should be checked first
-    # first verify whether a "Background" group exists in the  original_rate_df
-
-
-     if ("Background" %in% {original_rate_df$Group %>% unique()}) {
-
-       logger::log_info("A background group was found in the RATE sheet")
-
-
-       check_background <- original_rate_df %>%
-         dplyr::filter(Group == "Background") %>%
-         dplyr::select(OCR) %>%
-         dplyr::summarise(mean = mean(OCR)) %>%
-         dplyr::pull(mean)
-
-       if (check_background == 0) {
-         corrected_allready <- TRUE
-       } else {
-         corrected_allready <-  FALSE
-       }
-
-     } else {
-
-       #in case when there is no Background group we work with the original data
-       # that is in the input file "Rate" sheet
-       # please note that there will be warning logged, but the columns will be
-       # labeled incorrectly as if the data is background corrected
-
-       logger::log_info("WARNING: no background group was found in the 'Rate' sheet")
-
-       corrected_allready <-  TRUE
-
-     }
-
-    if (corrected_allready == TRUE){
-      colnames(original_rate_df) <-
-        c("measurement","well", "group",
-          "time_wave", "OCR_wave_bc",
-          "ECAR_wave_bc", "PER_wave_bc")
-      original_rate_df <- original_rate_df %>%
-        dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
-
-      original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group,
-                      time_wave, OCR_wave, OCR_wave_bc,
-                      ECAR_wave, ECAR_wave_bc)
-
-    } else{
-      colnames(original_rate_df) <-
-        c("measurement","well", "group",
-          "time_wave", "OCR_wave",
-          "ECAR_wave", "PER_wave")
-
-      #do background substraction for wave table
-      background <- original_rate_df %>%
-        dplyr::filter(group=="Background") %>%
-        dplyr::group_by(measurement) %>%
-        dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
-                  bkg_ECAR_wave = mean(ECAR_wave)
-        )
-      original_rate_df <- dplyr::left_join(original_rate_df,
-                                           background,
-                                           by = c("measurement"), copy = TRUE)
-
-      original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
-      original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
-
-      original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group,
-                      time_wave, OCR_wave, OCR_wave_bc,
-                      ECAR_wave, ECAR_wave_bc)
-    }
-
-    original_rate_df_list <- list(original_rate_df, corrected_allready)
-
-    logger::log_info("Finished collecting OCR from 'Rate' sheet.")
-
-    return(original_rate_df_list)
-
-}
-
-# Additional utility functions
-# check_excel_positions() -------------------------------------------------------
-#' Used as util function in get_xf_assayinfo()
-#'
-#' @param df The meta_df that was read from Assay Configuration sheet.
-#' @param pos_vector  a vector of cell positions that should be checked
-#' @param name_vector a vector with the strings that should be at the positions
-#' that were given in 'pos_vector'
-#'
-#' @return either TRUE or FALSE depending on if the check passed or failed
-#'
-#' @examples
-#' pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
-#' name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
-#'                 "ksv", "Ksv Temp Correction", "Corrected Ksv", "Calculated FO",
-#'                 "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
-#'
-#' meta_df <- readxl::read_excel(filepath_seahorse,
-#'  sheet = "Assay Configuration",
-#'  col_names = c("parameter", "value"),
-#'  range = "A1:B83"
-#'
-#' check_excel_positions(meta_df, pos_vector, name_vector)
-
-check_excel_positions <- function(df, pos_vector, name_vector){
-
-  logger::log_info("Check if excel df contains data name on certain position.")
-  tf_values <- mapply(function(pos_vector, name_vector) {
-    true_false <- name_vector %in% df[[1]][pos_vector]
-    if(true_false == FALSE){return(FALSE)} else{
-      return(TRUE)
-    }
-  }, pos_vector, name_vector)
-
-  check_tf_list <- function(tf_values){
-    if(all((tf_values)) == FALSE){
-      logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
-      stop()
-    } else{
-      logger::log_error("'Assay Configuration' sheet contains all values.")
-
-      return(TRUE)
-    }
-  }
-
-  tf <- check_tf_list(tf_values)
-
-  return(tf)
-}
 
