@@ -16,13 +16,12 @@ Suggests:
     RColorBrewer
 Config/testthat/edition: 3
 Imports:
+    dplyr,
     tidyverse,
     readxl,
     logger,
     tidyxl,
-    magrittr,
     knitr,
-    dplyr,
     purrr,
     usethis,
     here,
@@ -36,8 +35,8 @@ Imports:
     cli,
     tzdb,
     ggplot2,
-    tidyverse,
-    bayestestR
+    magrittr
 RoxygenNote: 7.2.3
-Depends: 
+Depends:
     R (>= 2.10)
+VignetteBuilder: knitr
