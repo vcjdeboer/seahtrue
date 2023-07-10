@@ -8,8 +8,9 @@
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return TRUE or FALSE, based the existence of the filepath and sheets in excel file
-#'
-#' @examples validate_xf_input(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' @keywords internal
+#' @export
+#' @examples validate_xf_input(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 
 validate_xf_input <- function(filepath_seahorse){
   # check if arguments function are present.
@@ -40,7 +41,11 @@ validate_xf_input <- function(filepath_seahorse){
 #'
 #' @return TRUE or FALSE, based the existence of the filepath.
 #'
-#' @examples path_not_found(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' @keywords internal
+#' @export
+#'
+#' @examples path_not_found(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#'
 path_not_found <- function(filepath_seahorse){
   rlang::try_fetch({
     if (file.exists(filepath_seahorse)) {
@@ -64,8 +69,11 @@ path_not_found <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #' @param sheets_predicted
 #'
+#' @keywords internal
+#' @export
+#'
 #' @return TRUE or FALSE, based on existence of the required Seahorse sheets.
-#' @examples check_sheets(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
+#' @examples check_sheets(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
 check_sheets <- function(filepath_excel, sheets_predicted, call = rlang::caller_env()){
   rlang::try_fetch({
 

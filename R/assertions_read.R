@@ -1,19 +1,24 @@
-
-
-
+#' Validate dataframe
+#'
+#' @param df dataframe used for the validation
+#' @param rules validation rules to check the dataframe.
+#'
+#' @return list with failed params and validation pass
+#' @keywords internal
+#' @export
 validate_df <- function(df, rules){
 
   out <- validate::confront(df, rules)
 
   # this checks whether there are any rows where 'fails' is higher than 0
   # meaning that the validator rule did not pass for that row
-  if (nrow(summary(out) %>%
+  if (nrow(validate::summary(out) %>%
            dplyr::filter(fails > 0)) > 0){
 
     failed_params <-
-      summary(out) %>%
+      validate::summary(out) %>%
       dplyr::filter(fails > 0) %>%
-      select(name,expression)
+      dplyr::select(name,expression)
 
     validation_passed <- FALSE
 
@@ -38,13 +43,25 @@ log_validation <- function(val_output, validated_df_name){
 }
 
 
-validate_preprocessed <- function(df1 = xf$raw_data[[1]],
-                                  df1_name = "raw_data",
-                                  df2 = xf$assay_info[[1]],
-                                  df2_name = "assay_info"){
+#' Validate the preprocessed seahorse dataset.
+#'
+#' @param xf The preprocessed seahorse dataset.
+#'
+#' @return None
+#' @importFrom magrittr %T>%
+#' @keywords internal
+#' @export
+validate_preprocessed <- function(xf){
 
   out <- tryCatch(
-    { logger::log_info("Validate the preprocessed data.")
+    {
+
+      df1 = xf$raw_data[[1]]
+      df1_name = "raw_data"
+      df2 = xf$assay_info[[1]]
+      df2_name = "assay_info"
+
+      logger::log_info("Validate the preprocessed data.")
       xf_plate_pr_raw_rules <- validate::validator(.file = raw_yaml_path)
       xf_assay_info_rules <- validate::validator(.file = assay_info_yaml_path)
 
