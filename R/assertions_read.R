@@ -4,8 +4,8 @@
 #' @param rules validation rules to check the dataframe.
 #'
 #' @return list with failed params and validation pass
+#' @noRd
 #' @keywords internal
-#' @export
 validate_df <- function(df, rules){
 
   out <- validate::confront(df, rules)
@@ -49,8 +49,8 @@ log_validation <- function(val_output, validated_df_name){
 #'
 #' @return None
 #' @importFrom magrittr %T>%
+#' @noRd
 #' @keywords internal
-#' @export
 validate_preprocessed <- function(xf){
 
   out <- tryCatch(

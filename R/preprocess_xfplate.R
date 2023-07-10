@@ -17,8 +17,12 @@
 #'  * rate_data = preprocessed rate data from Rate sheet
 #'  One assay (one plate), contains all data in one row
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' preprocess_xfplate(xf)
+#' preprocess_xfplate(xf_donor_A)
+
 
 preprocess_xfplate <- function(xf){
 
@@ -84,8 +88,11 @@ preprocess_xfplate <- function(xf){
 #' pH_em_corr_bkg, O2_mmHg_bkg, pH_bkgd, pH_em_corr_corr_bkg, bufferfactor,
 #' cell_n, flagged_well
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' preprocess_xf_raw(xf$raw, xf$pHcal, xf$inj, xf$assayinfo, xf$buffer, xf$norm, xf$flagged)
+#' preprocess_xf_raw(xf_donor_A$raw, xf_donor_A$pHcal, xf_donor_A$inj, xf_donor_A$assayinfo, xf_donor_A$buffer, xf_donor_A$norm, xf_donor_A$flagged)
 
 preprocess_xf_raw <- function(xf_raw,
                               xf_pHcal,
@@ -167,8 +174,11 @@ preprocess_xf_raw <- function(xf_raw,
 #'
 #' @return Preprocessed Rate tibble
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' preprocess_xf_rate(xf$rate, xf$norm, xf$flagged)
+#' preprocess_xf_rate(xf_donor_A$rate, xf_donor_A$norm, xf_donor_A$flagged)
 preprocess_xf_rate <- function(xf_rate,
                                xf_norm,
                                xf_flagged){
@@ -181,15 +191,6 @@ preprocess_xf_rate <- function(xf_rate,
 
   return(OCR_from_excel)
 }
-
-#' Preprocessing the seahorse plate data that was read.
-#'
-#' @param xf list with all necessary seahorse data.
-#'
-#' @return Data tibble containing preprocessed data.
-#' @export
-#' @examples
-#' preprocess_xfplate(xf)
 
 # DEPENDENT FUNCTIONS ---------------------------------------------------------------
 
@@ -207,6 +208,9 @@ preprocess_xf_rate <- function(xf_rate,
 #'
 #' @return A dataframe with adjusted and selected column names. The selected columns with new names are:
 #'   ("measurement","tick", "well", "group", "time", "O2_em_corr","pH_em_corr", "O2_mmHg", "pH")
+#'
+#' @noRd
+#' @keywords internal
 
 rename_columns <- function(xf_raw_pr) {
 
@@ -243,6 +247,9 @@ rename_columns <- function(xf_raw_pr) {
 #' @return A new dataframe with new columns added  to xf_raw_pr. New columns
 #'  are: "totalMinutes", "minutes", "timescale".
 #'
+#' @noRd
+#' @keywords internal
+#'
 convert_timestamp <- function(xf_raw_pr) {
 
   # first make sure that the data is sorted correctly
@@ -274,6 +281,8 @@ convert_timestamp <- function(xf_raw_pr) {
 #' @param pH_targetEmission pH target emission derived from the seahorse "Calibration" sheet.
 #'
 #' @return a vector with corrected pH_em_corr 'pH_em_corr_corr'
+#' @noRd
+#' @keywords internal
 
 correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 
@@ -292,6 +301,9 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 #'
 #' @return A new dataframe  'background' with for each measurement the mean background for:
 #' O2_em_corr, pH_em_corr, O2_mmHg, pH and pH_em_corr_corr
+#'
+#' @noRd
+#' @keywords internal
 #'
 calc_background <- function(xf_raw_pr){
 

@@ -76,10 +76,11 @@ read_xfplate <- function(filepath_seahorse) {
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return xf_raw tibble (list) with 'Raw' Seahorse information.
-#``
+#`
+#' @noRd
 #' @keywords internal
 #' @import dplyr readxl
-#' @export
+
 #'
 #' @examples
 #' get_xf_raw(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -130,9 +131,8 @@ read_xfplate <- function(filepath_seahorse) {
 #'
 #' @return List consisting of [1] well names and the corresponding normalization values and
 #' [2] check if normalization data is available (TRUE/FALSE).
-
+#' @noRd
 #' @keywords internal
-#' @export
 #'
 #' @examples
 #' get_xf_norm(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -170,10 +170,8 @@ get_xf_norm <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return Vector that contains wells that were "unselected" (flagged).
-#'
+#' @noRd
 #' @keywords internal
-#' @export
-#'
 #' @examples
 #' get_xf_flagged(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' get_xf_flagged(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
@@ -238,9 +236,9 @@ get_xf_flagged <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#' @noRd
 #' @keywords internal
 #' @import dplyr readxl
-#' @export
 #' @examples
 #' get_originalRateTable(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
@@ -343,8 +341,8 @@ get_originalRateTable <- function(filepath_seahorse){
 #' that were given in 'pos_vector'
 #'
 #' @return either TRUE or FALSE depending on if the check passed or failed
+#' @noRd
 #' @keywords internal
-#' @export
 
 check_excel_positions <- function(df, pos_vector, name_vector){
 
@@ -386,8 +384,8 @@ check_excel_positions <- function(df, pos_vector, name_vector){
 #'
 #' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
 #'
+#' @noRd
 #' @keywords internal
-#' @export
 #
 #' @examples
 #' get_xf_rate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -412,8 +410,8 @@ get_xf_rate <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 
 #' @return List (tibble) that contains well and bufferfactor.
+#' @noRd
 #' @keywords internal
-#' @export
 #'
 #' @examples
 #' get_xf_buffer(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -447,7 +445,8 @@ get_xf_buffer <- function(filepath_seahorse){
 #' @return List (tibble) that contains well and the corresponding pH calibration emission info.
 #'
 #' @keywords internal
-#' @export
+#' @noRd
+#' @keywords internal
 
 #' @examples
 #' get_xf_pHcal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -476,7 +475,8 @@ get_xf_pHcal <- function(filepath_seahorse){
 #'
 #' @return List (tibble) that contains wells and the corresponding O2 calibration emission.
 #' @keywords internal
-#' @export
+#' @noRd
+#' @keywords internal
 #' @examples
 #' get_xf_O2cal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' get_xf_O2cal(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
@@ -512,8 +512,8 @@ get_xf_O2cal <- function(filepath_seahorse){
 #'
 #' @return A list (tibble) that contains injection information.
 #'
+#' @noRd
 #' @keywords internal
-#' @export
 #'
 #' @examples
 #' get_xf_inj(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -597,8 +597,8 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' @param instrument The type of seahorse analyzer. Can be "XFe96" or XFHSmini".
 #' @param norm_available requires xf_norm. Can be TRUE or FALSE.
 #' @param xls_ocr_backgroundcorrected requires original rate table. Can be TRUE or FALSE.
+#' @noRd
 #' @keywords internal
-#' @export
 #' @return List (tibble) with assay information.
 #'
 #' @examples
@@ -791,8 +791,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #'
 #' @return data frame with plate layout data.
 #'
+#' @noRd
 #' @keywords internal
-#' @export
 #'
 #' @examples
 #' get_platelayout_data(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), "Assay Configuration", "B96:N104", "bufferfactor")
