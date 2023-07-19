@@ -1,0 +1,128 @@
+# ---
+# title: "seahtrue_vignette"
+# output: rmarkdown::html_vignette
+# vignette: >
+#   %\VignetteIndexEntry{seahtrue_vignette}
+#   %\VignetteEngine{knitr::rmarkdown}
+#   %\VignetteEncoding{UTF-8}
+# ---
+# 
+# ```{r, include = FALSE}
+# knitr::opts_chunk$set(
+#   collapse = TRUE,
+#   comment = "#>"
+# )
+# ```
+# 
+# ```{r setup}
+# # library(seahtrue)
+# ```
+# #### Introduction: Seahorse Backgound information
+# With the Seahorse XF systems of Agilent, scientists are able to get information about the biological energy transduction and mitochondrial functions in cells.
+# 
+# Biological energy transduction is the base of all physiological phenomena in cells. The metabolic processes associated with this energy transduction are related to diseases such as diabetes, cancer, rare genetic disease and aberrant cell death (1).
+# 
+# Agilent's systems are capable of measuring both oxygen concentration and pH within cell culture medium. The O2/pH is measured by fluorescent probes (sensitive to O2/pH). Probes are placed just above samples (cultured cells). This will result in a small chamber of a few microliters. This small volume makes it possible to measure changes in O2 concentration and pH. 
+# 
+# Cells use oxigen to make ATP in mitochondria. This results in a decreased oxigen concentration in the medium due to mitochondrial activity. Oxygen consumption is expressed as oxygen consumption rate (OCR). 
+# 
+# Cells produce lactate when burning glucose at glycolysis. Lactate is (for the most part) responsible for acidification of the medium. The change in pH is called extracellular acidification rate (ECAR). 
+# 
+# Mitochondrial cell respiration (oxidative phosphorylation) and glycolysis (non-mitochondrial) can be indirectly quantified by using the OCR and ECAR. Both processes contribute to the production of ATP in mammals (2). ATP is an energy carrier that provides cells with energy. So with this method scientists will get an insight for the energy management of cells. 
+# 
+# ### Advantages / Disadvantages
+# 
+# The software from Agilent called Wave is used while conducting experiments with these systems. Seahorse data can be obtained/visualized using saehtrue.
+# 
+# However, Wave's current software has some drawbacks when measuring OCR. These drawbacks may affect results, and may lead to aberrant OCR. An abnormal OCR could, for example, lead to incorrect research conclusions regarding energy management in cells. Hence, a script is written to overcome these drawbacks.
+# 
+# Advantages Rwave over Agilent's Wave:
+# 1. Oxygen escapes from the wells which must be corrected. Oxygen is consumed through the sides of sample wells. Wave takes this into account.
+# 2. Wave (currently) doesn't have a (background) quality control. Rwave determines background quality through the use of reference data. Quality scores for wells and plate are calculated.
+# 
+# 
+# ### Seahture Summary
+# 
+# ### Script
+# The Rwave script consists of several parts:
+# 
+# 1. Seahorse Excel files are loaded through Seahtrue. The Agilent Wave software automatically generates test results (.asyr) data. These data are converted to an Excel file (.xls). Wave includes a function to realize this conversion. 
+# 
+# 2. Useful information will be extracted from the Excel file. Information is considered useful if it's relevant to the end user. For example, it's useful to get some metadata of the project/experiment. Also data regarding our Rwave calculations are important. For example, oxigen and pH related calculations require 'O2 mmhg' an 'pH' data from the 'Raw' sheet of the Seahorse Excel file. With these data we can make calculations regarding OCR and ECAR.
+# 
+# 3. Calculations will be applied, including calulations to measure Oxigen Consumption rate (OCR) and Extracellular acidification rate (ECAR). This will be performed for both Wave and our alternative RWave method. Calculations are performed on data from both background wells and cell-containing wells.
+# 
+# 4. Relevant information will be visualized with plots. (See heading 'Figure' under 'Application')
+# 
+# Note 1: This vignette will show a chronological procedure of our Rwave script. With the interactive Rwave Shiny app, we don't have to pursue this chronological order. For example, the user may decide which plot will be visualised and it's possible to skip unwanted plots. This is possible due to 'reactivity'. The Shiny application will make Rwave userfriendly. 
+# 
+# Note 2: Rwave allows us to perform calculations (OCR, ECAR and fluorescence (AU)) on Seahorse data. We expect Rwave to perform better in certain results. This still requires prove. 
+# 
+# 
+# ### Run application 
+# 
+# ```{r, include = FALSE}
+# knitr::opts_chunk$set(
+#   collapse = TRUE,
+#   comment = "#>"
+# )
+# ```
+# 
+# 
+# Introduction:
+# The 'here' package in R simplifies spatial data analysis by automating file path resolution, improving code portability, and enhancing collaboration.
+# 
+# Features:
+# 
+# Automatic path resolution
+# Cross-platform compatibility
+# Directory detection
+# Enhanced code readability
+# Seamless integration with other packages
+# Conclusion:
+# 'here' streamlines spatial data analysis in R, simplifying file paths and enhancing project organization for efficient and collaborative workflows.
+# 
+# #### Assign working directory
+# We will automatically find the path of current R project in R Studio. 
+# To do this, we can use the 'here' package.
+# ```{r working_directory}
+# filepath_seahorse <- here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx")
+# print(filepath_seahorse)
+# ```
+# #### Validate the given input Excel file
+# When validating the input Excel file we will check whether the argument for the path to the excel file (filepath_seahorse) is given to the validation function. After this we will check if the seahorse excel file exists on the specific location. If the filepath does not exist an error is thrown. Next we check if the Excel sheet contains the required Excel sheets. If all expected sheets exists in the Excel file we asume the Excel file is a Seahorse file. The information will be stored in a nested tibble (list).
+# 
+# #### Collecting Seahorse information
+# When the input Excel file is assumed as a Seahorse Excel file we read the Seahorse Excel file and will collect the necessary information:
+# 1. Raw data
+# 2. Rate data
+# 3. Normalization data
+# 4. Buffer data
+# 5. Injection data
+# 6. pH calibration emission
+# 7. O2 calibration emission
+# 8. Flagged wells
+# 9. Assay information
+# 
+# #### Preprocess Seahorse information
+# The first two data frames (Raw and Rate) of our nested tibble will be preprocessed. 
+# 
+# The tibble of the 'Raw' dataframe will be processed in the following way:
+# - Rename Columns
+# - Correct pH emission correction
+# - Add plate id
+# - Add normalisation info
+# - Select columns that are needed
+# - Add injection info
+# - Calculate backgrounds
+# - Convert timestamp
+# - Add flag well column
+# - Add buffer factor
+# 
+# And the tibble of the 'Rate' dataframe will be processed in the following way:
+# - Add normalization information
+# - Add flagged wells
+# 
+# #### 
+# 
+# 
