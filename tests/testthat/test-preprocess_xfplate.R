@@ -54,7 +54,7 @@ for (rda_file in filepath){
     test_that("type character", {
       expect_type(xf_plate_pr$plate_id, "character")
       expect_type(xf_plate_pr$assay_info[[1]]$plate_id, "character")
-      expect_type(xf_plate_pr$filepath_seahorse, "character")
+      expect_type(xf_plate_pr$filepath_seahorse, "list")
       expect_type(xf_raw_pr$well, "character")
       expect_type(xf_raw_pr$group, "character")
       expect_type(xf_raw_pr$injection, "character")
@@ -72,7 +72,7 @@ for (rda_file in filepath){
 
     # Check if specific columns of the preprocessed datset are of type double -------
     test_that("type double", {
-      expect_type(xf_plate_pr$date, "double")
+      expect_type(xf_plate_pr$date, "list")
       expect_type(xf_raw_pr$timescale, "double")
       expect_type(xf_raw_pr$minutes, "double")
       expect_type(xf_raw_pr$interval, "double")
@@ -152,7 +152,7 @@ for (rda_file in filepath){
 
     # Check if specific columns of the preprocessed datset are of type date -------
     test_that("type date", {
-      expect_type(xf_plate_pr$date, "double")
+      expect_type(xf_plate_pr$date, "list")
       expect_type(xf_plate_pr$assay_info[[1]]$date_run, "double")
     })
 
