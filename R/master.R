@@ -7,7 +7,7 @@
 #'
 #' @param filepath_seahorse path to file and filename as input
 #'
-#' @return xf_plate_pr is returned this is a nested tibble with the following 7 columns:
+#' @return xf_plate_pr is returned. This is a nested tibble with the following 7 columns:
 #'  * plate_id = plate_id (from assay configuration sheet)
 #'  * filepath_seahorse = the original input file and its path on local drive
 #'  * date = date that seahorse was run (from assay configuration sheet)
@@ -23,7 +23,12 @@
 #' run_seahtrue(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
 #' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
-#'
+
+#'\dontrun{
+#' run_seahtrue(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
+#' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#'}
 
 run_seahtrue <- function(filepath_seahorse){
   filepath_seahorse %T>%
