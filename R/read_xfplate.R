@@ -346,25 +346,23 @@ get_originalRateTable <- function(filepath_seahorse){
 #' @return either TRUE or FALSE depending on if the check passed or failed
 #' @noRd
 #' @keywords internal
+#'
 
 check_excel_positions <- function(df, pos_vector, name_vector){
 
   logger::log_info("Check if excel df contains data name on certain position.")
-  tf_values <- mapply(function(pos_vector, name_vector) {
-    true_false <- name_vector %in% df[[1]][pos_vector]
-    if(true_false == FALSE){return(FALSE)} else{
-      return(TRUE)
-    }
+  tf_values <- mapply(function(pos, name) {
+    true_false <- name %in% df[[1]][pos]
+    return(true_false)
   }, pos_vector, name_vector)
 
   check_tf_list <- function(tf_values){
-    if(all((tf_values)) == FALSE){
+    if (all(tf_values)) {
+      logger::log_info("'Assay Configuration' sheet contains all values.")
+      return(TRUE)
+    } else {
       logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
       stop()
-    } else{
-      logger::log_error("'Assay Configuration' sheet contains all values.")
-
-      return(TRUE)
     }
   }
 
@@ -372,6 +370,7 @@ check_excel_positions <- function(df, pos_vector, name_vector){
 
   return(tf)
 }
+
 
 # get_xf_rate -------------------------------------------------------------
 
