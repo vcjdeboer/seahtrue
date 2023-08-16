@@ -7,7 +7,8 @@
 #'
 #' @return xf list with all necessary Seahorse data.
 #'
-#' @export
+#' @noRd
+#' @keywords internal
 #'
 #' @examples
 #' read_xfplate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
@@ -33,7 +34,7 @@ read_xfplate <- function(filepath_seahorse) {
     xf_flagged <- get_xf_flagged(filepath_seahorse)
     xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
                                      norm_available = xf_norm[[2]],
-                                     xls_ocr_backgroundcorrected =xf_rate[[2]])
+                                     xls_ocr_backgroundcorrected = xf_rate[[2]])
     xf_norm <- xf_norm[[1]]
     xf_rate <- xf_rate[[1]]
 
@@ -236,9 +237,11 @@ get_xf_flagged <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#'
 #' @noRd
 #' @keywords internal
 #' @import dplyr readxl
+#'
 #' @examples
 #' get_originalRateTable(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
@@ -262,7 +265,7 @@ get_originalRateTable <- function(filepath_seahorse){
     check_background <- original_rate_df %>%
       dplyr::filter(Group == "Background") %>%
       dplyr::select(OCR) %>%
-      dplyr::summarise(mean = mean(OCR)) %>%
+      dplyr::reframe(mean = mean(OCR)) %>%
       dplyr::pull(mean)
 
     if (check_background == 0) {
@@ -307,7 +310,7 @@ get_originalRateTable <- function(filepath_seahorse){
     background <- original_rate_df %>%
       dplyr::filter(group=="Background") %>%
       dplyr::group_by(measurement) %>%
-      dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
+      dplyr::reframe(bkg_OCR_wave = mean(OCR_wave),
                        bkg_ECAR_wave = mean(ECAR_wave)
       )
     original_rate_df <- dplyr::left_join(original_rate_df,
