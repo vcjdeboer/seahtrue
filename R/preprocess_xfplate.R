@@ -43,7 +43,11 @@ preprocess_xfplate <- function(xf){
   xf_plate_pr <- xf_raw_pr %>%
     dplyr::group_by(plate_id) %>%
     tidyr::nest() %>%
-    dplyr::mutate(filepath_seahorse = xf$filepath_seahorse,
+    dplyr::mutate(filepath_seahorse = list(tibble::tibble(
+                  directory_path = dirname(as.character(xf$filepath_seahorse)),
+                  base_name = basename(as.character(xf$filepath_seahorse)),
+                  full_path = xf$filepath_seahorse
+                )),
                   date = xf$assayinfo$date_run,
                   assay_info = list(tibble::tibble(xf$assayinfo)),
                   rate_data = list(tibble::tibble(xf_rate_pr)),
