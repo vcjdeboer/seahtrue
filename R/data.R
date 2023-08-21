@@ -27,9 +27,9 @@
 #' seahtrue_output_donor_C <- seahtrue::run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 #'
 #' \dontrun{
-#' save(seahtrue_output_donor_A, file="seahtrue_output_donor_A.rda")
-#' save(seahtrue_output_donor_B, file="seahtrue_output_donor_B.rda")
-#' save(seahtrue_output_donor_C, file="seahtrue_output_donor_C.rda")
+#' save(seahtrue_output_donor_A, file="seahtrue_output_donor_A.rda", compress='xz')
+#' save(seahtrue_output_donor_B, file="seahtrue_output_donor_B.rda", compress='xz')
+#' save(seahtrue_output_donor_C, file="seahtrue_output_donor_C.rda", compress='xz')
 #'
 #' Load the example dataset
 #'
