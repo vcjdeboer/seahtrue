@@ -111,16 +111,16 @@ preprocess_xf_raw <- function(xf_raw,
   xf_raw_pr <- xf_raw %>%
     tibble::as_tibble() %>%
     dplyr::mutate(across(c(Measurement,
-                    Tick,
-                    `O2 Light Emission`,
-                    `O2 Dark Emission`,
-                    `O2 Ref Light`,
-                    `O2 Ref Dark`,
-                    `pH Light`,
-                    `pH Dark`,
-                    `pH Ref Light`,
-                    `pH Ref Dark`),
-                  as.integer))
+                           Tick,
+                           `O2 Light Emission`,
+                           `O2 Dark Emission`,
+                           `O2 Ref Light`,
+                           `O2 Ref Dark`,
+                           `pH Light`,
+                           `pH Dark`,
+                           `pH Ref Light`,
+                           `pH Ref Dark`),
+                         as.integer))
 
   # rename columns
   xf_raw_pr <- rename_columns(xf_raw_pr)
@@ -133,9 +133,12 @@ preprocess_xf_raw <- function(xf_raw,
                                                   xf_pHcal$pH_cal_em,
                                                   xf_assayinfo$pH_targetEmission[1])
 
+
   # calculate backgrounds and join
   background <- calc_background(xf_raw_pr)
-  xf_raw_pr <- xf_raw_pr %>% dplyr::left_join(background, by = c("measurement"))
+
+  xf_raw_pr <- xf_raw_pr %>%
+    dplyr::left_join(background, by = c("measurement"), relationship = "many-to-many")
 
   # add injection info
   xf_raw_pr <- dplyr::left_join(xf_raw_pr, xf_inj, by = "measurement")
@@ -315,7 +318,7 @@ calc_background <- function(xf_raw_pr){
     dplyr::select(group, well, measurement, timescale, O2_em_corr,
            pH_em_corr, O2_mmHg, pH, pH_em_corr_corr) %>%
     dplyr::filter(group == "Background") %>%
-    dplyr::summarize(
+    dplyr::reframe(
       measurement,
       O2_em_corr_bkg = mean(O2_em_corr),
       pH_em_corr_bkg = mean(pH_em_corr),
