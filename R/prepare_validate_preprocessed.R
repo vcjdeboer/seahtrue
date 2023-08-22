@@ -95,8 +95,7 @@ for (rule_index in 1:length(xf_plate_pr_raw_rules)){
   attr(xf_plate_pr_raw_rules[[rule_index]], "description") <- descriptions$rule_desc[rule_index]
 
 }
-raw_yaml_path <- here::here("R", "assertions", "rules_raw.yaml")
-validate::export_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+
 
 #set assay_info yaml rules
 xf_assay_info_rules <- {validate::validator(
@@ -147,13 +146,17 @@ xf_assay_info_rules <- {validate::validator(
   O2_0_mmHg_miss_values = all_complete(O2_0_mmHg)
 
 )}
+
+# paths to yaml files
+raw_yaml_path <- here::here("R", "assertions", "rules_raw.yaml")
 assay_info_yaml_path <- here::here("R", "assertions", "rules_assay_info.yaml")
-validate::export_yaml(xf_assay_info_rules, assay_info_yaml_path)
 
+# export validation rules to yaml
+create_raw_yaml <- function(xf_plate_pr_raw_rules, raw_yaml_path){
+  validate::export_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+}
 
-
-
-
-
-
+create_assay_info_yaml <- function(xf_assay_info_rules, assay_info_yaml_path){
+  validate::export_yaml(xf_assay_info_rules, assay_info_yaml_path)
+}
 
