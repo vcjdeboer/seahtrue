@@ -23,10 +23,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Suggests:
-    rmarkdown,
-    testthat (>= 3.0.0),
-    RColorBrewer
-Config/testthat/edition: 3
+    testthat (>= 3.0.0)
 Imports:
     dplyr (>= 1.1.2),
     tidyverse (>= 1.3.2),
@@ -45,11 +42,10 @@ Imports:
     rlang (>= 1.0.0),
     glue (>= 1.6.2),
     cli (>= 3.4.1),
-    tzdb (>= 0.3.0),
     ggplot2 (>= 3.4.0),
     magrittr (>= 2.0.3),
     vctrs (>= 0.6.0)
 RoxygenNote: 7.2.3
 Depends:
-    R (>= 4.2.1)
+    R (>= 4.2.1) 
 VignetteBuilder: knitr
