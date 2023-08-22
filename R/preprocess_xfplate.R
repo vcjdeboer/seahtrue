@@ -23,7 +23,6 @@
 #' @examples
 #' preprocess_xfplate(xf_donor_A)
 
-
 preprocess_xfplate <- function(xf){
 
   # Use our xf list with all the necessary Seahorse data to fill this data tibble.
@@ -62,7 +61,7 @@ preprocess_xfplate <- function(xf){
 #' Preprocess xf raw
 #'
 #' @description
-#' This function uses seahorse excel data that was read using functions from read_xfplate.r
+#' This function uses seahorse excel data that was read using functions from read_xfplate.
 #' The function will preprocess and merge data into the xf_raw data tibble, to produce
 #' the xf_raw_pr tibble by:
 #'   * changing columns names
@@ -97,6 +96,8 @@ preprocess_xfplate <- function(xf){
 #'
 #' @examples
 #' preprocess_xf_raw(xf_donor_A$raw, xf_donor_A$pHcal, xf_donor_A$inj, xf_donor_A$assayinfo, xf_donor_A$buffer, xf_donor_A$norm, xf_donor_A$flagged)
+#' preprocess_xf_raw(xf_donor_B$raw, xf_donor_B$pHcal, xf_donor_B$inj, xf_donor_B$assayinfo, xf_donor_B$buffer, xf_donor_B$norm, xf_donor_B$flagged)
+#' preprocess_xf_raw(xf_donor_C$raw, xf_donor_C$pHcal, xf_donor_C$inj, xf_donor_C$assayinfo, xf_donor_C$buffer, xf_donor_C$norm, xf_donor_C$flagged)
 
 preprocess_xf_raw <- function(xf_raw,
                               xf_pHcal,
@@ -186,6 +187,8 @@ preprocess_xf_raw <- function(xf_raw,
 #'
 #' @examples
 #' preprocess_xf_rate(xf_donor_A$rate, xf_donor_A$norm, xf_donor_A$flagged)
+#' preprocess_xf_rate(xf_donor_B$rate, xf_donor_B$norm, xf_donor_B$flagged)
+#' preprocess_xf_rate(xf_donor_C$rate, xf_donor_C$norm, xf_donor_C$flagged)
 preprocess_xf_rate <- function(xf_rate,
                                xf_norm,
                                xf_flagged){
@@ -213,11 +216,13 @@ preprocess_xf_rate <- function(xf_rate,
 #'
 #' @param xf_raw_pr A list (tibble dataframe) for preprocessing.
 #'
-#' @return A dataframe with adjusted and selected column names. The selected columns with new names are:
-#'   ("measurement","tick", "well", "group", "time", "O2_em_corr","pH_em_corr", "O2_mmHg", "pH")
+#' @return A dataframe with renamed column names.
 #'
 #' @noRd
 #' @keywords internal
+#'
+#' @examples
+#' rename_columns(xf_donor_A$raw)
 
 rename_columns <- function(xf_raw_pr) {
 
@@ -231,15 +236,33 @@ rename_columns <- function(xf_raw_pr) {
     "pHref_dark", "pH_em_corr", "interval"
   )
 
+  return(xf_raw_pr)
+}
+
+## select_columns() -------------------------------------------------------
+#'
+#' Select columns of the xf_raw dataframe used for further analysis.
+#'
+#' @param xf_raw_pr  A list (tibble dataframe) for preprocessing.
+#'
+#' @return Selected columns. The selected columns with new names are:
+#'   ("measurement","tick", "well", "group", "time", "O2_em_corr","pH_em_corr", "O2_mmHg", "pH")
+#'
+#' @noRd
+#' @keywords internal
+#'
+#'
+
+select_columns <- function(xf_raw_pr){
   xf_raw_pr <- xf_raw_pr %>%
     dplyr::select(
       "measurement", "tick", "well",
       "group", "time", "O2_em_corr",
       "pH_em_corr", "O2_mmHg", "pH"
     )
-  return(xf_raw_pr)
 
-}
+  return(xf_raw_pr)
+  }
 
 
 ## convert_timestamp() -----------------------------------------------------
@@ -331,5 +354,3 @@ calc_background <- function(xf_raw_pr){
 }
 
 # END ---------------------------------------------------------------------
-
-
