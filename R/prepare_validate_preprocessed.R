@@ -147,9 +147,8 @@ xf_assay_info_rules <- {validate::validator(
 
 )}
 
-# paths to yaml files
-raw_yaml_path <- here::here("R", "assertions", "rules_raw.yaml")
-assay_info_yaml_path <- here::here("R", "assertions", "rules_assay_info.yaml")
+raw_yaml_path <- system.file("R", "assertions", "rules_raw.yaml", package = "seahtrue")
+assay_info_yaml_path <- system.file("R", "assertions", "rules_assay_info.yaml", package = "seahtrue")
 
 # export validation rules to yaml
 create_raw_yaml <- function(xf_plate_pr_raw_rules, raw_yaml_path){
