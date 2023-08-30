@@ -24,8 +24,12 @@
 #' preprocess_xfplate(xf_donor_A)
 
 preprocess_xfplate <- function(xf){
+  
+  logger::log_info("Preprocessing collected seahorse information.")
 
   # Use our xf list with all the necessary Seahorse data to fill this data tibble.
+  
+  logger::log_info("Edit created Raw dataframe.")
   xf_raw_pr <- preprocess_xf_raw(xf$raw,
                                  xf$pHcal,
                                  xf$inj,
@@ -34,11 +38,12 @@ preprocess_xfplate <- function(xf){
                                  xf$norm,
                                  xf$flagged)
 
+  logger::log_info("Edit created Rate dataframe.")
   xf_rate_pr <- preprocess_xf_rate(xf$rate,
                                    xf$norm,
                                    xf$flagged)
 
-  #output all plate data
+  logger::log_info("Creating new plate dataset with collected and preprocessed information.")
   xf_plate_pr <- xf_raw_pr %>%
     dplyr::group_by(plate_id) %>%
     tidyr::nest() %>%
@@ -53,6 +58,8 @@ preprocess_xfplate <- function(xf){
                   injection_info = list(tibble::tibble(xf$inj))) %>%
     dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
                   raw_data = data, rate_data)
+  
+  logger::log_info(glue::glue("Finished preprocessing collected seahorse information."))
 
   return(xf_plate_pr)
 }
@@ -107,7 +114,7 @@ preprocess_xf_raw <- function(xf_raw,
                               xf_norm,
                               xf_flagged) {
 
-
+  logger::log_info("Preprocessing: Convert the original integer column to integers again, instead of double.")
   # convert the original integer column to integers again, instead of double
   xf_raw_pr <- xf_raw %>%
     tibble::as_tibble() %>%
@@ -123,41 +130,51 @@ preprocess_xf_raw <- function(xf_raw,
                            `pH Ref Dark`),
                          as.integer))
 
+  logger::log_info("Preprocessing data: Rename columns")
   # rename columns
   xf_raw_pr <- rename_columns(xf_raw_pr)
 
   # convert time column
+  logger::log_info("Preprocessing Raw sheet: Convert time column")
   xf_raw_pr <- convert_timestamp(xf_raw_pr)
 
   # correct pH_em_corr
+  logger::log_info("Preprocessing Raw sheet: Coorrect pH emission")
   xf_raw_pr$pH_em_corr_corr <- correct_pH_em_corr(xf_raw_pr$pH_em_corr,
                                                   xf_pHcal$pH_cal_em,
                                                   xf_assayinfo$pH_targetEmission[1])
 
 
   # calculate backgrounds and join
+  logger::log_info("Preprocessing Raw sheet: Calculate backgrounds")
   background <- calc_background(xf_raw_pr)
 
   xf_raw_pr <- xf_raw_pr %>%
     dplyr::left_join(background, by = c("measurement"), relationship = "many-to-many")
 
   # add injection info
+  logger::log_info("Preprocessing Raw sheet: Add injection info")
   xf_raw_pr <- dplyr::left_join(xf_raw_pr, xf_inj, by = "measurement")
 
   #add plate_id to df
+  logger::log_info("Preprocessing Raw sheet: Add plate id")
   xf_raw_pr$plate_id <- xf_assayinfo$plate_id
 
   #add norm_info
+  logger::log_info("Preprocessing Raw sheet: Normalisation info")
   xf_raw_pr <- xf_raw_pr %>% dplyr::left_join(xf_norm, by = c("well"))
 
   #add bufferfactor
+  logger::log_info("Preprocessing Raw sheet: Add bufferfactor")
   xf_raw_pr <- xf_raw_pr %>% dplyr::left_join(xf_buffer, by = c("well"))
 
   #add flag well columnn
+  logger::log_info("Preprocessing Raw sheet: Add flag well column")
   xf_raw_pr$flagged_well <- FALSE
   xf_raw_pr$flagged_well[xf_raw_pr$well %in% xf_flagged] <- TRUE
 
   # select columns that are needed
+  logger::log_info("Preprocessing: Select columns that are needed")
   xf_raw_pr <- xf_raw_pr %>% dplyr::select(
     plate_id, well, measurement, tick, timescale, minutes, group, interval, injection,
     O2_em_corr, pH_em_corr, O2_mmHg, pH, pH_em_corr_corr, O2_em_corr_bkg,

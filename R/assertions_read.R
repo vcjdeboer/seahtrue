@@ -79,9 +79,8 @@ validate_preprocessed <- function(xf){
           log_validation(assay_info_val_output$failed_params[row,], df2_name)
         }
       }
-
-
-
+      
+      logger::log_info("Finsished validate the preprocessed data.")
     },
     warning = function(war) {
       cat("WARNING :", conditionMessage(war), "\n")
