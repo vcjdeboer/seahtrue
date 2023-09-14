@@ -30,12 +30,29 @@
 #' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 #'}
 
-run_seahtrue <- function(filepath_seahorse){
-  filepath_seahorse %T>%
-    validate_xf_input() %>%
-    read_xfplate() %>%
-    preprocess_xfplate() %T>%
-    validate_preprocessed()
+run_seahtrue <- function(filepath_seahorse, ...){
+  
+  out <- tryCatch(
+    {
+      
+    if (length(list(...)) > 0) {
+      stop("Only one argument (filepath_seahorse) is allowed.")
+    }
+      
+    filepath_seahorse %T>%
+      validate_xf_input() %>%
+      read_xfplate() %>%
+      preprocess_xfplate() %T>%
+      validate_preprocessed()
+      }, warning = function(war) {
+        cat("WARNING :", conditionMessage(war), "\n")
+        logger::log_warn(conditionMessage(war), "\n")
+      },
+    error = function(err) {
+      logger::log_error(conditionMessage(err))
+      logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    }
+  ) 
 }
 
 
