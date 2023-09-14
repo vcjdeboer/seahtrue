@@ -64,3 +64,11 @@
 #' @format A tibble with appropriate columns and descriptions.
 #'
 #' @usage data(seahtrue_output_donor_C)
+#' 
+#' 
+#' @name create_yaml_location
+#' @title Make yaml location available
+#' @description Make YAML location available for for preprocessing validation.
+#' 
+#' @format YAML file
+#' create_raw_yaml(xf_plate_pr_raw_rules, system.file("R", "assertions", "rules_assay_info.yaml", package = "seahtrue"))

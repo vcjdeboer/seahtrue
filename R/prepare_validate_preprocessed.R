@@ -147,8 +147,8 @@ xf_assay_info_rules <- {validate::validator(
 
 )}
 
-raw_yaml_path <- system.file("R", "assertions", "rules_raw.yaml", package = "seahtrue")
-assay_info_yaml_path <- system.file("R", "assertions", "rules_assay_info.yaml", package = "seahtrue")
+raw_yaml_path <- system.file("extdata", "rules_raw.yaml", package = "seahtrue")
+assay_info_yaml_path <- system.file("extdata", "rules_assay_info.yaml", package = "seahtrue")
 
 # export validation rules to yaml
 create_raw_yaml <- function(xf_plate_pr_raw_rules, raw_yaml_path){
@@ -159,3 +159,5 @@ create_assay_info_yaml <- function(xf_assay_info_rules, assay_info_yaml_path){
   validate::export_yaml(xf_assay_info_rules, assay_info_yaml_path)
 }
 
+create_raw_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+create_assay_info_yaml(xf_assay_info_rules, assay_info_yaml_path)

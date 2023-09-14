@@ -17,6 +17,7 @@ validate_xf_input <- function(filepath_seahorse){
   
   # check if arguments function are present.
   rlang::check_required(filepath_seahorse)
+  
   # Check if file with specific file path exists.
   path_not_found_boolean <- path_not_found(filepath_seahorse)
   # Check if Excel sheet contains the required Seahorse sheets.
