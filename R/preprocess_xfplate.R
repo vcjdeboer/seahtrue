@@ -210,9 +210,10 @@ preprocess_xf_rate <- function(xf_rate,
                                xf_norm,
                                xf_flagged){
   #add norm_info to rate data
+  logger::log_info("Add normalisation information to xf Rate datasframe.")
   OCR_from_excel <- xf_rate %>% dplyr::left_join(xf_norm, by = c("well"))
 
-  # add flagged wells to xf rate
+  logger::log_info("Add flagged wells to xf Rate dataframe.")
   OCR_from_excel$flagged_well <- FALSE
   OCR_from_excel$flagged_well[OCR_from_excel$well %in% xf_flagged] <- TRUE
 
