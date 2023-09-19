@@ -49,3 +49,4 @@ RoxygenNote: 7.2.3
 Depends:
     R (>= 4.2.1) 
 VignetteBuilder: knitr
+StagedInstall: no
