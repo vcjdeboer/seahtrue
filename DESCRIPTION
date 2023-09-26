@@ -41,7 +41,6 @@ Imports:
     rlang (>= 1.0.0),
     glue (>= 1.6.2),
     cli (>= 3.4.1),
-    ggplot2 (>= 3.4.0),
     magrittr (>= 2.0.3),
     vctrs (>= 0.6.0)
 RoxygenNote: 7.2.3
