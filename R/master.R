@@ -7,15 +7,14 @@
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
 #'
-#' @return xf_plate_pr is returned. This is a nested tibble with the following 7 columns:
-#'  * plate_id = Seahorse Plate ID (from assay configuration sheet).
-#'  * filepath_seahorse = The original input file and its path on local drive.
-#'  * date = Date of the Seahorse run (from assay configuration sheet).
-#'  * assay_info = Parameters from Assay Configuration sheet.
-#'  * injection_info = Info from Operation log sheet.
-#'  * raw_data = Preprocessed raw data from Raw sheet.
-#'  * rate_data = Preprocessed rate data from Rate sheet.
-#'  One assay (one plate), contains all data in one row.
+#' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
+#'  * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr 
+#'  * filepath_seahorse = Path to Seahorse Excel file. \cr
+#'  * date = Date derived from 'Assay Configuration' sheet of the Seahorse Excel file. \cr
+#'  * assay_info = Dataframe with information from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
+#'  * injection_info = Dataframe with information derived from 'Operation log' sheet. \cr
+#'  * raw_data = Preprocessed raw dataframe from Seahorse 'Raw' sheet. \cr
+#'  * rate_data = Preprocessed rate data from 'Rate' sheet.
 #' @keywords internal
 #' @export
 #'
