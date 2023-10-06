@@ -22,36 +22,49 @@
 #' run_seahtrue(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
 #' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
 #' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
-
+#'
 #'\dontrun{
-#' run_seahtrue(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
+#'run_seahtrue(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
 #' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
 #' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
 #'}
 
 run_seahtrue <- function(filepath_seahorse, ...){
   
-  out <- tryCatch(
-    {
-      
-    if (length(list(...)) > 0) {
-      stop("Only one argument (filepath_seahorse) is allowed.")
-    }
-      
-    filepath_seahorse %T>%
-      validate_xf_input() %>%
-      read_xfplate() %>%
-      preprocess_xfplate() %T>%
-      validate_preprocessed()
-      }, warning = function(war) {
-        cat("WARNING :", conditionMessage(war), "\n")
-        logger::log_warn(conditionMessage(war), "\n")
-      },
-    error = function(err) {
-      logger::log_error(conditionMessage(err))
-      logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
-    }
-  ) 
+  formalArgs(run_seahtrue)
+  f <- formals(run_seahtrue)
+  
+  if (length(list(...)) > 0) {
+    cli::cli_alert_info("You provided multiple arguments")
+    cli::cli_alert_danger("Only one argument is allowed.")
+    cli::cli_abort(glue::glue("Only {length(formals(run_seahtrue)) -1} argument is allowed."))
+  }
+  
+  if (is.na(filepath_seahorse) || filepath_seahorse == ''){
+    cli::cli_alert_info("The path you provided either doesn't exist or is empty.")
+    cli::cli_alert_danger("Couldn't find path to Excel file.")
+    cli::cli_abort("An error occured because an unexpected path is provided. Stopping analyis.")
+  }
+
+  if (missing(filepath_seahorse) || !is.character(filepath_seahorse)) {
+    cli::cli_alert_info(glue::glue("{f[1]} must be provided as a character vector"))
+    cli::cli_abort("'filepath_seahorse' must be provided as a character vector")
+  }
+  
+  if (missing(filepath_seahorse) || !isSingleString(filepath_seahorse)) {
+    cli::cli_alert_info(glue::glue("{f[1]} must be provided as a character vector"))
+    cli::cli_abort("filepath_seahorse must be a single, non-NA string")
+  }
+  
+  filepath_seahorse %T>%
+    validate_xf_input() %>%
+    read_xfplate() %>%
+    preprocess_xfplate() %T>%
+    validate_preprocessed()
 }
 
+isSingleString <- function (x) 
+{
+  is.character(x) && length(x) == 1L && !is.na(x)
+}
 

@@ -37,9 +37,14 @@ log_validation <- function(val_output, validated_df_name){
   name = val_output$name
   rule = val_output$expression
 
-  logger::log_error(glue::glue("Validation for '{validated_df_name}' in
+  cli::cli_alert_warning(glue::glue("Validation for '{name}' in
                          the preprocessed seahorse dataset FAILED.
                          The '{name}' parameter did not pass the following rule: '{rule}'"))
+  
+  input<-menu(c("Yes", "No"),title="Do you want to continue?")
+  
+  return(input)
+
 }
 
 
@@ -70,13 +75,24 @@ validate_preprocessed <- function(xf){
 
       if (!raw_val_output$validation_passed){
         for (row in 1:nrow(raw_val_output$failed_params)){
-          log_validation(raw_val_output$failed_params[row,], df1_name)
+          input <- log_validation(raw_val_output$failed_params[row,], df1_name)
+          if (input == 1){
+          }
+          if (input == 2){
+            cli::cli_abort("You stopped the Seahtrue analysis.")
+          }
         }
       }
 
       if (!assay_info_val_output$validation_passed){
         for (row in 1:nrow(assay_info_val_output$failed_params)){
-          log_validation(assay_info_val_output$failed_params[row,], df2_name)
+          input <- log_validation(assay_info_val_output$failed_params[row,], df2_name)
+          if (input == 1){
+          }
+          if (input == 2){
+            cli::cli_abort("You stopped the Seahtrue analysis.")
+          }
+          
         }
       }
       

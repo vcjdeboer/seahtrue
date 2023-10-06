@@ -15,8 +15,9 @@
 #' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
 #' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
 read_xfplate <- function(filepath_seahorse) {
-
-  tryCatch({
+  
+  out <- tryCatch(
+    {
 
     rlang::check_required(filepath_seahorse)
 
@@ -55,17 +56,15 @@ read_xfplate <- function(filepath_seahorse) {
     logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
 
     return(xf)
-
-
-  }, warning = function(war) {
-    cat("WARNING :", conditionMessage(war), "\n")
-    logger::log_warn(conditionMessage(war), "\n")
-  },
+    
+    
+},
   error = function(err) {
     logger::log_error(conditionMessage(err))
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
+    stop()
   }
-  )
+  ) 
+
 
 }
 
@@ -117,9 +116,10 @@ read_xfplate <- function(filepath_seahorse) {
                          ))
 
     logger::log_info("Finished collecting data from 'Raw' sheet.")
-
+    
     return(xf_raw)
-}
+    
+      }
 
 # get_xf_norm -------------------------------------------------------------
 

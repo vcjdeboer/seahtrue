@@ -113,7 +113,10 @@ preprocess_xf_raw <- function(xf_raw,
                               xf_buffer,
                               xf_norm,
                               xf_flagged) {
-
+  
+  out <- tryCatch(
+    {
+      
   logger::log_info("Preprocessing: Convert the original integer column to integers again, instead of double.")
   # convert the original integer column to integers again, instead of double
   xf_raw_pr <- xf_raw %>%
@@ -182,6 +185,14 @@ preprocess_xf_raw <- function(xf_raw,
   )
 
   return(xf_raw_pr)
+  
+  },
+  
+  error = function(err) {
+    logger::log_error(conditionMessage(err))
+    stop()
+  }
+  ) 
 }
 
 
