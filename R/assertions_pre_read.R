@@ -62,7 +62,7 @@ path_not_found <- function(filepath_seahorse){
                                   {filepath_seahorse}"))
       return(TRUE)
     } else {
-      logger::log_info(glue::glue("The following file does not exist: {filepath_seahorse}"))
+      cli::cli_abort(glue::glue("The following file does not exist: {filepath_seahorse}"))
       stop()
     }
 }
@@ -85,7 +85,7 @@ check_sheets <- function(filepath_excel, sheets_predicted = list("Assay Configur
     
     logger::log_info(glue::glue("Check if Excel input contains the required Seahorse sheets"))
     
-    cli::cli_alert_info(glue::glue("Performing a check on the following seahorse sheets: 
+    logger::log_info(glue::glue("Performing a check on the following seahorse sheets: 
                                    {arguments[2]}"))
 
     excel_sheets <- readxl::excel_sheets(filepath_excel)
