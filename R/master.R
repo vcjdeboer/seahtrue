@@ -83,35 +83,27 @@ run_seahtrue <- function(filepath_seahorse, ...) {
     )
   )
 
-  # If all Excel sheet validations return TRUE,
-  # we suppose it's a Seahorse xf file and we can continue with reading the data.
-  meets_criteria <- all(path_not_found_boolean, check_sheets_boolean)
-
-  cli::cli_alert_success(glue::glue("File meets criteria for data reading: {meets_criteria}"))
-
   logger::log_info("Finished seahorse input file validation.")
   logger::log_info("Reading seahorse input with input file.")
 
   logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
                                 {filepath_seahorse}"))
 
-  if (meets_criteria == TRUE) {
-    # read data
-    xf_raw <- get_xf_raw(filepath_seahorse)
-    xf_rate <- get_xf_rate(filepath_seahorse) # outputs list of 2
-    xf_norm <- get_xf_norm(filepath_seahorse) # outputs list of 2
-    xf_buffer <- get_xf_buffer(filepath_seahorse)
-    xf_inj <- get_xf_inj(filepath_seahorse)
-    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-    xf_flagged <- get_xf_flagged(filepath_seahorse)
-    xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
-      norm_available = xf_norm[[2]],
-      xls_ocr_backgroundcorrected = xf_rate[[2]]
-    )
-    xf_norm <- xf_norm[[1]]
-    xf_rate <- xf_rate[[1]]
-  }
+  # read data
+  xf_raw <- get_xf_raw(filepath_seahorse)
+  xf_rate <- get_xf_rate(filepath_seahorse) # outputs list of 2
+  xf_norm <- get_xf_norm(filepath_seahorse) # outputs list of 2
+  xf_buffer <- get_xf_buffer(filepath_seahorse)
+  xf_inj <- get_xf_inj(filepath_seahorse)
+  xf_pHcal <- get_xf_pHcal(filepath_seahorse)
+  xf_O2cal <- get_xf_O2cal(filepath_seahorse)
+  xf_flagged <- get_xf_flagged(filepath_seahorse)
+  xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
+    norm_available = xf_norm[[2]],
+    xls_ocr_backgroundcorrected = xf_rate[[2]]
+  )
+  xf_norm <- xf_norm[[1]]
+  xf_rate <- xf_rate[[1]]
 
 
   # make the output list
