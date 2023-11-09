@@ -32,46 +32,41 @@ run_seahtrue <- function(filepath_seahorse, ...) {
 
   cli::cli_inform("Starting Seahtrue analysis")
 
-
   logger::log_info("Checking if file meets criteria for data reading.")
 
-  # check if arguments function are present.
+  # Check if the seahorse file path argument is present.
+  # If not, stop the analysis.
   rlang::check_required(filepath_seahorse)
-  
 
+  # Check if the function contains the right amount of arguments.
+  # If not, stop the analysis.
   if (length(list(...)) > 0) {
-    
-    formalArgs(run_seahtrue)
-    f <- formals(run_seahtrue)
-    
     cli::cli_alert_info("You provided multiple arguments.")
     cli::cli_alert_danger(glue::glue("Only {length(formals(run_seahtrue)) -1} argument(s) allowed."))
     cli::cli_abort(glue::glue("Only {length(formals(run_seahtrue)) -1} argument(s) allowed."))
   }
-  
 
+  # Check if the provided seahorse file path contains missing values or is an empty string.
+  # If not, stop the analysis.
   if (is.na(filepath_seahorse) || filepath_seahorse == "") {
     cli::cli_alert_info("The path you provided either doesn't exist or is empty.")
     cli::cli_alert_danger("Couldn't find path to Excel file.")
     cli::cli_abort("An error occured because an unexpected path is provided. Stopping analyis.")
   }
 
-  if (missing(filepath_seahorse) || !is.character(filepath_seahorse)) {
-    cli::cli_alert_info(glue::glue("{f[1]} must be provided as a character vector"))
+  # Check if provided seahorse file path has type character.
+  # If not, stop the analysis.
+  if (!is.character(filepath_seahorse)) {
+    cli::cli_alert_info(glue::glue("{formalArgs(run_seahtrue)[1]} must be provided as a character vector."))
     cli::cli_abort("'filepath_seahorse' must be provided as a character vector")
   }
 
-  if (missing(filepath_seahorse) || !isSingleString(filepath_seahorse)) {
-    cli::cli_alert_info(glue::glue("{f[1]} must be provided as a character vector"))
-    cli::cli_abort("filepath_seahorse must be a single, non-NA string")
-  }
-
   # Check if file with specific file path exists.
+  # If not, stop the analysis.
   path_not_found_boolean <- path_not_found(filepath_seahorse)
-  # Check if Excel sheet contains the required Seahorse sheets.
-
-
-  # Check seahorse Excel sheets
+  
+  # Check if Excel file on file path location contains the required Seahorse sheets.
+  # Note: If these seahorse sheets exist we assume a seahorse file has been provided.
   check_sheets_boolean <- check_sheets(
     filepath_seahorse,
     list(
@@ -83,67 +78,36 @@ run_seahtrue <- function(filepath_seahorse, ...) {
     )
   )
 
-  logger::log_info("Finished seahorse input file validation.")
-  logger::log_info("Reading seahorse input with input file.")
+  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing.
+  # Load the Seahorse Excel file, collect data and preprocess it. 
+  # Put the preprocessed data in a variable.
+ 
+  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing.
+  # Load the Seahorse Excel file, collect data and preprocess it.
+  preprocessed_xf_plate <- read_xfplate(filepath_seahorse) %>%
+    {
+      if (is.null(.)) {
+        cli::cli_abort("The dataset is empty.")
+      } else if (any(is.na(.))) {
+        cli::cli_abort("The dataset contains missing values.")
+      } else {
+        preprocess_xfplate(.)
+      }
+    }
 
-  logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
-                                {filepath_seahorse}"))
-
-  # read data
-  xf_raw <- get_xf_raw(filepath_seahorse)
-  xf_rate <- get_xf_rate(filepath_seahorse) # outputs list of 2
-  xf_norm <- get_xf_norm(filepath_seahorse) # outputs list of 2
-  xf_buffer <- get_xf_buffer(filepath_seahorse)
-  xf_inj <- get_xf_inj(filepath_seahorse)
-  xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-  xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-  xf_flagged <- get_xf_flagged(filepath_seahorse)
-  xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
-    norm_available = xf_norm[[2]],
-    xls_ocr_backgroundcorrected = xf_rate[[2]]
-  )
-  xf_norm <- xf_norm[[1]]
-  xf_rate <- xf_rate[[1]]
-
-
-  # make the output list
-  xf <- list(
-    raw = xf_raw,
-    rate = xf_rate,
-    assayinfo = xf_assayinfo,
-    inj = xf_inj,
-    pHcal = xf_pHcal,
-    O2cal = xf_O2cal,
-    norm = xf_norm,
-    flagged = xf_flagged,
-    buffer = xf_buffer,
-    filepath_seahorse = filepath_seahorse
+  # Validate the preprocessed dataset.
+  # We want to extract the failed validation rules to memorize these. 
+  val_output <- validate_preprocessed(preprocessed_xf_plate)
+  
+  # Create the validation tibble
+  validation <- tibble(
+    raw_val_output = list(val_output$raw_val_output),  
+    assay_info_val_output = list(val_output$assay_info_val_output)
   )
   
-
-  if (is.null(xf) == FALSE) {
-    # Proceed with further checks and analysis
-  } else {
-    cli::cli_abort("The dataset is empty.")
-  }
+  # Add the entire validation tibble as a single column to preprocessed_xf_plate
+  preprocessed_xf_plate <- preprocessed_xf_plate %>%
+    mutate(validation_column = list(validation))
   
-  if (!(any(is.na(xf)))) {
-    # Proceed if there are no missing values
-  } else {
-    cli::cli_abort("The datset contains missing values.")
-  }
-  
-  # Proceed to preprocessing and validation.
-  preprocessed_file <- xf %>%
-    preprocess_xfplate() %T>%
-    validate_preprocessed()
-
-  logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
-
-  return(preprocessed_file)
-}
-
-
-isSingleString <- function(x) {
-  is.character(x) && length(x) == 1L && !is.na(x)
+  return(preprocessed_xf_plate)
 }

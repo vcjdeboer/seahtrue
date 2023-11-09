@@ -19,8 +19,7 @@ validate_xf_input <- function(filepath_seahorse){
   # check if arguments function are present.
   rlang::check_required(filepath_seahorse)
   
-  # Check if file with specific file path exists.
-  path_not_found_boolean <- path_not_found(filepath_seahorse)
+
   # Check if Excel sheet contains the required Seahorse sheets.
   
   check_sheets_boolean <- check_sheets(filepath_seahorse,
@@ -80,13 +79,10 @@ path_not_found <- function(filepath_seahorse){
 #' @return TRUE or FALSE, based on existence of the required Seahorse sheets.
 #' @examples check_sheets(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
 check_sheets <- function(filepath_excel, sheets_predicted = list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"), call = rlang::caller_env){
-    formalArgs(check_sheets)
-    arguments <- formals(check_sheets)
     
     logger::log_info(glue::glue("Check if Excel input contains the required Seahorse sheets"))
     
-    logger::log_info(glue::glue("Performing a check on the following seahorse sheets: 
-                                   {arguments[2]}"))
+    logger::log_info(glue::glue("Performing a check on the following Seahorse sheets: {paste(sheets_predicted, collapse = ', ')}"))
 
     excel_sheets <- readxl::excel_sheets(filepath_excel)
     
@@ -106,7 +102,7 @@ check_sheets <- function(filepath_excel, sheets_predicted = list("Assay Configur
       cli::cli_abort(glue::glue("Stopping analysis, because sheets were not found."))
     } else {
       result <- TRUE
-      logger::log_info(glue::glue("The excel sheet contains all required sheets."))
+      logger::log_info(glue::glue("The Excel sheet contains all required sheets."))
     }
 
     return(result)

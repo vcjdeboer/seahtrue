@@ -64,34 +64,21 @@ validate_preprocessed <- function(xf){
     df2_name = "assay_info"
 
     logger::log_info("Validate the preprocessed data.")
+    
+    # Provide the validation rules.
     xf_plate_pr_raw_rules <- validate::validator(.file = raw_yaml_path)
     xf_assay_info_rules <- validate::validator(.file = assay_info_yaml_path)
 
+    # Validate using the validation rules.
+    # Return the failed rules. If any rules failed the analysis doesn't meet the validation criteria.
     raw_val_output <- validate_df(df1, xf_plate_pr_raw_rules)
     assay_info_val_output <- validate_df(df2, xf_assay_info_rules)
-
-    if (!raw_val_output$validation_passed){
-      for (row in 1:nrow(raw_val_output$failed_params)){
-        input <- log_validation(raw_val_output$failed_params[row,], df1_name)
-        if (input == 1){
-        }
-        if (input == 2){
-          cli::cli_abort("You stopped the Seahtrue analysis.")
-        }
-      }
-    }
-
-    if (!assay_info_val_output$validation_passed){
-      for (row in 1:nrow(assay_info_val_output$failed_params)){
-        input <- log_validation(assay_info_val_output$failed_params[row,], df2_name)
-        if (input == 1){
-        }
-        if (input == 2){
-          cli::cli_abort("You stopped the Seahtrue analysis.")
-        }
-        
-      }
-    }
     
     logger::log_info("Finsished validate the preprocessed data.")
+    
+    return(list(raw_val_output = raw_val_output, 
+                assay_info_val_output = assay_info_val_output))
 }
+
+
+
