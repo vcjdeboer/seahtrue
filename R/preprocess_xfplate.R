@@ -25,8 +25,7 @@
 
 preprocess_xfplate <- function(xf){
   
-  logger::log_info("Preprocessing collected seahorse information.")
-
+  cli::cli_alert_info("Preprocessing collected seahorse information.")
   # Use our xf list with all the necessary Seahorse data to fill this data tibble.
   
   logger::log_info("Edit created Raw dataframe.")
@@ -59,7 +58,7 @@ preprocess_xfplate <- function(xf){
     dplyr::select(plate_id, filepath_seahorse, date, assay_info, injection_info,
                   raw_data = data, rate_data)
   
-  logger::log_info(glue::glue("Finished preprocessing collected seahorse information."))
+  cli::cli_alert_info("Finished preprocessing collected seahorse information.")
 
   return(xf_plate_pr)
 }

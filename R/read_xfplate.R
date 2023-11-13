@@ -18,7 +18,7 @@ read_xfplate <- function(filepath_seahorse) {
 
     rlang::check_required(filepath_seahorse)
 
-    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
+    cli::cli_alert(glue::glue("Start function to read seahorse plate data from Excel file:
                                 {filepath_seahorse}"))
 
     # read data
@@ -49,7 +49,7 @@ read_xfplate <- function(filepath_seahorse) {
       buffer = xf_buffer,
       filepath_seahorse = filepath_seahorse
     )
-
+    
     logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
 
     return(xf)
@@ -106,7 +106,7 @@ read_xfplate <- function(filepath_seahorse) {
    )
    
    if (exists("xf_raw")) {
-     cli::cli_alert_success("Succesfully read Raw information from data sheet.")
+     cli::cli_alert_success("Succesfully collected Raw information from data sheet.")
    } else {
      cli::cli_abort("An error occured during the data collection from 'Raw'sheet.")
    }
@@ -155,7 +155,7 @@ get_xf_norm <- function(filepath_seahorse){
 
     
     if (exists("xf_norm")) {
-      cli::cli_alert_success("Succesfully read normalisation info from 'Assay configuration' from data sheet.")
+      cli::cli_alert_success("Succesfully collected normalisation info from 'Assay configuration' from data sheet.")
     } else {
       stop("An error occured during the data collection from 'Assay Configuration' sheet.")
     }
@@ -409,7 +409,7 @@ get_xf_rate <- function(filepath_seahorse){
     xf_rate_list <- get_originalRateTable(filepath_seahorse)
     
     if (exists("xf_rate_list")) {
-      cli::cli_alert_success("Succesfully read Rate data from data sheet.")
+      cli::cli_alert_success("Succesfully collected Rate data from data sheet.")
     } else {
       stop("An error occured during the data collection from 'Rate'sheet.")
     }
@@ -451,7 +451,7 @@ get_xf_buffer <- function(filepath_seahorse){
     logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
     
     if (exists("bufferfactor_info")) {
-      cli::cli_alert_success("Succesfully read bufferfactor information from 'Assay configuration' data sheet.")
+      cli::cli_alert_success("Succesfully collected bufferfactor information from 'Assay configuration' data sheet.")
     } else {
       stop("An error occured during the data collection from 'Assay Configuration' sheet.")
     }
@@ -493,7 +493,7 @@ get_xf_pHcal <- function(filepath_seahorse){
  
   
   if (exists("pH_calibration")) {
-    cli::cli_alert_success("Succesfully read pH calibration emission data from 'Calibration' data sheet.")
+    cli::cli_alert_success("Succesfully collected pH calibration emission data from 'Calibration' data sheet.")
   } else {
     stop("An error occured during the data collection from 'Calibration sheet.")
   }
@@ -630,7 +630,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
   
   
   if (exists("measurement_info")) {
-    cli::cli_alert_success("Succesfully read injection information from 'Assay configuration' data sheet.")
+    cli::cli_alert_success("Succesfully collected injection information from 'Assay configuration' data sheet.")
   } else {
     stop("An error occured during the data collection from 'Assay Configuration' sheet.")
   }
@@ -862,7 +862,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
   tibbler$norm_available <- norm_available
   tibbler$xls_ocr_backgroundcorrected <- xls_ocr_backgroundcorrected
 
-  cli::cli_progress_bar("Finished collecting assay information.")
+  cli::cli_alert_info("Finished collecting assay information.")
 
   return(tibbler)
 }
