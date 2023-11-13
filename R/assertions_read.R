@@ -63,22 +63,51 @@ validate_preprocessed <- function(xf){
     df2 = xf$assay_info[[1]]
     df2_name = "assay_info"
 
-    logger::log_info("Validate the preprocessed data.")
+    cli::cli_alert_info("Validate the preprocessed data.")
     
     # Provide the validation rules.
     xf_plate_pr_raw_rules <- validate::validator(.file = raw_yaml_path)
     xf_assay_info_rules <- validate::validator(.file = assay_info_yaml_path)
 
-    # Validate using the validation rules.
-    # Return the failed rules. If any rules failed the analysis doesn't meet the validation criteria.
-    raw_val_output <- validate_df(df1, xf_plate_pr_raw_rules)
-    assay_info_val_output <- validate_df(df2, xf_assay_info_rules)
+    # Validate using the validation rules. Collect the failed validation rules for each provided rule group.
+    # If any rules failed the analysis doesn't meet the validation criteria.
+    val_output <- list(raw_val_output = validate_df(df1, xf_plate_pr_raw_rules), 
+                        assay_info_val_output = validate_df(df2, xf_assay_info_rules))
     
-    logger::log_info("Finsished validate the preprocessed data.")
+    # Organise the failed validations.
+    validation_failures <- organise_validation_failures(val_output)
     
-    return(list(raw_val_output = raw_val_output, 
-                assay_info_val_output = assay_info_val_output))
+    return(validation_failures)
 }
 
+organise_validation_failures <- function(val_output) {
+  # Create an empty data tibble to store data failures.
+  failed_validation_rules_tibble <- tibble()
+  
+  # For each rule group (for example from different yaml files) get the failed rules. 
+  # Organise the failed rules to a new tibble.
+  for (failed_rules_validation_output in names(val_output)) {
+    
+    # Extract failed rules from the validation output
+    failed_params <- val_output[[failed_rules_validation_output]]$failed_params
+    
+    # Add the extracted failed rules to a tibble with failed rules.
+    failure_tibble <- tibble(
+      validation_group = rep(failed_rules_validation_output, length(failed_params$name)),
+      failed_rules = failed_params$name,
+      expression = failed_params$expression
+    )
+    
+    # Check for duplicates. 
+    # Only add non-duplicates values to the tibble with failed rules.
+    failure_tibble <- failure_tibble[!duplicated(failure_tibble), ]
+    
+    # Failures from each validation yaml group are added to the eventual failed tibble that will be returned.
+    failed_validation_rules_tibble <- bind_rows(failed_validation_rules_tibble, failure_tibble)
+  }
+  
+  # Return the resulting tibble.
+  return(failed_validation_rules_tibble)
+}
 
 

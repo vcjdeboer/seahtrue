@@ -97,17 +97,12 @@ run_seahtrue <- function(filepath_seahorse, ...) {
 
   # Validate the preprocessed dataset.
   # We want to extract the failed validation rules to memorize these. 
-  val_output <- validate_preprocessed(preprocessed_xf_plate)
-  
-  # Create the validation tibble
-  validation <- tibble(
-    raw_val_output = list(val_output$raw_val_output),  
-    assay_info_val_output = list(val_output$assay_info_val_output)
-  )
+  failed_validation_rules_tibble <- validate_preprocessed(preprocessed_xf_plate)
   
   # Add the entire validation tibble as a single column to preprocessed_xf_plate
   preprocessed_xf_plate <- preprocessed_xf_plate %>%
-    mutate(validation_column = list(validation))
-  
+    mutate(validation_column = list(failed_validation_rules_tibble))
+
   return(preprocessed_xf_plate)
 }
+
