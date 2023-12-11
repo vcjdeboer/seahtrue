@@ -15,7 +15,7 @@
 #'  * injection_info = Dataframe with information derived from 'Operation log' sheet. \cr
 #'  * raw_data = Preprocessed raw dataframe from Seahorse 'Raw' sheet. \cr
 #'  * rate_data = Preprocessed rate data from 'Rate' sheet.
-#' @keywords internal
+#'  
 #' @export
 #'
 #' @examples
@@ -78,31 +78,19 @@ run_seahtrue <- function(filepath_seahorse, ...) {
     )
   )
 
-  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing.
-  # Load the Seahorse Excel file, collect data and preprocess it. 
-  # Put the preprocessed data in a variable.
- 
-  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing.
-  # Load the Seahorse Excel file, collect data and preprocess it.
-  preprocessed_xf_plate <- read_xfplate(filepath_seahorse) %>%
-    {
-      if (is.null(.)) {
-        cli::cli_abort("The dataset is empty.")
-      } else if (any(is.na(.))) {
-        cli::cli_abort("The dataset contains missing values.")
-      } else {
-        preprocess_xfplate(.)
-      }
-    }
-
-  # Validate the preprocessed dataset.
-  # We want to extract the failed validation rules to memorize these. 
-  failed_validation_rules_tibble <- validate_preprocessed(preprocessed_xf_plate)
+  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing step.
+  # We will validate the preprocessed seahorse data and store the output prerpocess data in a variable.
+  # Collect data, prepeprocess and validate preprocessed data.
+  preprocessed_xf_plate <- filepath_seahorse %>%
+    # Read
+    read_xfplate() %>%
+    # Preprocess
+    preprocess_xfplate() %>%
+    # Validate preprocessed data
+    validate_preprocessed()
   
-  # Add the entire validation tibble as a single column to preprocessed_xf_plate
-  preprocessed_xf_plate <- preprocessed_xf_plate %>%
-    mutate(validation_column = list(failed_validation_rules_tibble))
-
+  # Note: Regarding the code above, the run will continue even when the preprocessed dataset does not meet the validation criteria. 
+  
   return(preprocessed_xf_plate)
 }
 
