@@ -78,7 +78,6 @@ read_xfplate <- function(filepath_seahorse) {
  get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
 
-   try(
     xf_raw <- readxl::read_excel(filepath_seahorse,
                          sheet = "Raw",
                          col_types = c("numeric", # Measurment
@@ -103,14 +102,7 @@ read_xfplate <- function(filepath_seahorse) {
                                        "numeric",# pH Ref Dark
                                        "numeric" # pH Corrected Em.
                          ))
-   )
    
-   if (exists("xf_raw")) {
-     cli::cli_alert_success("Succesfully collected Raw information from data sheet.")
-   } else {
-     cli::cli_abort("An error occured during the data collection from 'Raw'sheet.")
-   }
-  
 
     logger::log_info("Finished collecting data from 'Raw' sheet.")
     
@@ -152,15 +144,7 @@ get_xf_norm <- function(filepath_seahorse){
       norm_available <- TRUE}
 
     xf_norm <- list(norm_info, norm_available)
-
     
-    if (exists("xf_norm")) {
-      cli::cli_alert_success("Succesfully collected normalisation info from 'Assay configuration' from data sheet.")
-    } else {
-      stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-    }
-    
-
     logger::log_info("Finished collecting normalisation info from 'Assay configuration' sheet.")
 
     return(xf_norm)
@@ -223,12 +207,6 @@ get_xf_flagged <- function(filepath_seahorse){
       well = flagged_vector,
       flag = TRUE
     )
-    
-    if (exists("flagged_tibble")) {
-      cli::cli_alert_success("Succesfully collected unselected (flagged) wells from 'Assay Configuration' data sheet.")
-    } else {
-      stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-    }
     
     logger::log_info("Finished collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
@@ -408,12 +386,6 @@ get_xf_rate <- function(filepath_seahorse){
     #first item is table, second item is background_corrected logical
     xf_rate_list <- get_originalRateTable(filepath_seahorse)
     
-    if (exists("xf_rate_list")) {
-      cli::cli_alert_success("Succesfully collected Rate data from data sheet.")
-    } else {
-      stop("An error occured during the data collection from 'Rate'sheet.")
-    }
-    
     logger::log_info("Finished collecting data from 'Rate' sheet.")
     
     return(xf_rate_list)
@@ -447,14 +419,6 @@ get_xf_buffer <- function(filepath_seahorse){
                                               my_sheet = "Assay Configuration",
                                               my_range = "B96:N104",
                                               my_param = "bufferfactor")
-
-    logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
-    
-    if (exists("bufferfactor_info")) {
-      cli::cli_alert_success("Succesfully collected bufferfactor information from 'Assay configuration' data sheet.")
-    } else {
-      stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-    }
     
     logger::log_info("Finished collecting bufferfactor information from 'Assay configuration' sheet.")
     
@@ -489,14 +453,6 @@ get_xf_pHcal <- function(filepath_seahorse){
                                          my_sheet = "Calibration",
                                          my_range = "P16:AB24",
                                          my_param = "pH_cal_em")
-
- 
-  
-  if (exists("pH_calibration")) {
-    cli::cli_alert_success("Succesfully collected pH calibration emission data from 'Calibration' data sheet.")
-  } else {
-    stop("An error occured during the data collection from 'Calibration sheet.")
-  }
   
   logger::log_info("Finished collecting pH calibration emission data")
   
@@ -528,12 +484,6 @@ get_xf_O2cal <- function(filepath_seahorse){
                                          my_sheet = "Calibration",
                                          my_range = "B7:N15",
                                          my_param = "O2_cal_em")
-  
-  if (exists("O2_calibration")) {
-    cli::cli_alert_success("Succesfully collected O2 calibration data.")
-  } else {
-    stop("An error occured during the data collection from 'Calibration sheet.")
-  }
 
   logger::log_info("Finished collecting O2 calibration emission")
   
@@ -628,13 +578,6 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
   logger::log_info("Finished collecting injection information")
   
-  
-  if (exists("measurement_info")) {
-    cli::cli_alert_success("Succesfully collected injection information from 'Assay configuration' data sheet.")
-  } else {
-    stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-  }
-  
   logger::log_info("Finished collecting injection information  from 'Assay configuration' sheet.")
   
   return(measurement_info)
@@ -679,17 +622,12 @@ get_xf_assayinfo <- function(filepath_seahorse,
   }
 
   # read Assay Configuration sheet
-  try(
     meta_df <- readxl::read_excel(filepath_seahorse,
                           sheet = "Assay Configuration",
                           col_names = c("parameter", "value"),
                           range = "A1:B83"
     )
-  )
-  
-  if (!(exists("meta_df"))) {
-    stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-  }
+
 
   pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
   name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
@@ -702,58 +640,35 @@ get_xf_assayinfo <- function(filepath_seahorse,
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
 
   # read Assay Configuration sheet gain1
-  try(
     gain1 <- readxl::read_excel(filepath_seahorse,
                         sheet = "Assay Configuration",
                         col_names = c("value"),
                         range = gain1_cell
     )
-  )
-  
-  if (!(exists("gain1"))) {
-    stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-  }
-  
 
   # read Assay Configuration sheet gain2
-  try(
     gain2 <- readxl::read_excel(filepath_seahorse,
                         sheet = "Assay Configuration",
                         col_names = c("value"),
                         range = gain2_cell
     )
-  )
-  if (!(exists("gain2"))) {
-    stop("An error occured during the data collection from 'Assay Configuration' sheet.")
-  }
-  
   
 
   # read target emission cells
-  try(
   O2_target_emission <- readxl::read_excel(filepath_seahorse,
                                    sheet = "Calibration",
                                    col_names = FALSE,
                                    range = "B4"
-  ))
+  )
   
-  if (!(exists("O2_target_emission"))) {
-    stop("An error occured during the data collection from 'Calibration' sheet.")
-  }
-  
-
   # read pH target emission cells
-  try(
     pH_target_emission <- readxl::read_excel(filepath_seahorse,
                                      sheet = "Calibration",
                                      col_names = FALSE,
                                      range = "P4"
                                      
                                      
-    ))
-  if (!(exists("gain1"))) {
-    stop("An error occured during the data collection from 'Calibration' sheet.")
-  }
+    )
 
   F0 <- as.double(meta_df$value[meta_df$parameter == "Calculated FO"])
   V_C <- as.double(meta_df$value[meta_df$parameter == "Pseudo Volume"])
