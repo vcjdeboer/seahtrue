@@ -56,11 +56,11 @@ log_validation <- function(val_output, validated_df_name){
 #' @importFrom magrittr %T>%
 #' @noRd
 #' @keywords internal
-validate_preprocessed <- function(xf){
+validate_preprocessed <- function(xf_pr){
   
-    df1 = xf$raw_data[[1]]
+    df1 = xf_pr$raw_data[[1]]
     df1_name = "raw_data"
-    df2 = xf$assay_info[[1]]
+    df2 = xf_pr$assay_info[[1]]
     df2_name = "assay_info"
 
     cli::cli_alert_info("Validate the preprocessed data.")
@@ -77,7 +77,10 @@ validate_preprocessed <- function(xf){
     # Organise the failed validations.
     validation_failures <- organise_validation_failures(val_output)
     
-    return(validation_failures)
+    xf_pr <- xf_pr %>%
+      mutate(validation_failures = list(validation_failures))
+    
+    return(xf_pr)
 }
 
 organise_validation_failures <- function(val_output) {
