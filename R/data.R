@@ -2,7 +2,7 @@
 #'
 #' A dataset containing output for donor A. This data contains the preprocess 
 #' output that was generated during the run of our Seahtrue pipeline. This data was 
-#' created with generated with input file '20191219 SciRep PBMCs donor A.xlsx', 
+#' created with generated with input file '20191219_SciRep_PBMCs_donor_A.xlsx', 
 #' located at the inst/extdata directory.
 #'
 #' @format A data frame with 1 rows and 7 variables.
@@ -21,7 +21,7 @@
 #'
 #' A dataset containing output for donor A. This data contains the preprocess 
 #' output that was generated during the run of our Seahtrue pipeline. This data was 
-#' created with generated with input file '20200110 SciRep PBMCs donor B.xlsx', 
+#' created with generated with input file '20200110_SciRep_PBMCs_donor_B.xlsx', 
 #' located at the inst/extdata directory.
 #'
 #' @format A data frame with 1 rows and 7 variables:
@@ -40,7 +40,7 @@
 #'
 #' A dataset containing output for donor A. This data contains the preprocess 
 #' output that was generated during the run of our Seahtrue pipeline. This data was 
-#' created with generated with input file '20200110 SciRep PBMCs donor C.xlsx', 
+#' created with generated with input file '20200110_SciRep_PBMCs_donor_C.xlsx', 
 #' located at the inst/extdata directory.
 #'
 #' @format A data frame with 1 rows and 7 variables:

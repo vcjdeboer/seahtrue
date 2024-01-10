@@ -22,7 +22,7 @@ seahtrue_output_donor_A
 \description{
 A dataset containing output for donor A. This data contains the preprocess 
 output that was generated during the run of our Seahtrue pipeline. This data was 
-created with generated with input file '20191219 SciRep PBMCs donor A.xlsx', 
+created with generated with input file '20191219_SciRep_PBMCs_donor_A.xlsx', 
 located at the inst/extdata directory.
 }
 \keyword{datasets}

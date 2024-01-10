@@ -19,13 +19,13 @@
 #' @export
 #'
 #' @examples
-#' run_seahtrue(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' run_seahtrue(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' run_seahtrue(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' run_seahtrue(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 #' \dontrun{
-#' run_seahtrue(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' run_seahtrue(here::here("inst", "extdata", "20191219_SciRep_PBMCs_donor_A.xlsx"))
+#' run_seahtrue(here::here("inst", "extdata", "20200110_SciRep_PBMCs_donor_B.xlsx"))
+#' run_seahtrue(here::here("inst", "extdata", "20200110_SciRep_PBMCs_donor_C.xlsx"))
 #' }
 #'
 run_seahtrue <- function(filepath_seahorse, ...) {
@@ -78,7 +78,7 @@ run_seahtrue <- function(filepath_seahorse, ...) {
     )
   )
 
-  # When we have a correct Seahorse Excel file, we can proceed to our data retrieval and preprocessing step.
+  # When we have checked that the input is Seahorse Excel file, we can proceed to our data retrieval and preprocessing step.
   # We will validate the preprocessed seahorse data and store the output prerpocess data in a variable.
   # Collect data, prepeprocess and validate preprocessed data.
   preprocessed_xf_plate <- filepath_seahorse %>%

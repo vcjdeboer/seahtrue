@@ -11,7 +11,7 @@ run_seahtrue(filepath_seahorse, ...)
 }
 \value{
 A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
- * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr 
+ * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
  * filepath_seahorse = Path to Seahorse Excel file. \cr
  * date = Date derived from 'Assay Configuration' sheet of the Seahorse Excel file. \cr
  * assay_info = Dataframe with information from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
@@ -24,13 +24,13 @@ This function takes the Seahorse Wave excel file and computes it through
 read, validate and preprocess
 }
 \examples{
-run_seahtrue(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-run_seahtrue(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+run_seahtrue(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+run_seahtrue(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+run_seahtrue(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 \dontrun{
-run_seahtrue(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-run_seahtrue(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+run_seahtrue(here::here("inst", "extdata", "20191219_SciRep_PBMCs_donor_A.xlsx"))
+run_seahtrue(here::here("inst", "extdata", "20200110_SciRep_PBMCs_donor_B.xlsx"))
+run_seahtrue(here::here("inst", "extdata", "20200110_SciRep_PBMCs_donor_C.xlsx"))
 }
+
 }
-\keyword{internal}

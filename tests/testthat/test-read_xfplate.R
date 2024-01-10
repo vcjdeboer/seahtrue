@@ -31,9 +31,9 @@ check_column_names <- function(df, df_columns_list){
   }
 }
 
-seahorse_files <- list(testthat::test_path("20191219 SciRep PBMCs donor A.xlsx"),
-                       testthat::test_path("20200110 SciRep PBMCs donor B.xlsx"),
-                       testthat::test_path("20200110 SciRep PBMCs donor C.xlsx"))
+seahorse_files <- list(testthat::test_path("20191219_SciRep_PBMCs_donor_A.xlsx"),
+                       testthat::test_path("20200110_SciRep_PBMCs_donor_B.xlsx"),
+                       testthat::test_path("20200110_SciRep_PBMCs_donor_C.xlsx"))
 
 
 # testthat: Test 'Raw' data --------------------------------------------------------------

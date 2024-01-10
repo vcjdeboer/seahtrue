@@ -11,9 +11,9 @@
 #' @keywords internal
 #'
 #' @examples
-#' read_xfplate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' read_xfplate(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 read_xfplate <- function(filepath_seahorse) {
 
     rlang::check_required(filepath_seahorse)
@@ -71,9 +71,9 @@ read_xfplate <- function(filepath_seahorse) {
 
 #'
 #' @examples
-#' get_xf_raw(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_raw(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_raw(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 
  get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
@@ -125,9 +125,9 @@ read_xfplate <- function(filepath_seahorse) {
 #' @keywords internal
 #'
 #' @examples
-#' get_xf_norm(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_norm(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_norm(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_norm <- function(filepath_seahorse){
 
     logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
@@ -162,18 +162,20 @@ get_xf_norm <- function(filepath_seahorse){
 #' @noRd
 #' @keywords internal
 #' @examples
-#' get_xf_flagged(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_flagged(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_flagged(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_flagged <- function(filepath_seahorse){
 
     logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
-    x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
+    x <<- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
     # subset to only the platelayout with the cells that show the "unselected" wells by user
-    subset_x <- x %>% dplyr::filter(row %in% c(12:19)) %>% dplyr::filter(col %in% c(3:14))
+    subset_x <- x %>% 
+      dplyr::filter(row %in% c(12:19)) %>% 
+      dplyr::filter(col %in% c(3:14))
 
     # get the "unselected" (flagged) wells (based on color fill)
     flagged_df <- subset_x[subset_x$local_format_id %in%
@@ -231,9 +233,9 @@ get_xf_flagged <- function(filepath_seahorse){
 #' @import dplyr readxl
 #'
 #' @examples
-#' get_originalRateTable(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_originalRateTable(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 
 get_originalRateTable <- function(filepath_seahorse){
 
@@ -378,9 +380,9 @@ check_excel_positions <- function(df, pos_vector, name_vector){
 #' @keywords internal
 #
 #' @examples
-#' get_xf_rate(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_rate(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_rate(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 
 get_xf_rate <- function(filepath_seahorse){
     #first item is table, second item is background_corrected logical
@@ -407,9 +409,9 @@ get_xf_rate <- function(filepath_seahorse){
 #' @keywords internal
 #'
 #' @examples
-#' get_xf_buffer(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_buffer(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_buffer(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_buffer <- function(filepath_seahorse){
 
     logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
@@ -443,9 +445,9 @@ get_xf_buffer <- function(filepath_seahorse){
 #' @keywords internal
 
 #' @examples
-#' get_xf_pHcal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_pHcal(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_pHcal(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_pHcal <- function(filepath_seahorse){
   logger::log_info("Collecting pH calibration emission data")
 
@@ -473,9 +475,9 @@ get_xf_pHcal <- function(filepath_seahorse){
 #' @noRd
 #' @keywords internal
 #' @examples
-#' get_xf_O2cal(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_O2cal(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_O2cal(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_O2cal <- function(filepath_seahorse){
 
   logger::log_info("Collecting O2 calibration emission")
@@ -512,9 +514,9 @@ get_xf_O2cal <- function(filepath_seahorse){
 #' @keywords internal
 #'
 #' @examples
-#' get_xf_inj(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
-#' get_xf_inj(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"))
-#' get_xf_inj(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
   logger::log_info("Collecting injection information")
@@ -600,9 +602,9 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' @return List (tibble) with assay information.
 #'
 #' @examples
-#' get_xf_assayinfo(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
-#' get_xf_assayinfo(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
-#' get_xf_assayinfo(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
+#' get_xf_assayinfo(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
 get_xf_assayinfo <- function(filepath_seahorse,
                              date_style = "empty",
                              instrument = "XFe96",
@@ -798,10 +800,10 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #' @keywords internal
 #'
 #' @examples
-#' get_platelayout_data(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), "Assay Configuration", "B96:N104", "bufferfactor")
-#' get_platelayout_data(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"), "Assay Configuration", "B84:N92", "cell_n")
-#' get_platelayout_data(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), "Calibration", "P16:AB24", "pH_cal_em")
-#' get_platelayout_data(system.file("extdata", "20200110 SciRep PBMCs donor C.xlsx", package = "seahtrue"), "Calibration", "B7:N15", "O2_cal_em")
+#' get_platelayout_data(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), "Assay Configuration", "B96:N104", "bufferfactor")
+#' get_platelayout_data(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), "Assay Configuration", "B84:N92", "cell_n")
+#' get_platelayout_data(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"), "Calibration", "P16:AB24", "pH_cal_em")
+#' get_platelayout_data(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"), "Calibration", "B7:N15", "O2_cal_em")
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param ){
 

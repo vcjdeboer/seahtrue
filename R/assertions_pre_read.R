@@ -10,7 +10,7 @@
 #' @return TRUE or FALSE, based the existence of the filepath and sheets in excel file
 #' @noRd
 #' @keywords internal
-#' @examples validate_xf_input(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' @examples validate_xf_input(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
 
 validate_xf_input <- function(filepath_seahorse){
   cli::cli_alert_info("Start seahorse input validation.")
@@ -52,7 +52,7 @@ validate_xf_input <- function(filepath_seahorse){
 #' @noRd
 #' @keywords internal
 #'
-#' @examples path_not_found(system.file("extdata", "20191219 SciRep PBMCs donor A.xlsx", package = "seahtrue"))
+#' @examples path_not_found(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
 #'
 path_not_found <- function(filepath_seahorse){
 
@@ -77,7 +77,7 @@ path_not_found <- function(filepath_seahorse){
 #' @keywords internal
 #'
 #' @return TRUE or FALSE, based on existence of the required Seahorse sheets.
-#' @examples check_sheets(system.file("extdata", "20200110 SciRep PBMCs donor B.xlsx", package = "seahtrue"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
+#' @examples check_sheets(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"), list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"))
 check_sheets <- function(filepath_excel, sheets_predicted = list("Assay Configuration","Rate","Raw", "Calibration","Operation Log"), call = rlang::caller_env){
     
     logger::log_info(glue::glue("Check if Excel input contains the required Seahorse sheets"))
