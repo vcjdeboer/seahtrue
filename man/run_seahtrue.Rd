@@ -8,6 +8,8 @@ run_seahtrue(filepath_seahorse, ...)
 }
 \arguments{
 \item{filepath_seahorse}{Absolute path to the Seahorse Excel file.}
+
+\item{...}{Dots argument (…) allows the function to take an undefined number of arguments.}
 }
 \value{
 A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr

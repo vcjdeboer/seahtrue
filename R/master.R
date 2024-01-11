@@ -6,6 +6,7 @@
 #'
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' @param ... Dots argument (…) allows the function to take an undefined number of arguments. 
 #'
 #' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
 #'  * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
