@@ -2,7 +2,7 @@ Package: seahtrue
 Type: Package
 Title: Introducing Seahtrue, a transformative view on cellular processes using OCR and ECAR 
 Version: 0.1.0
-Author: person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = "cre", "aut"),
+Author: person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = "cre", "aut, "cph"),
         person("Gerwin", "Smits", email = "gerwin.smits@wur.nl", role = "aut"))
 Maintainer: The package maintainer <gerwin.smits@wur.nl>
 Description:
