@@ -1,0 +1,15 @@
+## R reference
+rref <- c(
+  bibentry(
+      bibtype   = "Manual",
+      title     = "Introducing Seahtrue, a transformative view on cellular processes using OCR and ECAR.",
+      author    = c(
+          person("Vincent", "de Boer", role = c("cre", "aut", "cph")),
+          person("Gerwin", "Smits", role = c("aut"))
+          ),
+      year      = 2023,
+      note      = "R package version 0.1.0",
+      key       = "seahtrue-package",
+      url       = {"https://github.com/vcjdeboer/seahtrue"}
+  )
+)

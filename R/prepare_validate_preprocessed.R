@@ -1,7 +1,7 @@
 
 
 # set raw yaml rules
-xf_plate_pr_raw_rules <- {validator(
+xf_plate_pr_raw_rules <- {validate::validator(
 
   well_miss_values = all_complete(well),
   well_number = all(grepl("^[A-H](0[1-9]|1[0-2])", well)),
@@ -35,7 +35,7 @@ xf_plate_pr_raw_rules <- {validator(
 
   # Rules for O2_mmHg
   O2_mmHg_corr_miss_values = all_complete(O2_mmHg),
-  O2_mmHg_range = all(in_range(O2_mmHg, min=140, max=170)), #70 and 180
+  O2_mmHg_range = all(in_range(O2_mmHg, min=70, max=180)), #70 and 180
   # O2_mmHg_range = in_range(O2_mmHg, min=140, max=170) alternative each well
   # could confronted with rules as well instead of plate!
   # In that case a single well can be flagged instead of parameter of the whole plate
@@ -43,7 +43,7 @@ xf_plate_pr_raw_rules <- {validator(
   # Rules for pH
   pH_numeric = is.numeric(pH),
   pH_miss_values = all_complete(pH),
-  pH_range = all(in_range(pH, min=7.2, max=7.4)), #6.5 8
+  pH_range = all(in_range(pH, min=6.5, max=8)), #6.5 8
 
   # # Rules for O2_em_corr_bkg
   O2_em_corr_bkg_miss_values = all_complete(O2_em_corr_bkg),
@@ -62,7 +62,7 @@ xf_plate_pr_raw_rules <- {validator(
 
 )
 }
-descriptions <- {tibble(rule_name = names(xf_plate_pr_raw_rules),
+descriptions <- {tibble::tibble(rule_name = names(xf_plate_pr_raw_rules),
                        rule_desc =   c("The functions all_complete() test for missing values or combinations thereof in records.",
                                        "Well must contain A-H and must be within range 1-12.",
                                        "Check if measurement has minimum of 1.",
@@ -95,14 +95,13 @@ for (rule_index in 1:length(xf_plate_pr_raw_rules)){
   attr(xf_plate_pr_raw_rules[[rule_index]], "description") <- descriptions$rule_desc[rule_index]
 
 }
-raw_yaml_path <- here::here("assertions", "rules_raw.yaml")
-validate::export_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+
 
 #set assay_info yaml rules
-xf_assay_info_rules <- {validator(
+xf_assay_info_rules <- {validate::validator(
   # Rules for F0
   F0_miss_values = all_complete(F0),
-  F0_min_1 = F0 <= 1, #>=1
+  F0_min_1 = F0 >= 1, #>=1
 
   # Rules for V_C
   VC_miss_values = all_complete(V_C),
@@ -147,13 +146,18 @@ xf_assay_info_rules <- {validator(
   O2_0_mmHg_miss_values = all_complete(O2_0_mmHg)
 
 )}
-assay_info_yaml_path <- here::here("assertions", "rules_assay_info.yaml")
-validate::export_yaml(xf_assay_info_rules, assay_info_yaml_path)
 
+raw_yaml_path <- system.file("extdata", "rules_raw.yaml", package = "seahtrue")
+assay_info_yaml_path <- system.file("extdata", "rules_assay_info.yaml", package = "seahtrue")
 
+# export validation rules to yaml
+create_raw_yaml <- function(xf_plate_pr_raw_rules, raw_yaml_path){
+  validate::export_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+}
 
+create_assay_info_yaml <- function(xf_assay_info_rules, assay_info_yaml_path){
+  validate::export_yaml(xf_assay_info_rules, assay_info_yaml_path)
+}
 
-
-
-
-
+create_raw_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
+create_assay_info_yaml(xf_assay_info_rules, assay_info_yaml_path)

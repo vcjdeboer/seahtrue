@@ -1,0 +1,136 @@
+---
+title: "Introduction to Seahtrue"
+output: rmarkdown::html_vignette
+description: |
+  Overview of the Seahtrue package.
+vignette: >
+  %\VignetteIndexEntry{Introduction to Seahtrue}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  ---
+
+---
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Seahtrue Overview
+
+The Seahtrue package introduces notable refinements in the realm of OCR and ECAR 
+calculations, enhancing our ability to analyze cellular respiration and 
+metabolic processes. These improvements are characterized by:
+
+### Advantages / Disadvantages
+
+The software from Agilent called Wave is used while conducting experiments with these systems. Seahorse data can be obtained/visualized using Wave.
+
+However, Wave's current software has some drawbacks when measuring OCR. These drawbacks may affect results, and may lead to aberrant OCR. An abnormal OCR could, for example, lead to incorrect research conclusions regarding energy management in cells. Hence, a script is written to overcome these drawbacks.
+
+Advantages Seahtrue over Agilent's Wave:
+
+
+### Seahorse Backgound information
+
+With the Seahorse XF systems of Agilent, scientists are able to get information about the biological energy transduction and mitochondrial functions in cells.
+
+Biological energy transduction is the base of all physiological phenomena in cells. The metabolic processes associated with this energy transduction are related to diseases such as diabetes, cancer, rare genetic disease and aberrant cell death (1).
+
+Agilent's systems are capable of measuring both oxygen concentration and pH within cell culture medium. The O2/pH is measured by fluorescent probes (sensitive to O2/pH). Probes are placed just above samples (cultured cells). This will result in a small chamber of a few microliters. This small volume makes it possible to measure changes in O2 concentration and pH. 
+
+Cells use oxigen to make ATP in mitochondria. This results in a decreased oxygen concentration in the medium due to mitochondrial activity. Oxygen consumption is expressed as oxygen consumption rate (OCR). 
+
+Cells produce lactate when burning glucose at glycolysis. Lactate is (for the most part) responsible for acidification of the medium. The change in pH is called extracellular acidification rate (ECAR). 
+
+Mitochondrial cell respiration (oxidative phosphorylation) and glycolysis (non-mitochondrial) can be indirectly quantified by using the OCR and ECAR. Both processes contribute to the production of ATP in mammals (2). ATP is an energy carrier that provides cells with energy. So with this method scientists will get an insight for the energy management of cells. 
+
+### Seahtrue Summary
+
+### Script
+The Seahtrue script consists of several parts:
+
+1. Seahorse Excel files are loaded through Seahtrue. The Agilent Wave software automatically generates test results (.asyr) data. These data are converted to an Excel file (.xls). Wave includes a function to realize this conversion. 
+
+2. Useful information will be extracted from the Excel file. Information is considered useful if it's relevant to the end user. For example, it's useful to get some metadata of the project/experiment. Also data regarding our Seahtrue calculations are important. For example, oxigen and pH related calculations require 'O2 mmhg' an 'pH' data from the 'Raw' sheet of the Seahorse Excel file. With these data we can make calculations regarding OCR and ECAR.
+
+3. Calculations will be applied, including calulations to measure Oxigen Consumption rate (OCR) and Extracellular acidification rate (ECAR). This will be performed for both Wave and our alternative Seahtrue method. Calculations are performed on data from both background wells and cell-containing wells.
+
+4. Relevant information will be visualized with plots. (See heading 'Figure' under 'Application')
+
+Note 1: This vignette will show a chronological procedure of our seahtrue script. With the interactive seahtrue Shiny app, we don't have to pursue this chronological order. For example, the user may decide which plot will be visualised and it's possible to skip unwanted plots. This is possible due to 'reactivity'. The Shiny application will make Seahtrue userfriendly. 
+
+Note 2: Seahtrue allows us to perform calculations (OCR, ECAR and fluorescence (AU)) on Seahorse data. We expect Seahtrue to perform better in certain results. This still requires prove. 
+
+### Run application 
+
+#### Get all essential Seahorse information
+
+Read all the nessecary Seahorse information from the Excel file, 
+
+including data from the 'Assay Configuration' and 'Raw' sheet.
+
+A tibble with these data will be returned.
+```{r read_plate_data}
+# plate_df <- read_plate_data(filePathSeahorse, injscheme)
+# print(plate_df)
+```
+
+#### Preprocess Seahorse information
+
+We will preprocess our returned plate_df (containing all the nessary Seahorse data we need).
+
+* The preprocess_plate_data function preprocesses the data by:
+* changing columns names
+* adding new time columns
+* adding injection info columns
+* add plate_id column
+* calculating background data
+* calculating raw pH emission data
+
+A nested tibble will be returned, containing all the information we need to perform our Seahtrue calculations.
+
+Note: The nested tibble includes raw data from the 'Raw' Seahorse xls datasheet)
+
+Information received from the 'Raw' Seahorse datasheet.
+
+|     Constant     |  Description |
+|------------------|--------------|
+| Measurement      |              |
+| Tick             |              |
+| Well             |              |
+| Group            |              |
+| TimeStamp        |              |
+| Well Temperature |              |
+| Env. Temperature |              |
+| O2 is Valid      |              |
+| O2 (MmHg)        |              |
+| O2 Light Emision |              |
+| O2 Dark Emission |              |
+| O2 Ref Light     |              |
+| O2 Corrected Em  |              |
+| pH is Valid, pH  |              |
+| pH Light         |              |
+| pH Dark          |              |
+| pH Ref Light     |              |
+| pH Ref Dar       |              |
+| pH Corrected Em. |              |
+
+Information received from the 'Assay information' Seahorse datasheet.
+
+| Constant | Description |
+|----------|-------------|
+| F0       |             |
+| V_C      |             |
+| Tau_AC   |             |
+| Tau_W    |             |
+| Tau_C    |             |
+| Tau_P    |             |
+| KSV      |             |
+| gain1    |             |
+| gain2    |             |
+| pH_0     |             |
+

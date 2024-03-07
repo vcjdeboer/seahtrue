@@ -54,7 +54,7 @@ for (rda_file in filepath){
     test_that("type character", {
       expect_type(xf_plate_pr$plate_id, "character")
       expect_type(xf_plate_pr$assay_info[[1]]$plate_id, "character")
-      expect_type(xf_plate_pr$filepath_seahorse, "character")
+      expect_type(xf_plate_pr$filepath_seahorse, "list")
       expect_type(xf_raw_pr$well, "character")
       expect_type(xf_raw_pr$group, "character")
       expect_type(xf_raw_pr$injection, "character")

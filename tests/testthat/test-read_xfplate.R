@@ -31,8 +31,9 @@ check_column_names <- function(df, df_columns_list){
   }
 }
 
-
-seahorse_files <- testthat::test_path("20200110 SciRep PBMCs donor B.xlsx")
+seahorse_files <- list(testthat::test_path("20191219_SciRep_PBMCs_donor_A.xlsx"),
+                       testthat::test_path("20200110_SciRep_PBMCs_donor_B.xlsx"),
+                       testthat::test_path("20200110_SciRep_PBMCs_donor_C.xlsx"))
 
 
 # testthat: Test 'Raw' data --------------------------------------------------------------
@@ -91,7 +92,7 @@ for (seahorse_file in seahorse_files){
   filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Tests for unselected (flagged) wells derived from Assay configuration sheet.", {
     flagged <- get_xf_flagged(filepath_seahorse)
-    expect_type(flagged, "character")
+    expect_type(flagged, "list")
   })
 }
 
@@ -169,7 +170,7 @@ for (seahorse_file in seahorse_files){
   filepath_seahorse <- testthat::test_path(seahorse_file)
   test_that("Test assay information.", {
     tibbler <- get_xf_assayinfo(filepath_seahorse, instrument = "XFe96", norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE")
-    expect_length(tibbler, 23)
+    expect_length(tibbler, 25)
     expect_type(tibbler, "list")
     expect_type(tibbler$V_C, "double")
     expect_type(tibbler$Tau_AC, "double") # actually integer

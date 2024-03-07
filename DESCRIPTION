@@ -1,43 +1,50 @@
 Package: seahtrue
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Introducing Seahtrue, a transformative view on cellular processes using OCR and ECAR 
 Version: 0.1.0
-Author: person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = "cre", "aut"),
+Author: person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = "cre", "aut, "cph"),
         person("Gerwin", "Smits", email = "gerwin.smits@wur.nl", role = "aut"))
 Maintainer: The package maintainer <gerwin.smits@wur.nl>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: MIT + file LICENSE
+Description:
+    Seahtrue version 0.1.0 introduces an open and reproducible way to analyze Seahorse experiments. It uses
+    file paths to Seahorse Excel files. These files are created from the assay result files (.asyr)
+    which are derived from the Agilent Seahorse XF Wave software. They contain different sheets of
+    important data for the experiment:
+    1. Assay Information: Details about how the experiment was set up.
+    2. Rate Data: Information about the rates of different cellular processes.
+    3. Raw Data: The original data collected during the experiment.
+    4. Calibration Data: Data related to calibrating the instrument.
+    Seahtrue version 0.1.0 focuses on getting the specific data needed for analysis. Once this data is extracted,
+    it's prepared for calculations through preprocessing. To make sure everything is accurate, 
+    both the initial data and the preprocessed data go through thorough checks.
+    The upcoming version of Seahtrue will incorporate comprehensive calculations that build upon the preprocessed data, 
+    enhancing its analytical capabilities and providing deeper insights into Seahorse experiment results.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Suggests:
-    rmarkdown,
-    testthat (>= 3.0.0),
-    RColorBrewer
-Config/testthat/edition: 3
+    testthat (>= 3.0.0)
 Imports:
-    tidyverse,
-    readxl,
-    logger,
-    tidyxl,
-    magrittr,
-    knitr,
-    dplyr,
-    purrr,
-    usethis,
-    here,
-    tidyr,
-    lubridate,
-    stringr,
-    tibble,
-    validate,
-    rlang,
-    glue,
-    cli,
-    tzdb,
-    ggplot2,
-    tidyverse,
-    bayestestR
+    dplyr (>= 1.1.2),
+    readxl (>= 1.4.1),
+    logger (>= 0.2.2),
+    tidyxl (>= 1.0.8),
+    knitr (>= 1.40),
+    purrr (>= 0.3.5),
+    usethis (>= 2.1.6),
+    here (>= 1.0.1),
+    tidyr (>= 1.3.0),
+    lubridate (>= 1.8.0),
+    stringr (>= 1.4.1),
+    tibble (>= 3.1.8),
+    validate (>= 1.1.1),
+    rlang (>= 1.0.0),
+    glue (>= 1.6.2),
+    cli (>= 3.4.1),
+    magrittr (>= 2.0.3),
+    vctrs (>= 0.6.0)
 RoxygenNote: 7.2.3
-Depends: 
-    R (>= 2.10)
+Depends:
+    R (>= 4.2.0) 
+VignetteBuilder: knitr
+StagedInstall: no

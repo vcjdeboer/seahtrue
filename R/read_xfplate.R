@@ -7,17 +7,18 @@
 #'
 #' @return xf list with all necessary Seahorse data.
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' read_xfplate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' read_xfplate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' read_xfplate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' read_xfplate(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 read_xfplate <- function(filepath_seahorse) {
-
-  tryCatch({
 
     rlang::check_required(filepath_seahorse)
 
-    logger::log_info(glue::glue("Start function to read seahorse plate data from Excel file:
+    cli::cli_alert(glue::glue("Start function to read seahorse plate data from Excel file:
                                 {filepath_seahorse}"))
 
     # read data
@@ -31,7 +32,7 @@ read_xfplate <- function(filepath_seahorse) {
     xf_flagged <- get_xf_flagged(filepath_seahorse)
     xf_assayinfo <- get_xf_assayinfo(filepath_seahorse,
                                      norm_available = xf_norm[[2]],
-                                     xls_ocr_backgroundcorrected =xf_rate[[2]])
+                                     xls_ocr_backgroundcorrected = xf_rate[[2]])
     xf_norm <- xf_norm[[1]]
     xf_rate <- xf_rate[[1]]
 
@@ -48,21 +49,10 @@ read_xfplate <- function(filepath_seahorse) {
       buffer = xf_buffer,
       filepath_seahorse = filepath_seahorse
     )
-
+    
     logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
 
     return(xf)
-
-
-  }, warning = function(war) {
-    cat("WARNING :", conditionMessage(war), "\n")
-    logger::log_warn(conditionMessage(war), "\n")
-  },
-  error = function(err) {
-    logger::log_error(conditionMessage(err))
-    logger::log_info(glue::glue("Quiting analysis with sheet: {filepath_seahorse}"))
-  }
-  )
 
 }
 
@@ -74,11 +64,16 @@ read_xfplate <- function(filepath_seahorse) {
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return xf_raw tibble (list) with 'Raw' Seahorse information.
+#`
+#' @noRd
+#' @keywords internal
+#' @import dplyr readxl
+
 #'
 #' @examples
-#' get_xf_raw(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_raw(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_raw(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_raw(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 
  get_xf_raw <- function(filepath_seahorse){
     logger::log_info("Collecting data from 'Raw' sheet")
@@ -107,11 +102,13 @@ read_xfplate <- function(filepath_seahorse) {
                                        "numeric",# pH Ref Dark
                                        "numeric" # pH Corrected Em.
                          ))
+   
 
     logger::log_info("Finished collecting data from 'Raw' sheet.")
-
+    
     return(xf_raw)
-}
+    
+      }
 
 # get_xf_norm -------------------------------------------------------------
 
@@ -121,13 +118,16 @@ read_xfplate <- function(filepath_seahorse) {
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
+#'
 #' @return List consisting of [1] well names and the corresponding normalization values and
 #' [2] check if normalization data is available (TRUE/FALSE).
+#' @noRd
+#' @keywords internal
 #'
 #' @examples
-#' get_xf_norm(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_norm(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_norm(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_norm(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_norm <- function(filepath_seahorse){
 
     logger::log_info("Collecting normalisation info from 'Assay Configuration' sheet.")
@@ -136,8 +136,7 @@ get_xf_norm <- function(filepath_seahorse){
                                       my_sheet = "Assay Configuration",
                                       my_range = "B84:N92",
                                       my_param = "cell_n")
-
-
+    
 
     if (sum(is.na(norm_info$cell_n)) >90){
       norm_available <- FALSE
@@ -145,8 +144,8 @@ get_xf_norm <- function(filepath_seahorse){
       norm_available <- TRUE}
 
     xf_norm <- list(norm_info, norm_available)
-
-    logger::log_info("Finished collection normalisation info from 'Assay Configuration' sheet.")
+    
+    logger::log_info("Finished collecting normalisation info from 'Assay configuration' sheet.")
 
     return(xf_norm)
 }
@@ -160,20 +159,23 @@ get_xf_norm <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return Vector that contains wells that were "unselected" (flagged).
-#'
+#' @noRd
+#' @keywords internal
 #' @examples
-#' get_xf_flagged(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_flagged(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_flagged(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_flagged <- function(filepath_seahorse){
 
     logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
-    x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
+    x <<- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
     # subset to only the platelayout with the cells that show the "unselected" wells by user
-    subset_x <- x %>% dplyr::filter(row %in% c(12:19)) %>% dplyr::filter(col %in% c(3:14))
+    subset_x <- x %>% 
+      dplyr::filter(row %in% c(12:19)) %>% 
+      dplyr::filter(col %in% c(3:14))
 
     # get the "unselected" (flagged) wells (based on color fill)
     flagged_df <- subset_x[subset_x$local_format_id %in%
@@ -207,10 +209,156 @@ get_xf_flagged <- function(filepath_seahorse){
       well = flagged_vector,
       flag = TRUE
     )
-
+    
     logger::log_info("Finished collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
     return(flagged_tibble)
+}
+
+# get_originalRateTable() -------------------------------------------------
+#' Get the OCR from the excel file
+#'
+#' @details
+#' [2]If rate data was not already corrected, a background subtraction was performed and the second element of this list contains TRUE (logical).
+#' [2]If rate data was already corrected, there is no need for background subtraction
+#'
+#' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
+#' This Excel file is converted from the assay result file (.asyr) downloaded from
+#' the Agilent Seahorse XF Wave software.
+#'
+#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
+#'
+#' @noRd
+#' @keywords internal
+#' @import dplyr readxl
+#'
+#' @examples
+#' get_originalRateTable(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_originalRateTable(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
+
+get_originalRateTable <- function(filepath_seahorse){
+
+  logger::log_info("Collecting OCR from 'Rate' sheet.")
+
+  original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
+
+  # because rate data can be either background corrected or not this should be checked first
+  # first verify whether a "Background" group exists in the  original_rate_df
+
+
+  if ("Background" %in% {original_rate_df$Group %>% unique()}) {
+
+    logger::log_info("A background group was found in the RATE sheet")
+
+
+    check_background <- original_rate_df %>%
+      dplyr::filter(Group == "Background") %>%
+      dplyr::select(OCR) %>%
+      dplyr::reframe(mean = mean(OCR)) %>%
+      dplyr::pull(mean)
+
+    if (check_background == 0) {
+      corrected_allready <- TRUE
+    } else {
+      corrected_allready <-  FALSE
+    }
+
+  } else {
+
+    #in case when there is no Background group we work with the original data
+    # that is in the input file "Rate" sheet
+    # please note that there will be warning logged, but the columns will be
+    # labeled incorrectly as if the data is background corrected
+
+    logger::log_info("WARNING: no background group was found in the 'Rate' sheet")
+
+    corrected_allready <-  TRUE
+
+  }
+
+  if (corrected_allready == TRUE){
+    colnames(original_rate_df) <-
+      c("measurement","well", "group",
+        "time_wave", "OCR_wave_bc",
+        "ECAR_wave_bc", "PER_wave_bc")
+    original_rate_df <- original_rate_df %>%
+      dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
+
+    original_rate_df <- original_rate_df %>%
+      dplyr::select(measurement, well, group,
+                    time_wave, OCR_wave, OCR_wave_bc,
+                    ECAR_wave, ECAR_wave_bc)
+
+  } else{
+    colnames(original_rate_df) <-
+      c("measurement","well", "group",
+        "time_wave", "OCR_wave",
+        "ECAR_wave", "PER_wave")
+
+    #do background substraction forr wave table
+    background <- original_rate_df %>%
+      dplyr::filter(group=="Background") %>%
+      dplyr::group_by(measurement) %>%
+      dplyr::reframe(bkg_OCR_wave = mean(OCR_wave),
+                       bkg_ECAR_wave = mean(ECAR_wave)
+      )
+    original_rate_df <- dplyr::left_join(original_rate_df,
+                                         background,
+                                         by = c("measurement"), copy = TRUE)
+
+    original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
+    original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
+
+    original_rate_df <- original_rate_df %>%
+      dplyr::select(measurement, well, group,
+                    time_wave, OCR_wave, OCR_wave_bc,
+                    ECAR_wave, ECAR_wave_bc)
+  }
+
+  original_rate_df_list <- list(original_rate_df, corrected_allready)
+
+  logger::log_info("Finished collecting OCR from 'Rate' sheet.")
+
+  return(original_rate_df_list)
+
+}
+
+# Additional utility functions
+# check_excel_positions() -------------------------------------------------------
+#' Used as util function in get_xf_assayinfo()
+#'
+#' @param df The meta_df that was read from Assay Configuration sheet.
+#' @param pos_vector  a vector of cell positions that should be checked
+#' @param name_vector a vector with the strings that should be at the positions
+#' that were given in 'pos_vector'
+#'
+#' @return either TRUE or FALSE depending on if the check passed or failed
+#' @noRd
+#' @keywords internal
+#'
+
+check_excel_positions <- function(df, pos_vector, name_vector){
+
+  logger::log_info("Check if excel df contains data name on certain position.")
+  tf_values <- mapply(function(pos, name) {
+    true_false <- name %in% df[[1]][pos]
+    return(true_false)
+  }, pos_vector, name_vector)
+
+  check_tf_list <- function(tf_values){
+    if (all(tf_values)) {
+      logger::log_info("'Assay Configuration' sheet contains all values.")
+      return(TRUE)
+    } else {
+      logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
+      stop()
+    }
+  }
+
+  tf <- check_tf_list(tf_values)
+
+  return(tf)
 }
 
 
@@ -228,13 +376,20 @@ get_xf_flagged <- function(filepath_seahorse){
 #'
 #' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
 #'
+#' @noRd
+#' @keywords internal
+#
 #' @examples
-#' get_xf_rate(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_rate(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_rate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_rate(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
+
 get_xf_rate <- function(filepath_seahorse){
     #first item is table, second item is background_corrected logical
     xf_rate_list <- get_originalRateTable(filepath_seahorse)
+    
+    logger::log_info("Finished collecting data from 'Rate' sheet.")
+    
     return(xf_rate_list)
 }
 
@@ -248,13 +403,15 @@ get_xf_rate <- function(filepath_seahorse){
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
-#'
+
 #' @return List (tibble) that contains well and bufferfactor.
+#' @noRd
+#' @keywords internal
 #'
 #' @examples
-#' get_xf_buffer(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_buffer(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_buffer(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_buffer(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_buffer <- function(filepath_seahorse){
 
     logger::log_info("Collecting buffer factor info from 'Assay configuration' sheet.")
@@ -264,8 +421,9 @@ get_xf_buffer <- function(filepath_seahorse){
                                               my_sheet = "Assay Configuration",
                                               my_range = "B96:N104",
                                               my_param = "bufferfactor")
-
-    logger::log_info("Finished collecting buffer factor info from 'Assay configuration' sheet.")
+    
+    logger::log_info("Finished collecting bufferfactor information from 'Assay configuration' sheet.")
+    
 
     return(bufferfactor_info)
 
@@ -279,12 +437,17 @@ get_xf_buffer <- function(filepath_seahorse){
 #' This Excel file is converted from the assay result file (.asyr) downloaded from
 #' the Agilent Seahorse XF Wave software.
 #'
+
 #' @return List (tibble) that contains well and the corresponding pH calibration emission info.
 #'
+#' @keywords internal
+#' @noRd
+#' @keywords internal
+
 #' @examples
-#' get_xf_pHcal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_pHcal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_pHcal(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_pHcal(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_pHcal <- function(filepath_seahorse){
   logger::log_info("Collecting pH calibration emission data")
 
@@ -292,9 +455,10 @@ get_xf_pHcal <- function(filepath_seahorse){
                                          my_sheet = "Calibration",
                                          my_range = "P16:AB24",
                                          my_param = "pH_cal_em")
-
+  
   logger::log_info("Finished collecting pH calibration emission data")
-
+  
+  
   return(pH_calibration)
 }
 
@@ -307,11 +471,13 @@ get_xf_pHcal <- function(filepath_seahorse){
 #' the Agilent Seahorse XF Wave software.
 #'
 #' @return List (tibble) that contains wells and the corresponding O2 calibration emission.
-#'
+#' @keywords internal
+#' @noRd
+#' @keywords internal
 #' @examples
-#' get_xf_O2cal(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_O2cal(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_O2cal(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_O2cal(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_O2cal <- function(filepath_seahorse){
 
   logger::log_info("Collecting O2 calibration emission")
@@ -322,7 +488,8 @@ get_xf_O2cal <- function(filepath_seahorse){
                                          my_param = "O2_cal_em")
 
   logger::log_info("Finished collecting O2 calibration emission")
-
+  
+  
   return(O2_calibration)
 }
 
@@ -343,10 +510,13 @@ get_xf_O2cal <- function(filepath_seahorse){
 #'
 #' @return A list (tibble) that contains injection information.
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' get_xf_inj(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_xf_inj(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
+#' get_xf_inj(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"))
+#' get_xf_inj(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
   logger::log_info("Collecting injection information")
@@ -409,13 +579,15 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
   }
 
   logger::log_info("Finished collecting injection information")
-
+  
+  logger::log_info("Finished collecting injection information  from 'Assay configuration' sheet.")
+  
   return(measurement_info)
 
 }
 
 
-# get_assay_info ----------------------------------------------------
+# get_xf_assayinfo ----------------------------------------------------
 #' Get assay information.
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
@@ -425,13 +597,14 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' @param instrument The type of seahorse analyzer. Can be "XFe96" or XFHSmini".
 #' @param norm_available requires xf_norm. Can be TRUE or FALSE.
 #' @param xls_ocr_backgroundcorrected requires original rate table. Can be TRUE or FALSE.
-#'
+#' @noRd
+#' @keywords internal
 #' @return List (tibble) with assay information.
 #'
 #' @examples
-#' get_xf_assayinfo(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
-#' get_xf_assayinfo(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
+#' get_xf_assayinfo(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "US")
+#' get_xf_assayinfo(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
 get_xf_assayinfo <- function(filepath_seahorse,
                              date_style = "empty",
                              instrument = "XFe96",
@@ -451,11 +624,12 @@ get_xf_assayinfo <- function(filepath_seahorse,
   }
 
   # read Assay Configuration sheet
-  meta_df <- readxl::read_excel(filepath_seahorse,
-                        sheet = "Assay Configuration",
-                        col_names = c("parameter", "value"),
-                        range = "A1:B83"
-  )
+    meta_df <- readxl::read_excel(filepath_seahorse,
+                          sheet = "Assay Configuration",
+                          col_names = c("parameter", "value"),
+                          range = "A1:B83"
+    )
+
 
   pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
   name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
@@ -468,18 +642,19 @@ get_xf_assayinfo <- function(filepath_seahorse,
   meta_df <- meta_df[!is.na(meta_df$parameter), ]
 
   # read Assay Configuration sheet gain1
-  gain1 <- readxl::read_excel(filepath_seahorse,
-                      sheet = "Assay Configuration",
-                      col_names = c("value"),
-                      range = gain1_cell
-  )
+    gain1 <- readxl::read_excel(filepath_seahorse,
+                        sheet = "Assay Configuration",
+                        col_names = c("value"),
+                        range = gain1_cell
+    )
 
   # read Assay Configuration sheet gain2
-  gain2 <- readxl::read_excel(filepath_seahorse,
-                      sheet = "Assay Configuration",
-                      col_names = c("value"),
-                      range = gain2_cell
-  )
+    gain2 <- readxl::read_excel(filepath_seahorse,
+                        sheet = "Assay Configuration",
+                        col_names = c("value"),
+                        range = gain2_cell
+    )
+  
 
   # read target emission cells
   O2_target_emission <- readxl::read_excel(filepath_seahorse,
@@ -487,13 +662,15 @@ get_xf_assayinfo <- function(filepath_seahorse,
                                    col_names = FALSE,
                                    range = "B4"
   )
-
+  
   # read pH target emission cells
-  pH_target_emission <- readxl::read_excel(filepath_seahorse,
-                                   sheet = "Calibration",
-                                   col_names = FALSE,
-                                   range = "P4"
-  )
+    pH_target_emission <- readxl::read_excel(filepath_seahorse,
+                                     sheet = "Calibration",
+                                     col_names = FALSE,
+                                     range = "P4"
+                                     
+                                     
+    )
 
   F0 <- as.double(meta_df$value[meta_df$parameter == "Calculated FO"])
   V_C <- as.double(meta_df$value[meta_df$parameter == "Pseudo Volume"])
@@ -597,11 +774,12 @@ get_xf_assayinfo <- function(filepath_seahorse,
       O2_0_mM
     )
   }
+  
 
   tibbler$norm_available <- norm_available
   tibbler$xls_ocr_backgroundcorrected <- xls_ocr_backgroundcorrected
 
-  logger::log_info("Finished collecting assay information.")
+  cli::cli_alert_info("Finished collecting assay information.")
 
   return(tibbler)
 }
@@ -618,11 +796,14 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #'
 #' @return data frame with plate layout data.
 #'
+#' @noRd
+#' @keywords internal
+#'
 #' @examples
-#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B84:N92", "cell_n")
-#' get_platelayout_data(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"), "Assay Configuration", "B96:N104", "bufferfactor")
-#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"), "Calibration", "P16:AB24", "pH_cal_em")
-#' get_platelayout_data(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"), "Calibration", "B7:N15", "O2_cal_em")
+#' get_platelayout_data(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), "Assay Configuration", "B96:N104", "bufferfactor")
+#' get_platelayout_data(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), "Assay Configuration", "B84:N92", "cell_n")
+#' get_platelayout_data(system.file("extdata", "20200110_SciRep_PBMCs_donor_B.xlsx", package = "seahtrue"), "Calibration", "P16:AB24", "pH_cal_em")
+#' get_platelayout_data(system.file("extdata", "20200110_SciRep_PBMCs_donor_C.xlsx", package = "seahtrue"), "Calibration", "B7:N15", "O2_cal_em")
 
 get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param ){
 
@@ -651,157 +832,5 @@ get_platelayout_data <- function(filepath_seahorse, my_sheet, my_range, my_param
 
 }
 
-# get_originalRateTable() -------------------------------------------------
-#' Get the OCR from the excel file
-#'
-#' @details
-#' [2]If rate data was not already corrected, a background subtraction was performed and the second element of this list contains TRUE (logical).
-#' [2]If rate data was already corrected, there is no need for background subtraction
-#'
-#' @param filepath_seahorse Absolute path to the Seahorse Excel file.wesd
-#' This Excel file is converted from the assay result file (.asyr) downloaded from
-#' the Agilent Seahorse XF Wave software.
-#'
-#' @return List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
-#'
-#' @examples
-#' get_originalRateTable(here::here("inst", "extdata", "20191219 SciRep PBMCs donor A.xlsx"))
-#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor B.xlsx"))
-#' get_originalRateTable(here::here("inst", "extdata", "20200110 SciRep PBMCs donor C.xlsx"))
-get_originalRateTable <- function(filepath_seahorse){
 
-    logger::log_info("Collecting OCR from 'Rate' sheet.")
-
-    original_rate_df <- readxl::read_excel(filepath_seahorse, sheet = "Rate")
-
-    # because rate data can be either background corrected or not this should be checked first
-    # first verify whether a "Background" group exists in the  original_rate_df
-
-
-     if ("Background" %in% {original_rate_df$Group %>% unique()}) {
-
-       logger::log_info("A background group was found in the RATE sheet")
-
-
-       check_background <- original_rate_df %>%
-         dplyr::filter(Group == "Background") %>%
-         dplyr::select(OCR) %>%
-         dplyr::summarise(mean = mean(OCR)) %>%
-         dplyr::pull(mean)
-
-       if (check_background == 0) {
-         corrected_allready <- TRUE
-       } else {
-         corrected_allready <-  FALSE
-       }
-
-     } else {
-
-       #in case when there is no Background group we work with the original data
-       # that is in the input file "Rate" sheet
-       # please note that there will be warning logged, but the columns will be
-       # labeled incorrectly as if the data is background corrected
-
-       logger::log_info("WARNING: no background group was found in the 'Rate' sheet")
-
-       corrected_allready <-  TRUE
-
-     }
-
-    if (corrected_allready == TRUE){
-      colnames(original_rate_df) <-
-        c("measurement","well", "group",
-          "time_wave", "OCR_wave_bc",
-          "ECAR_wave_bc", "PER_wave_bc")
-      original_rate_df <- original_rate_df %>%
-        dplyr::mutate(OCR_wave = 0, ECAR_wave = 0)
-
-      original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group,
-                      time_wave, OCR_wave, OCR_wave_bc,
-                      ECAR_wave, ECAR_wave_bc)
-
-    } else{
-      colnames(original_rate_df) <-
-        c("measurement","well", "group",
-          "time_wave", "OCR_wave",
-          "ECAR_wave", "PER_wave")
-
-      #do background substraction for wave table
-      background <- original_rate_df %>%
-        dplyr::filter(group=="Background") %>%
-        dplyr::group_by(measurement) %>%
-        dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
-                  bkg_ECAR_wave = mean(ECAR_wave)
-        )
-      original_rate_df <- dplyr::left_join(original_rate_df,
-                                           background,
-                                           by = c("measurement"), copy = TRUE)
-
-      original_rate_df$OCR_wave_bc <- original_rate_df$OCR_wave - original_rate_df$bkg_OCR_wave
-      original_rate_df$ECAR_wave_bc <- original_rate_df$ECAR_wave - original_rate_df$bkg_ECAR_wave
-
-      original_rate_df <- original_rate_df %>%
-        dplyr::select(measurement, well, group,
-                      time_wave, OCR_wave, OCR_wave_bc,
-                      ECAR_wave, ECAR_wave_bc)
-    }
-
-    original_rate_df_list <- list(original_rate_df, corrected_allready)
-
-    logger::log_info("Finished collecting OCR from 'Rate' sheet.")
-
-    return(original_rate_df_list)
-
-}
-
-# Additional utility functions
-# check_excel_positions() -------------------------------------------------------
-#' Used as util function in get_xf_assayinfo()
-#'
-#' @param df The meta_df that was read from Assay Configuration sheet.
-#' @param pos_vector  a vector of cell positions that should be checked
-#' @param name_vector a vector with the strings that should be at the positions
-#' that were given in 'pos_vector'
-#'
-#' @return either TRUE or FALSE depending on if the check passed or failed
-#'
-#' @examples
-#' pos_vector = c(4, 26, 32, 38, 58, 59, 60, 61, 62, 63, 65, 66, 67, 76)
-#' name_vector = c("Assay Name", "Cartridge Barcode", "Plate Barcode", "Instrument Serial",
-#'                 "ksv", "Ksv Temp Correction", "Corrected Ksv", "Calculated FO",
-#'                 "Pseudo Volume", "TAC", "TW", "TC", "TP", "Calibration pH")
-#'
-#' meta_df <- readxl::read_excel(filepath_seahorse,
-#'  sheet = "Assay Configuration",
-#'  col_names = c("parameter", "value"),
-#'  range = "A1:B83"
-#'
-#' check_excel_positions(meta_df, pos_vector, name_vector)
-
-check_excel_positions <- function(df, pos_vector, name_vector){
-
-  logger::log_info("Check if excel df contains data name on certain position.")
-  tf_values <- mapply(function(pos_vector, name_vector) {
-    true_false <- name_vector %in% df[[1]][pos_vector]
-    if(true_false == FALSE){return(FALSE)} else{
-      return(TRUE)
-    }
-  }, pos_vector, name_vector)
-
-  check_tf_list <- function(tf_values){
-    if(all((tf_values)) == FALSE){
-      logger::log_error("'Assay Configuration' sheet doesn't contain all values.")
-      stop()
-    } else{
-      logger::log_error("'Assay Configuration' sheet contains all values.")
-
-      return(TRUE)
-    }
-  }
-
-  tf <- check_tf_list(tf_values)
-
-  return(tf)
-}
 

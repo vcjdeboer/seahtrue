@@ -5,3 +5,4 @@
 ^seahtrue\.Rcheck$
 ^seahtrue.*\.tar\.gz$
 ^seahtrue.*\.tgz$
+^LICENSE\.md$
