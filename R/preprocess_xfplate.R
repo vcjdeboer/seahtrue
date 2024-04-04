@@ -44,8 +44,7 @@ preprocess_xfplate <- function(xf){
 
   logger::log_info("Creating new plate dataset with collected and preprocessed information.")
   xf_plate_pr <- xf_raw_pr %>%
-    dplyr::group_by(plate_id) %>%
-    tidyr::nest() %>%
+    tidyr::nest(.by = plate_id) %>%
     dplyr::mutate(filepath_seahorse = list(tibble::tibble(
                   directory_path = dirname(as.character(xf$filepath_seahorse)),
                   base_name = basename(as.character(xf$filepath_seahorse)),
