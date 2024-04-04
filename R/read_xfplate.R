@@ -298,10 +298,10 @@ get_originalRateTable <- function(filepath_seahorse){
     #do background substraction forr wave table
     background <- original_rate_df %>%
       dplyr::filter(group=="Background") %>%
-      dplyr::group_by(measurement) %>%
-      dplyr::reframe(bkg_OCR_wave = mean(OCR_wave),
-                       bkg_ECAR_wave = mean(ECAR_wave)
-      )
+      dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
+                       bkg_ECAR_wave = mean(ECAR_wave),
+                       .by = measurement)
+  
     original_rate_df <- dplyr::left_join(original_rate_df,
                                          background,
                                          by = c("measurement"), copy = TRUE)
