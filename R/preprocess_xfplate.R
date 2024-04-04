@@ -150,7 +150,7 @@ preprocess_xf_raw <- function(xf_raw,
   background <- calc_background(xf_raw_pr)
 
   xf_raw_pr <- xf_raw_pr %>%
-    dplyr::left_join(background, by = c("measurement"), relationship = "many-to-many")
+    dplyr::left_join(background, by = c("tick"))
 
   # add injection info
   logger::log_info("Preprocessing Raw sheet: Add injection info")
@@ -358,16 +358,16 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 calc_background <- function(xf_raw_pr){
 
   background <- xf_raw_pr %>%
-    dplyr::select(group, well, measurement, timescale, O2_em_corr,
+    dplyr::select(group, well, tick, O2_em_corr,
            pH_em_corr, O2_mmHg, pH, pH_em_corr_corr) %>%
     dplyr::filter(group == "Background") %>%
-    dplyr::reframe(
-      measurement,
+    dplyr::summarize(
       O2_em_corr_bkg = mean(O2_em_corr),
       pH_em_corr_bkg = mean(pH_em_corr),
       O2_mmHg_bkg = mean(O2_mmHg),
       pH_bkgd = mean(pH),
-      pH_em_corr_corr_bkg = mean(pH_em_corr_corr)
+      pH_em_corr_corr_bkg = mean(pH_em_corr_corr),
+      .by = c(tick)
     )
 
   return(background)
