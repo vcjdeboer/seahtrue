@@ -169,7 +169,7 @@ get_xf_flagged <- function(filepath_seahorse){
 
     logger::log_info("Collecting unselected (flagged) wells from the Assay Configuration sheet.")
 
-    x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
+    x <<- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
     # subset to only the platelayout with the cells that show the "unselected" wells by user
