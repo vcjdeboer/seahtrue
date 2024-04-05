@@ -93,12 +93,16 @@ for (rule_index in 1:length(xf_plate_pr_raw_rules)){
 
   attr(xf_plate_pr_raw_rules[[rule_index]], "label") <- descriptions$rule_name[rule_index]
   attr(xf_plate_pr_raw_rules[[rule_index]], "description") <- descriptions$rule_desc[rule_index]
-
+  
+  #please note that the yaml file is assembled using attributes when calling the 
+  #validator::export_yaml() function
 }
 
 
 #set assay_info yaml rules
 xf_assay_info_rules <- {validate::validator(
+  # the decriptions for the assay_info_yaml file have not been set yet
+  
   # Rules for F0
   F0_miss_values = all_complete(F0),
   F0_min_1 = F0 >= 1, #>=1
@@ -161,3 +165,5 @@ create_assay_info_yaml <- function(xf_assay_info_rules, assay_info_yaml_path){
 
 create_raw_yaml(xf_plate_pr_raw_rules, raw_yaml_path)
 create_assay_info_yaml(xf_assay_info_rules, assay_info_yaml_path)
+
+
