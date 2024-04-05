@@ -254,8 +254,9 @@ get_originalRateTable <- function(filepath_seahorse){
 
     check_background <- original_rate_df %>%
       dplyr::filter(Group == "Background") %>%
-      dplyr::pull(OCR) %>%
-      mean()
+      dplyr::select(OCR) %>%
+      dplyr::reframe(mean = mean(OCR)) %>%
+      dplyr::pull(mean)
 
     if (check_background == 0) {
       corrected_allready <- TRUE
