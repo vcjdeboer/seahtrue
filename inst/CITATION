@@ -2,12 +2,13 @@
 rref <- c(
   bibentry(
       bibtype   = "Manual",
-      title     = "Introducing Seahtrue, a transformative view on cellular processes using OCR and ECAR.",
+      title     = "Seahtrue package for extracellular flux analysis",
       author    = c(
           person("Vincent", "de Boer", role = c("cre", "aut", "cph")),
+          person("Xiang", "Zhang", role = c("aut"))
           person("Gerwin", "Smits", role = c("aut"))
           ),
-      year      = 2023,
+      year      = 2024,
       note      = "R package version 0.1.0",
       key       = "seahtrue-package",
       url       = {"https://github.com/vcjdeboer/seahtrue"}
