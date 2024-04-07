@@ -814,5 +814,32 @@ get_platelayout_data <- function(filepath_seahorse,
 
 }
 
+#new util function
+missing_strings <- function(my_strings, strings_required){
+  
+  my_strings_df <- my_strings %>% 
+    as_tibble() 
+  
+  rule <- validate::validator(
+    value %in% valid_codes)
+  
+  strings_available<- 
+    validate::satisfying(my_strings_df, rule, 
+                         ref = list(valid_codes = strings_required)) %>%  
+    pull(value)
+  
+  my_missing_strings <-
+    if (!identical(strings_available, strings_required)){
+      setdiff(strings_required,
+              strings_available)}
+  
+  
+  return(my_missing_strings)
+  
+  # if(is.null(my_missing_strings)){
+  #   return(FALSE)} else{
+  #     return(my_missing_strings)
+  #   }
+}
 
 
