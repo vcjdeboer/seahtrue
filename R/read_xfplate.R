@@ -836,9 +836,9 @@ get_platelayout_data <- function(filepath_seahorse,
         dplyr::mutate(well = dplyr::case_when(
               nchar(col) == 1 ~ paste0(row, "0", col),
               .default = paste0(row, col))) %>% 
-        dplyr::select(well, my_values) %>% 
-        rename_with(~all_of(my_param), my_values)
-
+        dplyr::select(well,  my_values) %>% 
+        dplyr::rename(!!my_param := my_values) #OMG the := :)
+        
      return(df)
 
 }
