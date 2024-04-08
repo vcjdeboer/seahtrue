@@ -17,16 +17,13 @@
 read_xfplate <- function(filepath_seahorse) {
 
 
-    cli::cli_alert(glue::glue("Start function to read seahorse plate data from Excel file:
-                                {filepath_seahorse}"))
+    cli::cli_alert(
+      glue::glue("Start function to read seahorse plate data 
+                 from Excel file: {filepath_seahorse}"))
 
     # read data
-    xf_raw <- get_xf_raw(filepath_seahorse)
-    xf_buffer <- get_xf_buffer(filepath_seahorse)
-    xf_inj <- get_xf_inj(filepath_seahorse)
-    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
-    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
-    xf_flagged <- get_xf_flagged(filepath_seahorse)
+    xf_raw <- get_xf_raw(filepath_seahorse) %>% 
+      verify_xf_raw()
     
     xf_assayinfo <- 
       get_xf_assayinfo(filepath_seahorse) %>% 
@@ -39,6 +36,12 @@ read_xfplate <- function(filepath_seahorse) {
     xf_rate <- 
       get_xf_rate(filepath_seahorse) %>% 
       verify_xf_rate()
+    
+    xf_buffer <- get_xf_buffer(filepath_seahorse)
+    xf_inj <- get_xf_inj(filepath_seahorse)
+    xf_pHcal <- get_xf_pHcal(filepath_seahorse)
+    xf_O2cal <- get_xf_O2cal(filepath_seahorse)
+    xf_flagged <- get_xf_flagged(filepath_seahorse)
     
     # make the output list
     xf <- list(
@@ -53,8 +56,6 @@ read_xfplate <- function(filepath_seahorse) {
       buffer = xf_buffer,
       filepath_seahorse = filepath_seahorse
     )
-    
-    logger::log_info(glue::glue("Parsing all collected seahorse information from file: {filepath_seahorse}"))
 
     return(xf)
 
@@ -75,7 +76,7 @@ read_xfplate <- function(filepath_seahorse) {
 #'
 #' @examples
 #' get_xf_raw(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
- get_xf_raw <- function(filepath_seahorse){
+get_xf_raw <- function(filepath_seahorse){
 
     xf_raw <- readxl::read_excel(filepath_seahorse, 
                                  sheet = "Raw") %>%  
@@ -87,6 +88,37 @@ read_xfplate <- function(filepath_seahorse) {
     return(xf_raw)
     }
 
+#new function
+verify_xf_raw <- function(xf_raw){
+  
+  # Check if required columns are available in input file
+  columns_required <- c("measurement", "tick", "well", "group", "timestamp", 
+                        "well_temperature", "env_temperature", "O2_is_valid", 
+                        "O2_mmhg", "O2_light_emission", "O2_dark_emission", 
+                        "O2_ref_light", "O2_ref_dark", "O2_corrected_em", 
+                        "pH_is_valid", "pH", "pH_light", "pH_dark", 
+                        "pH_ref_light", "pH_ref_dark", "pH_corrected_em")
+  
+  my_columns <- names(xf_raw)
+  
+  my_missing_columns <- missing_strings(my_columns, 
+                                       columns_required)
+  
+  if (!is.null(my_missing_columns)){
+    if (length(my_missing_columns)>1){
+      cli::cli_abort(
+        glue::glue("The following sheets 
+                  do not exist: {my_missing_columns}"))
+    } else {
+      cli::cli_abort(
+        glue::glue("The following sheet 
+                      does not exist: {my_missing_columns}"))
+    }
+  }
+  
+  return(xf_raw)
+  
+}
 # get_xf_norm() -------------------------------------------------------------
 
 #' Get normalization info from the Assay Configuration sheet.
@@ -436,7 +468,6 @@ get_xf_O2cal <- function(filepath_seahorse){
 #' get_xf_inj(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
 get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 
-  logger::log_info("Collecting injection information")
 
   #command_index in "Operation Log" sheet give numbers to 
   # the phases in a seahorse exp
