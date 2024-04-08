@@ -16,10 +16,9 @@
 
 read_xfplate <- function(filepath_seahorse) {
 
-
     cli::cli_alert(
-      glue::glue("Start function to read seahorse plate data 
-                 from Excel file: {filepath_seahorse}"))
+      glue::glue("Start function to read seahorse plate data from 
+                 Excel file: {filepath_seahorse}"))
 
     # read data
     xf_raw <- get_xf_raw(filepath_seahorse) %>% 
@@ -83,7 +82,11 @@ get_xf_raw <- function(filepath_seahorse){
       dplyr::rename_all(., toupper) %>% 
       janitor::clean_names() %>% 
       dplyr::rename_with(~str_replace(., 'o2', 'O2')) %>% 
-      dplyr::rename_with(~str_replace(., 'ph', 'pH')) 
+      dplyr::rename_with(~str_replace(., 'ph', 'pH')) %>% 
+      dplyr::rename_with(~str_replace(., 'hg', 'Hg')) %>% 
+      dplyr::rename(pH_em_corr = pH_corrected_em,
+                    O2_em_corr = O2_corrected_em)
+      
    
     return(xf_raw)
     }
@@ -94,10 +97,10 @@ verify_xf_raw <- function(xf_raw){
   # Check if required columns are available in input file
   columns_required <- c("measurement", "tick", "well", "group", "timestamp", 
                         "well_temperature", "env_temperature", "O2_is_valid", 
-                        "O2_mmhg", "O2_light_emission", "O2_dark_emission", 
-                        "O2_ref_light", "O2_ref_dark", "O2_corrected_em", 
+                        "O2_mmHg", "O2_light_emission", "O2_dark_emission", 
+                        "O2_ref_light", "O2_ref_dark", "O2_em_corr", 
                         "pH_is_valid", "pH", "pH_light", "pH_dark", 
-                        "pH_ref_light", "pH_ref_dark", "pH_corrected_em")
+                        "pH_ref_light", "pH_ref_dark", "pH_em_corr")
   
   my_columns <- names(xf_raw)
   
@@ -107,11 +110,11 @@ verify_xf_raw <- function(xf_raw){
   if (!is.null(my_missing_columns)){
     if (length(my_missing_columns)>1){
       cli::cli_abort(
-        glue::glue("The following sheets 
+        glue::glue("The following columns 
                   do not exist: {my_missing_columns}"))
     } else {
       cli::cli_abort(
-        glue::glue("The following sheet 
+        glue::glue("The following column 
                       does not exist: {my_missing_columns}"))
     }
   }
@@ -610,17 +613,16 @@ get_xf_assayinfo <- function(filepath_seahorse,
     pull(value) %>%  as.numeric()
   
   # read target emission cells
-  O2_target_emission <- 
+  O2_targetEmission <- 
     readxl::read_excel(
       filepath_seahorse,
       sheet = "Calibration",
       col_names = c("value"),
-      range = "B4",
-      .name_repair = "unique_quiet") %>% 
+      range = "B4") %>% 
     pull(value) %>%  as.numeric()
   
   # read pH target emission cells
-  pH_target_emission <- 
+  pH_targetEmission <- 
     readxl::read_excel(
       filepath_seahorse,
       sheet = "Calibration",
@@ -734,8 +736,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       pH_0,
       pH_plateVolume,
       pH_kVol,
-      pH_target_emission,
-      O2_target_emission,
+      pH_targetEmission,
+      O2_targetEmission,
       plate_id,
       cartridge_barcode,
       date_run,
@@ -760,8 +762,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       pH_0,
       pH_plateVolume,
       pH_kVol,
-      pH_target_emission,
-      O2_target_emission,
+      pH_targetEmission,
+      O2_targetEmission,
       plate_id,
       cartridge_barcode,
       date_run,
@@ -771,10 +773,6 @@ get_xf_assayinfo <- function(filepath_seahorse,
       O2_0_mM
     )
   }
-  
-  #these go somewhere else
-  #ids_constants$norm_available <- norm_available
-  #ids_constants$xls_ocr_backgroundcorrected <- xls_ocr_backgroundcorrected
 
   cli::cli_alert_info("Finished collecting assay information.")
 
@@ -799,7 +797,7 @@ verify_xf_assayinfo <- function(xfassay_info){
       glue::glue("plateid is identified as:{plate_id}"))
   }
   
-  return(xf_assayinfo)
+  return(xfassay_info)
 }
 
 # get_platelayout_data() -------------------------------------------------
