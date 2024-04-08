@@ -49,7 +49,7 @@ run_seahtrue <- function(filepath_seahorse) {
                                        sheets_required)
   
   if (!is.null(my_missing_sheets)){
-    if (length(missing_sheets)>1){
+    if (length(my_missing_sheets)>1){
     cli::cli_abort(
       glue::glue("The following sheets 
                   do not exist: {my_missing_sheets}"))
