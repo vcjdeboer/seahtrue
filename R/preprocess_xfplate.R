@@ -54,7 +54,7 @@ preprocess_xfplate <- function(xf){
                   injection_info,
                   raw_data = data, rate_data)
   
-  cli::cli_alert_info("Finished reviving eahorse information.")
+  cli::cli_alert_info("Finished preprocessing of the input data")
 
   return(xf_plate_pr)
 }
