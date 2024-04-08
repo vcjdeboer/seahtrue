@@ -782,10 +782,10 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #new function
 verify_xf_assayinfo <- function(xfassay_info){
   
-  plate_id <- xf_assayinfo %>%  pluck("plate_id", 1)
+  plate_id <- xfassay_info %>%  pluck("plate_id", 1)
   
   if (is.null(plate_id)){
-    xf_assayinfo <- xf_assayinfo %>% 
+    xfassay_info <- xfassay_info %>% 
       mutate(plate_id = "no_plate_id_found")
     
     cli::cli_alert(
