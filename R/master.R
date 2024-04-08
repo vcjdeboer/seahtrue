@@ -1,32 +1,34 @@
-#' Running the read, validate and preprocess
+#' Running the read, preprocess and validate
 #'
 #' @description
 #' This function takes the Seahorse Wave excel file and computes it through
 #' read, validate and preprocess
 #'
-#'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
-#' @param ... Dots argument (…) allows the function to take an undefined number of arguments. 
 #'
 #' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
 #'  * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
 #'  * filepath_seahorse = Path to Seahorse Excel file. \cr
-#'  * date = Date derived from 'Assay Configuration' sheet of the Seahorse Excel file. \cr
+#'  * date_run = Date derived from 'Assay Configuration' sheet of the Seahorse Excel file. \cr
+#'  * date_processed = Date and time that this function was run. \cr
 #'  * assay_info = Dataframe with information from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
 #'  * injection_info = Dataframe with information derived from 'Operation log' sheet. \cr
 #'  * raw_data = Preprocessed raw dataframe from Seahorse 'Raw' sheet. \cr
 #'  * rate_data = Preprocessed rate data from 'Rate' sheet.
 #'  
 #' @export
-#'
+#' @import logger rlang cli glue readxl 
+
 #' @examples
-#' run_seahtrue(
+#' revive_xfplate(
 #'   system.file("extdata", 
 #'   "20191219_SciRep_PBMCs_donor_A.xlsx", 
 #'   package = "seahtrue"))
 #'
-run_seahtrue <- function(filepath_seahorse) {
+revive_xfplate <- function(filepath_seahorse) {
 
+  logger::log_info("Start reviving")
+  
   # Check if argument is present
   rlang::check_required(filepath_seahorse)
 
@@ -60,11 +62,16 @@ run_seahtrue <- function(filepath_seahorse) {
     }
   }
   
+  
+  
   # run the read/preprocess/validate function
   preprocessed_xf_plate <- filepath_seahorse %>%
     read_xfplate() %>%
-    preprocess_xfplate() %>%
-    validate_preprocessed()
+    preprocess_xfplate() #%>%
+    #validate_preprocessed()
+  
+  logger::log_info("Finished reviving")
+  
   
   return(preprocessed_xf_plate)
 }
