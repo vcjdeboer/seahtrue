@@ -592,7 +592,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
   #                 "TC", "TP", "Calibration pH")
 
   meta_df <- meta_df %>% 
-    filter(!is.na(parameter))
+    dplyr::filter(!is.na(parameter))
   
   # read Assay Configuration sheet gain1
   gain1 <- 
@@ -601,7 +601,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
       sheet = "Assay Configuration",
       col_names = c("value"),
       range = gain1_cell) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::pull(value) %>%  as.numeric()
 
   # read Assay Configuration sheet gain2
   gain2 <- 
@@ -610,7 +610,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
       sheet = "Assay Configuration",
       col_names = c("value"),
       range = gain2_cell) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::pull(value) %>%  as.numeric()
   
   # read target emission cells
   O2_targetEmission <- 
@@ -619,7 +619,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
       sheet = "Calibration",
       col_names = c("value"),
       range = "B4") %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::pull(value) %>%  as.numeric()
   
   # read pH target emission cells
   pH_targetEmission <- 
@@ -628,73 +628,73 @@ get_xf_assayinfo <- function(filepath_seahorse,
       sheet = "Calibration",
       col_names = c("value"),
       range = "P4") %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::pull(value) %>%  as.numeric()
   
   F0 <- meta_df %>% 
-    filter(parameter == "Calculated FO" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "Calculated FO" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   V_C <- meta_df %>% 
-    filter(parameter == "Pseudo Volume" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "Pseudo Volume" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   Tau_AC <- meta_df %>% 
-    filter(parameter == "TAC" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "TAC" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   Tau_W <- meta_df %>% 
-    filter(parameter == "TW" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "TW" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   Tau_C <- meta_df %>% 
-    filter(parameter == "TC" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "TC" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   Tau_P <- meta_df %>% 
-    filter(parameter == "TP" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "TP" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   KSV_original <- meta_df %>% 
-    filter(parameter == "ksv" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "ksv" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   KSV_corrected <- meta_df %>% 
-    filter(parameter == "Corrected Ksv" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "Corrected Ksv" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   KSV_tempCorrection <- meta_df %>% 
-    filter(parameter == "Ksv Temp Correction" ) %>% 
-    pull(value) %>%  as.logical()
+    dplyr::filter(parameter == "Ksv Temp Correction" ) %>% 
+    dplyr::pull(value) %>%  as.logical()
   
   KSV <- KSV_corrected
   
   pH_0 <- meta_df %>% 
-    filter(parameter == "Calibration pH" ) %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "Calibration pH" ) %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   pH_plateVolume <- meta_df %>% 
-    filter(parameter == "Plate Volume") %>% 
-    pull(value) %>%  as.numeric()
+    dplyr::filter(parameter == "Plate Volume") %>% 
+    dplyr::pull(value) %>%  as.numeric()
   
   pH_kVol <- meta_df %>% 
-    filter(parameter == "kVol") %>% 
-    pull(value)  %>%  as.numeric()
+    dplyr::filter(parameter == "kVol") %>% 
+    dplyr::pull(value)  %>%  as.numeric()
   
   plate_id <- meta_df %>% 
-    filter(parameter == "Plate Barcode" ) %>% 
-    pull(value)
+    dplyr::filter(parameter == "Plate Barcode" ) %>% 
+    dplyr::pull(value)
   
   cartridge_barcode <- meta_df %>% 
-    filter(parameter == "Cartridge Barcode") %>% 
-    pull(value)
+    dplyr::filter(parameter == "Cartridge Barcode") %>% 
+    dplyr::pull(value)
   
   assay_name <- meta_df %>% 
-    filter(parameter == "Assay Name" ) %>% 
-    pull(value)
+    dplyr::filter(parameter == "Assay Name" ) %>% 
+    dplyr::pull(value)
   
   instrument_serial <- meta_df %>% 
-    filter(parameter == "Instrument Serial") %>% 
-    pull(value)
+    dplyr::filter(parameter == "Instrument Serial") %>% 
+    dplyr::pull(value)
 
   # other constants
   O2_0_mmHg <- 151.6900241
@@ -779,14 +779,24 @@ get_xf_assayinfo <- function(filepath_seahorse,
   return(ids_constants)
 }
 
-#new function
+#
+#' Verify xf assay info
+#'
+#' @param xfassay_info tibble with collected data in get_xf_assayinfo()
+#'
+#'
+#' @examples
+#' xfassay_info <-get_xf_assayinfo(
+#'   system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
+#' verify_xf_assayinfo(xfassay_info)
 verify_xf_assayinfo <- function(xfassay_info){
   
-  plate_id <- xfassay_info %>%  pluck("plate_id", 1)
+  plate_id <- xfassay_info %>%  
+    purrr::pluck("plate_id", 1)
   
   if (is.null(plate_id)){
     xfassay_info <- xfassay_info %>% 
-      mutate(plate_id = "no_plate_id_found")
+      dplyr::mutate(plate_id = "no_plate_id_found")
     
     cli::cli_alert(
       glue::glue("no plateid is found in input file"))
@@ -847,7 +857,7 @@ get_platelayout_data <- function(filepath_seahorse,
 missing_strings <- function(my_strings, strings_required){
   
   my_strings_df <- my_strings %>% 
-    as_tibble() 
+    dplyr::as_tibble() 
   
   rule <- validate::validator(
     value %in% valid_codes)
@@ -859,16 +869,12 @@ missing_strings <- function(my_strings, strings_required){
   
   my_missing_strings <-
     if (!identical(strings_available, strings_required)){
-      setdiff(strings_required,
+      dplyr::setdiff(strings_required,
               strings_available)}
   
   
   return(my_missing_strings)
   
-  # if(is.null(my_missing_strings)){
-  #   return(FALSE)} else{
-  #     return(my_missing_strings)
-  #   }
 }
 
 
