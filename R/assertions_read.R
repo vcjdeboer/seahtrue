@@ -201,10 +201,10 @@ get_timing_info <- function(xf_raw_pr){
   
 }
 
-validate_preprocessed <- function(prepocessed_xf_plate){
+validate_preprocessed <- function(preprocessed_xf_plate){
   
   
-  xf_raw_pr <- prepocessed_xf_plate %>% 
+  xf_raw_pr <- preprocessed_xf_plate %>% 
     purrr::pluck("raw_data", 1) 
   
   #rules
@@ -255,9 +255,11 @@ validate_preprocessed <- function(prepocessed_xf_plate){
   
   
   all_validator_rules <- 
-    list(NA_rule, tick_range_rule, 
-         start_tick_range_rule, "is_linear_sequence_tick",
-         "all_96_wells_are_present")
+    list(NA_rule = NA_rule, 
+         tick_range_rule = tick_range_rule, 
+         start_tick_range_rule = start_tick_range_rule, 
+         "is_linear_sequence_tick" = "is_linear_sequence_tick",
+         "all_96_wells_are_present" = "all_96_wells_are_present")
   
   validation_output <- 
     list(all_96_wells_are_present = all_96_wells_are_present,
@@ -268,8 +270,11 @@ validate_preprocessed <- function(prepocessed_xf_plate){
          all_validator_rules = all_validator_rules
     )
   
-  return( prepocessed_xf_plate %>% 
-            mutate(validation_ouptut = validation_output))
+  cli::cli_alert_info("Finished validating the input data")
+  
+  
+  return( preprocessed_xf_plate %>% 
+            mutate(validation_output = list(validation_output)))
   
 }
 

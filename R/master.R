@@ -62,13 +62,11 @@ revive_xfplate <- function(filepath_seahorse) {
     }
   }
   
-  
-  
   # run the read/preprocess/validate function
   preprocessed_xf_plate <- filepath_seahorse %>%
     read_xfplate() %>%
-    preprocess_xfplate() #%>%
-    #validate_preprocessed()
+    preprocess_xfplate() %>% 
+    validate_preprocessed()
   
   logger::log_info("Finished reviving")
   
