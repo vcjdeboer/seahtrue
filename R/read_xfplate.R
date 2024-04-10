@@ -28,9 +28,11 @@ read_xfplate <- function(filepath_seahorse) {
       get_xf_assayinfo(filepath_seahorse) %>% 
       verify_xf_assayinfo()
 
-    xf_rate <- 
-      get_xf_rate(filepath_seahorse) %>% 
-      verify_xf_rate()
+    xf_norm <- 
+      get_xf_norm(filepath_seahorse) %>% 
+      verify_xf_norm()
+    
+    
     
     xf_buffer <- get_xf_buffer(filepath_seahorse)
     xf_inj <- get_xf_inj(filepath_seahorse)
@@ -38,13 +40,10 @@ read_xfplate <- function(filepath_seahorse) {
     xf_O2cal <- get_xf_O2cal(filepath_seahorse)
     xf_flagged <- get_xf_flagged(filepath_seahorse)
     
-    xf_norm <- 
-      get_xf_norm(filepath_seahorse) %>% 
-      verify_xf_norm(., 
-                     xf_flagged, 
-                     xf_raw %>% 
-                       select(well, group) %>% 
-                       unique())
+    xf_rate <- 
+      get_xf_rate(filepath_seahorse) %>% 
+      verify_xf_rate(., 
+                     xf_flagged)
     
     # make the output list
     xf <- list(
@@ -269,14 +268,18 @@ get_xf_rate <- function(filepath_seahorse){
 }
 
 #new function
-verify_xf_rate <- function(xf_rate, xf_flagged, groups){
+verify_xf_rate <- function(xf_rate, xf_flagged){
   # because rate data can be either background corrected or
   # not in the WAVE software and the export depends on this
   # settings this should be checked first
   
   #if background wells are flagged, this could go wrong
   # therefore they should be removed if flagged, first
-  xf_flagged <- xf_flagged %>%  
+  groups <- xf_rate %>%  
+    select(well, group) %>% 
+    unique()
+  
+  xf_flagged <- xf_flagged %>% 
     left_join(groups, by = c("well"))
   
   if("Background" %in% xf_flagged$group) {
