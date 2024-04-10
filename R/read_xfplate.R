@@ -28,10 +28,6 @@ read_xfplate <- function(filepath_seahorse) {
       get_xf_assayinfo(filepath_seahorse) %>% 
       verify_xf_assayinfo()
 
-    xf_norm <- 
-      get_xf_norm(filepath_seahorse) %>% 
-      verify_xf_norm()
-    
     xf_rate <- 
       get_xf_rate(filepath_seahorse) %>% 
       verify_xf_rate()
@@ -41,6 +37,14 @@ read_xfplate <- function(filepath_seahorse) {
     xf_pHcal <- get_xf_pHcal(filepath_seahorse)
     xf_O2cal <- get_xf_O2cal(filepath_seahorse)
     xf_flagged <- get_xf_flagged(filepath_seahorse)
+    
+    xf_norm <- 
+      get_xf_norm(filepath_seahorse) %>% 
+      verify_xf_norm(., 
+                     xf_flagged, 
+                     xf_raw %>% 
+                       select(well, group) %>% 
+                       unique())
     
     # make the output list
     xf <- list(
@@ -184,6 +188,9 @@ verify_xf_norm <- function(xf_norm){
 #' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
 get_xf_flagged <- function(filepath_seahorse){
 
+  
+    
+  
     x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
@@ -213,8 +220,9 @@ get_xf_flagged <- function(filepath_seahorse){
     new_row_names <- flagged_df %>%
       dplyr::pull(address) %>% substr(2,3) %>%
       stringr::str_c(collapse = "---") %>%
-      stringr::str_replace_all(c("12" = "A", "13" = "B", "14" = "C", "15" = "D", "16" = "E", "17" = "F",
-                                 "18" = "G", "18" = "H"))
+      stringr::str_replace_all(c("12" = "A", "13" = "B", "14" = "C", 
+                                 "15" = "D", "16" = "E", "17" = "F",
+                                 "18" = "G", "19" = "H"))
     
     new_row_names_2 <-   unlist(stringr::str_split(new_row_names, "---"))
 
@@ -261,12 +269,30 @@ get_xf_rate <- function(filepath_seahorse){
 }
 
 #new function
-verify_xf_rate <- function(xf_rate){
+verify_xf_rate <- function(xf_rate, xf_flagged, groups){
   # because rate data can be either background corrected or
   # not in the WAVE software and the export depends on this
   # settings this should be checked first
   
-  if (is.null(missing_strings(xf_rate %>% 
+  #if background wells are flagged, this could go wrong
+  # therefore they should be removed if flagged, first
+  xf_flagged <- xf_flagged %>%  
+    left_join(groups, by = c("well"))
+  
+  if("Background" %in% xf_flagged$group) {
+    
+    flagged_bkgd_wells <- xf_flagged %>% 
+      filter(group == "Background") %>% 
+      pull(well)
+    
+    xf_rate <-  xf_rate %>% 
+      filter(!well %in% flagged_bkgd_wells) 
+    
+  }
+  
+  #next do the check whether the data is bkgd corrected
+  if (is.null(
+    missing_strings(xf_rate %>% 
                       pull(group) %>% 
                       unique(), 
                       "Background") )) {
