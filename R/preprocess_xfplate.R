@@ -210,27 +210,23 @@ preprocess_xf_rate <- function(xf_rate,
 #' @noRd
 #' @keywords internal
 #'
-convert_timestamp <- function(xf_raw_pr) {
 
-  xf_raw_pr <- xf_raw_pr %>%  dplyr::arrange(tick, well)
-
-  # add three columns to df (totalMinutes, minutes and time) 
-  # by converting the timestamp into minutes andseconds
-  xf_raw_pr$timestamp <- as.character((xf_raw_pr$timestamp))
-  times <- strsplit(xf_raw_pr$timestamp, ":")
-  xf_raw_pr$totalMinutes <- sapply(times, function(x) {
-    x <- as.numeric(x)
-    x[1] * 60 + x[2] + x[3] / 60
-  })
+convert_timestamp_new <-  function(xf_raw_pr){
   
-  # first row needs to be first timepoint!
-  xf_raw_pr$minutes <- 
-    xf_raw_pr$totalMinutes - xf_raw_pr$totalMinutes[1]
-  
-  xf_raw_pr$timescale <- round(xf_raw_pr$minutes * 60)
-
-  return(xf_raw_pr)
+  xf_raw_pr %>% 
+    mutate(timestamp = as.character(timestamp)) %>% 
+    mutate(times = 
+             stringr::str_split(timestamp, ":")) %>% 
+    mutate(totalMinutes =
+             purrr::map_dbl(times, ~ .x %>% 
+                              as.numeric() %>% 
+                              {first(.)*60 + nth(.,2)+ nth(.,3)/60})) %>%  
+    mutate(minutes = totalMinutes - first(totalMinutes)) %>%
+    mutate(timescale = round(minutes*60)) %>% 
+    select(-times)
 }
+
+
 
 ## correct_pH_em_corr() ------------------------------------------------------
 #' Corrected pH emission
