@@ -211,12 +211,12 @@ validate_preprocessed <- function(preprocessed_xf_plate){
   
   #rules
   tick_range_rule <- validate::validator(
-    validate::in_range(O2_mmHg, min = 10, max = 200),
-    validate::in_range(pH, min = 7, max = 7.5))
+    in_range(O2_mmHg, min = 10, max = 200), #with packagename in front does not work!
+    in_range(pH, min = 7, max = 7.5))
   
   start_tick_range_rule <- validate::validator(
-    validate::in_range(O2_mmHg, min = 140, max = 170),
-    validate::in_range(pH, min = 7.2, max = 7.6))
+    in_range(O2_mmHg, min = 140, max = 170),
+    in_range(pH, min = 7.2, max = 7.6))
   
   NA_rule <- validate::validator(is_complete(well),
                        is_complete(measurement),
@@ -279,5 +279,6 @@ validate_preprocessed <- function(preprocessed_xf_plate){
             dplyr::mutate(validation_output = list(validation_output)))
   
 }
+
 
 
