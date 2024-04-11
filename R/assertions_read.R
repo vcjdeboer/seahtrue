@@ -10,7 +10,7 @@ validate_O2_pH_levels <- function(xf_raw_pr,
                purrr::map(.x = data, 
                           .f = ~.x %>%  
                             validate::confront(., rule) %>%  
-                            summary() %>%  
+                            validate::summary() %>%  
                             dplyr::as_tibble() %>% 
                             dplyr::filter(fails != 0))) %>% 
       tidyr::unnest(validate) %>% 
@@ -130,7 +130,7 @@ validatie_tick_is_linear <- function(xf_raw_pr){
 validate_for_NA <- function(xf_raw_pr, NA_rule){
   
   NA_df_summary <- validate::confront(xf_raw_pr, NA_rule) %>%  
-    summary() %>% 
+    validate::summary() %>% 
     #pull(expression) %>% 
     dplyr::mutate(param_NA = 
              purrr::map_chr(.x = expression,
