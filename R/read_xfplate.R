@@ -25,7 +25,7 @@ read_xfplate <- function(filepath_seahorse) {
       verify_xf_raw()
     
     xf_assayinfo <- 
-      get_xf_assayinfo(filepath_seahorse) %>% 
+      get_xf_assayinfo(filepath_seahorse, xf_raw) %>% 
       verify_xf_assayinfo()
 
     xf_norm <- 
@@ -42,8 +42,7 @@ read_xfplate <- function(filepath_seahorse) {
     
     xf_rate <- 
       get_xf_rate(filepath_seahorse) %>% 
-      verify_xf_rate(., 
-                     xf_flagged)
+      verify_xf_rate(., xf_flagged)
     
     # make the output list
     xf <- list(
@@ -590,6 +589,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP"){
 #' get_xf_assayinfo(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"), norm_available = "TRUE", xls_ocr_backgroundcorrected = "TRUE", date_style = "NL")
 
 get_xf_assayinfo <- function(filepath_seahorse,
+                             xf_raw,
                              date_style = "empty",
                              instrument = "XFe96") {
 
@@ -728,7 +728,19 @@ get_xf_assayinfo <- function(filepath_seahorse,
   # other constants
   O2_0_mmHg <- 151.6900241
   O2_0_mM <- 0.214
-
+  
+  #time from start assay to start measuring
+  
+  minutes_to_start_measurement_one <- xf_raw %>%
+    dplyr:::arrange(tick) %>% 
+    dplyr::slice(1) %>% 
+    dplyr::pull(timestamp) %>% 
+    as.character() %>% 
+    stringr::str_split(., ":") %>%
+    unlist() %>% 
+    as.numeric() %>% 
+    {first(.)*60 + nth(.,2)+ nth(.,3)/60}
+  
   #not used data_style conversion
   if (date_style == "US"){
     date_run <- lubridate::mdy_hm(
@@ -773,7 +785,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       assay_name,
       instrument_serial,
       O2_0_mmHg,
-      O2_0_mM
+      O2_0_mM,
+      minutes_to_start_measurement_one
     )
 
   }
@@ -799,7 +812,8 @@ get_xf_assayinfo <- function(filepath_seahorse,
       assay_name,
       instrument_serial,
       O2_0_mmHg,
-      O2_0_mM
+      O2_0_mM,
+      minutes_to_start_measurement_one
     )
   }
 
