@@ -211,7 +211,7 @@ preprocess_xf_rate <- function(xf_rate,
 #' @keywords internal
 #'
 
-convert_timestamp_new <-  function(xf_raw_pr){
+convert_timestamp <-  function(xf_raw_pr){
   
   xf_raw_pr %>% 
     mutate(timestamp = as.character(timestamp)) %>% 
