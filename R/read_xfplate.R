@@ -739,7 +739,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
     stringr::str_split(., ":") %>%
     unlist() %>% 
     as.numeric() %>% 
-    {first(.)*60 + nth(.,2)+ nth(.,3)/60}
+    {first(.)*60 + nth(.,2)+ nth(.,3)/60} 
   
   #not used data_style conversion
   if (date_style == "US"){
@@ -814,6 +814,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
       O2_0_mmHg,
       O2_0_mM,
       minutes_to_start_measurement_one
+      
     )
   }
 
