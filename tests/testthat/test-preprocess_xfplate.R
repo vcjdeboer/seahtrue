@@ -1,183 +1,150 @@
-# Load seahorse xf dataset -------
-# xf_donor_A <- here::here("tests", "testthat", "xf_donor_A.rda")
-# xf_donor_B <- here::here("tests", "testthat", "xf_donor_B.rda")
-# xf_donor_C <- here::here("tests", "testthat", "xf_donor_C.rda")
-#
-# xf_donor_A <- testthat::test_path("xf_donor_A.rda")
-# xf_donor_B <- testthat::test_path("xf_donor_B.rda")
-# xf_donor_C <- testthat::test_path("xf_donor_C.rda")
 
-load(testthat::test_path("xf_donor_A.rda"))
-load(testthat::test_path("xf_donor_B.rda"))
-load(testthat::test_path("xf_donor_C.rda"))
+my_filepath <- 
+  testthat::test_path("20191219_SciRep_PBMCs_donor_A.xlsx")
 
-donor_a <- xf_donor_A
-donor_b <- xf_donor_B
-donor_c <- xf_donor_C
+my_req_cols_preprocessed_output <-  
+  c("plate_id", "filepath_seahorse", 
+    "date_run", "date_processed", 
+    "assay_info", "injection_info", 
+    "raw_data", "rate_data")#, "my_wrong_col")
 
-filepath <- list(donor_a,
-                 donor_b,
-                 donor_c)
+my_req_cols_readxfplate_output <- 
+  c("raw", "rate", "assayinfo",
+    "inj", "pHcal", "O2cal", "norm",
+    "flagged", "buffer", "filepath_seahorse") #"my_wrong_col")
+
+my_flagged_required <- 
+  tibble(well =  c("A05", "A06", "A07", "A08", 
+                   "A12", "C08", "F03", "G12", "H09"),
+         flag = c(TRUE, TRUE, TRUE, TRUE, 
+                  TRUE, TRUE, TRUE, TRUE, TRUE))
+
+testthat::test_that("test_file_exists_and_notNULL", {
+
+  testthat::expect_true(file.exists(my_filepath))
+  
+  xf_plate_pr <- my_filepath %>%
+    read_xfplate() %>%
+    preprocess_xfplate()
+
+  testthat::expect_true(!is.null(xf_plate_pr) )
+  testthat::expect_true(exists("xf_plate_pr") )
+})
+
+testthat::test_that("missing_columns_read_xfplate_output", {
+
+  xf_plate_read <- my_filepath %>%
+    read_xfplate()
+  
+  my_missing <- 
+    missing_strings(xf_plate_read %>%  names(),
+                    my_req_cols_readxfplate_output)
+
+  if(is.null(my_missing)){
+    no_missing_columns = TRUE
+  } else {
+    no_missing_columns = FALSE
+  }
+  
+  testthat::expect_length(xf_plate_read %>%  names(), 10)
+  testthat::expect_true(no_missing_columns)
+  
+})
+
+testthat::test_that("missing_columns_preprocessed_output", {
+
+  xf_plate_pr <- my_filepath %>%
+    read_xfplate() %>%
+    preprocess_xfplate()
+
+  my_missing <- 
+    missing_strings(xf_plate_pr %>%
+                      names(),
+                    my_req_cols_preprocessed_output)
+
+  if(is.null(my_missing)){
+    no_missing_columns = TRUE
+  } else {
+    no_missing_columns = FALSE
+  }
+
+  testthat::expect_true(no_missing_columns)
+})
+
+testthat::test_that("norm_has_type_logical_attribute", {
+  
+  xf_norm <- my_filepath %>% 
+    get_xf_norm() %>% 
+    verify_xf_norm()
+  
+  my_norm_attribute <- attributes(xf_norm) %>%  pluck("norm_available")
+  
+  testthat::expect_type(my_norm_attribute, "logical")
+  
+})
+
+testthat::test_that("flagged_wells_are_correct", {
+  
+  xf_flagged <- my_filepath %>% 
+    get_xf_flagged()
+  
+  testthat::expect_mapequal(xf_flagged, my_flagged_required)
+  
+  
+})
+
+testthat::test_that("injections_are_correct", {
+  
+  xf_inj <- my_filepath %>% 
+    get_xf_inj()
+  
+  testthat::expect_setequal(xf_inj %>% pull(measurement), 1:12)
+  testthat::expect_setequal(xf_inj %>% pull(injection), 
+                            c(rep("Baseline", 3),
+                              rep("FCCP", 3),
+                              rep("AM/ROT", 3),
+                              rep("Monensin/Hoechst", 3))
+                              )
+  testthat::expect_setequal(xf_inj %>% pull(interval) %>%  unique(), 1:4)
+  
+  
+  
+})
+
+testthat::test_that("rate_background_check", {
+  
+  xf_flagged <- get_xf_flagged(my_filepath)
+  
+  xf_rate <- my_filepath %>%  get_xf_rate() %>%  verify_xf_rate(., xf_flagged)
+  
+  testthat::expect_setequal(
+    xf_rate %>%  
+      names(), 
+    c("measurement", "well", "group", "time_wave",
+      "OCR_wave", "OCR_wave_bc", "ECAR_wave", "ECAR_wave_bc" ))
+  
+  testthat::expect_setequal(
+    xf_rate %>% 
+      filter(group == "Background") %>% 
+      pull(OCR_wave_bc), 
+    c(rep(0, 36)))
+  
+  
+})
+
+testthat::test_that("assayinfo_check", {
+  
+  xf_raw <- get_xf_raw(my_filepath)
+  xf_assayinfo <- get_xf_assayinfo(my_filepath, xf_raw)
+  
+  KSV <- xf_assayinfo %>%  pluck("KSV")
+  F0 <-  xf_assayinfo %>%  pluck("F0")
+  min_to_st <- xf_assayinfo %>%  pluck("minutes_to_start_measurement_one") 
+  testthat::expect_type(KSV, "double")
+  testthat::expect_type(F0, "double")
+  testthat::expect_type(min_to_st, "double")
+
+  
+})
 
 
-# Perform checks on each seahorse xf dataset ----
-for (rda_file in filepath){
-
-  local({
-
-    xf <- rda_file
-
-    # Check if columns in df --------------------------------------------------------------
-    check_column_names <- function(df, df_columns_list){
-      for(columname in df_columns_list){
-        expect_true(columname %in% names(df))
-      }
-    }
-
-    xf_plate_pr = NULL
-    xf_raw_pr = NULL
-    OCR_from_excel = NULL
-
-    # Check if specific columns of the preprocessed datset are of type list -------
-    test_that("type list", {
-      # <<- to change the above variables (xf_plate_pr, xf_raw_pr, OCR_from_excel) outside of test_that.
-      xf_plate_pr <<- expect_type(preprocess_xfplate(xf), "list")
-      expect_type(xf_plate_pr$assay_info, "list")
-      expect_type(xf_plate_pr$injection_info, "list")
-      expect_type(xf_plate_pr$raw_data, "list")
-      expect_type(xf_plate_pr$rate_data, "list")
-      xf_raw_pr <<- expect_type(preprocess_xf_raw(xf$raw, xf$pHcal, xf$inj, xf$assayinfo, xf$buffer, xf$norm, xf$flagged), "list")
-      OCR_from_excel <<- expect_type(preprocess_xf_rate(xf$rate, xf$norm, xf$flagged), "list")
-    })
-
-    # Check if specific columns of the preprocessed datset are of type character -------
-    test_that("type character", {
-      expect_type(xf_plate_pr$plate_id, "character")
-      expect_type(xf_plate_pr$assay_info[[1]]$plate_id, "character")
-      expect_type(xf_plate_pr$filepath_seahorse, "list")
-      expect_type(xf_raw_pr$well, "character")
-      expect_type(xf_raw_pr$group, "character")
-      expect_type(xf_raw_pr$injection, "character")
-      expect_type(xf_plate_pr$assay_info[[1]]$plate_id, "character")
-      expect_type(xf_plate_pr$assay_info[[1]]$cartridge_barcode, "character")
-      expect_type(xf_plate_pr$assay_info[[1]]$assay_name, "character")
-      expect_type(xf_plate_pr$assay_info[[1]]$instrument_serial, "character")
-      expect_type(xf_plate_pr$injection_info[[1]]$injection, "character")
-      expect_type(xf_plate_pr$raw_data[[1]]$well, "character")
-      expect_type(xf_plate_pr$raw_data[[1]]$group, "character")
-      expect_type(xf_plate_pr$raw_data[[1]]$injection, "character")
-      expect_type(xf_plate_pr$rate_data[[1]]$well, "character")
-      expect_type(xf_plate_pr$rate_data[[1]]$group, "character")
-    })
-
-    # Check if specific columns of the preprocessed datset are of type double -------
-    test_that("type double", {
-      expect_type(xf_plate_pr$date, "double")
-      expect_type(xf_raw_pr$timescale, "double")
-      expect_type(xf_raw_pr$minutes, "double")
-      expect_type(xf_raw_pr$interval, "double")
-      expect_type(xf_raw_pr$O2_em_corr, "double")
-      expect_type(xf_raw_pr$pH_em_corr, "double")
-      expect_type(xf_raw_pr$O2_mmHg, "double")
-      expect_type(xf_raw_pr$pH, "double")
-      expect_type(xf_raw_pr$pH_em_corr_corr, "double")
-      expect_type(xf_raw_pr$O2_em_corr_bkg, "double")
-      expect_type(xf_raw_pr$pH_em_corr_bkg, "double")
-      expect_type(xf_raw_pr$O2_mmHg_bkg, "double")
-      expect_type(xf_raw_pr$pH_bkgd, "double")
-      expect_type(xf_raw_pr$pH_em_corr_corr_bkg, "double")
-      expect_type(xf_raw_pr$bufferfactor, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$F0, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$V_C, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$Tau_AC, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$Tau_W, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$Tau_C, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$Tau_P, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$KSV, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$KSV_original, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$gain1, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$gain2, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$pH_0, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$pH_targetEmission, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$O2_targetEmission, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$O2_0_mmHg, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$O2_0_mM, "double")
-      expect_type(xf_plate_pr$injection_info[[1]]$interval, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$timescale, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$minutes, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$interval, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$O2_em_corr, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$O2_mmHg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr_corr, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$O2_em_corr_bkg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr_bkg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$O2_mmHg_bkg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$pH_bkgd, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$pH_em_corr_corr_bkg, "double")
-      expect_type(xf_plate_pr$raw_data[[1]]$bufferfactor, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$measurement, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$time_wave, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$OCR_wave, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$OCR_wave_bc, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$ECAR_wave, "double")
-      expect_type(xf_plate_pr$rate_data[[1]]$ECAR_wave_bc, "double")
-    })
-
-    # Check if specific columns of the preprocessed datset are of type integer -------
-    test_that("type integer", {
-      expect_type(xf_raw_pr$measurement, "integer")
-      expect_type(xf_raw_pr$tick, "integer")
-      expect_type(xf_plate_pr$injection_info[[1]]$measurement, "integer")
-      expect_type(xf_plate_pr$raw_data[[1]]$measurement, "integer")
-      expect_type(xf_plate_pr$raw_data[[1]]$tick, "integer")
-      expect_type(xf_plate_pr$rate_data[[1]]$measurement, "double") # actually an integer
-    })
-
-    # Check if specific columns of the preprocessed datset are of type logical -------
-    test_that("type logical", {
-      expect_type(xf_raw_pr$flagged_well, "logical")
-      expect_type(xf_plate_pr$assay_info[[1]]$KSV_tempCorrection, "logical")
-      expect_type(xf_plate_pr$assay_info[[1]]$norm_available, "logical")
-      expect_type(xf_plate_pr$rate_data[[1]]$flagged_well, "logical")
-    })
-
-    # Check if the preprocessed xf datasframe contains the right columnnames -------
-    test_that("check column names", {
-      check_column_names(xf_plate_pr, list("plate_id", "filepath_seahorse", "date", "assay_info", "injection_info", "raw_data", "rate_data"))
-      check_column_names(xf_raw_pr, list("plate_id" , "well" , "measurement", "tick", "timescale", "minutes", "group", "injection", "O2_em_corr",
-                                         "pH_em_corr", "O2_mmHg", "pH", "pH_em_corr_corr", "O2_em_corr_bkg", "pH_em_corr_bkg", "O2_mmHg_bkg",
-                                         "pH_bkgd", "pH_em_corr_corr_bkg", "cell_n", "flagged_well"))
-    })
-
-    # Check if specific columns of the preprocessed datset are of type date -------
-    test_that("type date", {
-      expect_type(xf_plate_pr$date, "double")
-      expect_type(xf_plate_pr$assay_info[[1]]$date_run, "double")
-    })
-
-    # Check if specific columns of the preprocessed datset are of type logical -------
-  test_that("type logical or double", {
-      if (all(is.na(xf_plate_pr$raw_data[[1]]$cell_n)) == TRUE) {
-        expect_type(xf_plate_pr$raw_data[[1]]$cell_n, "logical")
-      } else {
-        expect_type(xf_plate_pr$raw_data[[1]]$cell_n, "double") #actually integer
-      }
-
-      if (all(is.na(xf_raw_pr$cell_n)) == TRUE) {
-        expect_type(xf_raw_pr$cell_n, "logical")
-      } else {
-        expect_type(xf_raw_pr$cell_n, "double") #actually integer
-      }
-
-      if (all(is.na(xf_plate_pr$rate_data[[1]]$cell_n)) == TRUE) {
-        expect_type(xf_plate_pr$rate_data[[1]]$cell_n, "logical")
-      } else {
-        expect_type(xf_plate_pr$rate_data[[1]]$cell_n, "double") #actually integer
-      }
-
-    })
-
-  })
-
-}
