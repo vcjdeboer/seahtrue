@@ -13,8 +13,7 @@ You can install the latest version of seahtrue with the following
 command:
 
 ``` r
-devtools::install_github("vcjdeboer/seahtrue", ref = "main", quiet = TRUE)
-#> Installing 1 packages: knitr
+devtools::install_github("vcjdeboer/seahtrue", ref = "main")
 ```
 
 ### Getting Help
