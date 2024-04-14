@@ -1,8 +1,6 @@
 Seahtrue
 ================
 
-<a href="https://vcjdeboer.github.io/seahtrue/"><img src="man/figures/logo.png" align="right" height="138" alt="seahtrue website" /></a>
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 seahtrue is a package for analyzing extracellular flux data. It
@@ -19,19 +17,19 @@ devtools::install_github("vcjdeboer/seahtrue", ref = "main")
 #> Downloading GitHub repo vcjdeboer/seahtrue@main
 #> knitr (1.45 -> 1.46) [CRAN]
 #> Installing 1 packages: knitr
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1bbae40a4'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1b69833ab3'
 #> (as 'lib' is unspecified)
 #> 
 #> The downloaded binary packages are in
-#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmpJPOEQH/downloaded_packages
+#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmpKMtlil/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpJPOEQH/remotes30274b776857/vcjdeboer-seahtrue-6ecc8ff/DESCRIPTION’ ... OK
+#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpKMtlil/remotes31155a0a2615/vcjdeboer-seahtrue-91fe92c/DESCRIPTION’ ... OK
 #> * preparing ‘seahtrue’:
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
 #> * checking for empty or unneeded directories
 #> * building ‘seahtrue_0.2.0.tar.gz’
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1bbae40a4'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1b69833ab3'
 #> (as 'lib' is unspecified)
 ```
 
