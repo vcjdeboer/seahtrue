@@ -1,8 +1,4 @@
-^renv$
-^renv\.lock$
-^.*\.Rproj$
-^\.Rproj\.user$
-^seahtrue\.Rcheck$
-^seahtrue.*\.tar\.gz$
-^seahtrue.*\.tgz$
-^LICENSE\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
