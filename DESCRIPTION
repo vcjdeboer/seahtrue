@@ -1,16 +1,9 @@
 Package: seahtrue
 Type: Package
-<<<<<<< HEAD
-Title: Introducing Seahtrue, a transformative view on cellular processes using OCR and ECAR 
-Version: 0.2.0
-Author: person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = "cre", "aut, "cph"),
-=======
 Title: Seahtrue revives XF data for structured data analysis
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = c("cre", "aut")),
         person("Xiang", "Zhang", role = "ctb"),
->>>>>>> main
-        person("Gerwin", "Smits", email = "gerwin.smits@wur.nl", role = "aut"))
 Maintainer: The package maintainer <gerwin.smits@wur.nl>
 Description:
     Seahtrue organizes data from experiments performed on an XF analyzer into structured nested tibbles.
