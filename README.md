@@ -1,7 +1,7 @@
-Seahtrue
-================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# seahtrue <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
 seahtrue is a package for analyzing extracellular flux data. It
 organizes data from excel files into nested tibbles and allows for
