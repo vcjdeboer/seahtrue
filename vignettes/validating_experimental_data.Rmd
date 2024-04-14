@@ -1,0 +1,19 @@
+---
+title: "validating_experimental_data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{validating_experimental_data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(seahtrue)
+```
