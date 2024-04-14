@@ -36,7 +36,8 @@ revive_xfplate <- function(filepath_seahorse) {
   if (!file.exists(filepath_seahorse)) {
     cli::cli_abort(
       glue::glue("The following file 
-                  does not exist: {filepath_seahorse}"))}
+                  does not exist: {filepath_seahorse}"),
+      wrap = TRUE)}
   
   # Check if required sheets are available in input file
   sheets_required <- c("Assay Configuration",
@@ -54,11 +55,13 @@ revive_xfplate <- function(filepath_seahorse) {
     if (length(my_missing_sheets)>1){
     cli::cli_abort(
       glue::glue("The following sheets 
-                  do not exist: {my_missing_sheets}"))
+                  do not exist: {my_missing_sheets}"),
+      wrap = TRUE)
       } else {
         cli::cli_abort(
           glue::glue("The following sheet 
-                      does not exist: {my_missing_sheets}"))
+                      does not exist: {my_missing_sheets}"),
+          wrap = TRUE)
     }
   }
   

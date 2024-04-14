@@ -18,7 +18,8 @@ read_xfplate <- function(filepath_seahorse) {
 
     cli::cli_alert(
       glue::glue("Start function to read seahorse plate data from 
-                 Excel file: {filepath_seahorse}"))
+                 Excel file: {filepath_seahorse}"),
+      wrap = TRUE)
 
     # read data
     xf_raw <- get_xf_raw(filepath_seahorse) %>% 
@@ -113,11 +114,13 @@ verify_xf_raw <- function(xf_raw){
     if (length(my_missing_columns)>1){
       cli::cli_abort(
         glue::glue("The following columns 
-                  do not exist: {my_missing_columns}"))
+                  do not exist: {my_missing_columns}"),
+        wrap = TRUE)
     } else {
       cli::cli_abort(
         glue::glue("The following column 
-                      does not exist: {my_missing_columns}"))
+                      does not exist: {my_missing_columns}"),
+        wrap = TRUE)
     }
   }
   
@@ -376,7 +379,8 @@ verify_xf_rate <- function(xf_rate, xf_flagged){
     
     cli::cli_alert(
       glue::glue("Rate was exported WITHOUT background correction,
-                 Therefore, the background correction was added"))
+                 Therefore, the background correction was added"),
+      wrap = TRUE)
   }
 
   xf_rate <- xf_rate %>% 

@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ### Seahtrue overview
 
-The seahtrue package offers a set of functions to be able to perform reproducible data analysis of extracellular flux analysis. The main function `revieve_xfplate()` reads, preprocess and validates the input data and outputs experimental details and outcome variables in an organized (tidy) way. The output of the `revive_xfplate()` is a nested tibble.
+The seahtrue package offers a set of functions to be able to perform reproducible data analysis of extracellular flux analysis. The main function `revive_xfplate()` reads, preprocess and validates the input data and outputs experimental details and outcome variables in an organized (tidy) way. The output of the `revive_xfplate()` is a nested tibble.
 
 ### Extracellular flux analysis scientific primer
 
@@ -33,7 +33,7 @@ Seahorse extracellular flux instruments performs analysis of O2 and pH in either
 
 ### Getting started
 
-The `tidyverse` and `seahtrue` package are used here, so we have to load them first. Also, the `here` package can be usefull.
+The `tidyverse` pipe symbol and `seahtrue` package are used here, so we have to load them first.
 
 ```{r load packages}
 suppressPackageStartupMessages({
@@ -70,7 +70,9 @@ Otherwise, when you are on a Mac you might want to copy the direct path from the
 In this vignette we use an xlsx file that we included with the seahtrue package:
 
 ```{r example revive}
-my_file_path <- system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue")
+my_file_path <- system.file("extdata", 
+                            "20191219_SciRep_PBMCs_donor_A.xlsx", 
+                            package = "seahtrue")
 
 my_plate <- my_file_path %>% revive_xfplate()
 
