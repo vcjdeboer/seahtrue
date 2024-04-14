@@ -21,19 +21,19 @@ devtools::install_github("vcjdeboer/seahtrue", ref = "main")
 #> Downloading GitHub repo vcjdeboer/seahtrue@main
 #> knitr (1.45 -> 1.46) [CRAN]
 #> Installing 1 packages: knitr
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee01e933c39'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1b7cf05528'
 #> (as 'lib' is unspecified)
 #> 
 #> The downloaded binary packages are in
-#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmpCx9T8S/downloaded_packages
+#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmprFE4dF/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpCx9T8S/remotes23ec2d19038c/vcjdeboer-seahtrue-edc474c/DESCRIPTION’ ... OK
+#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmprFE4dF/remotes2ef223e8ec53/vcjdeboer-seahtrue-ffccb9e/DESCRIPTION’ ... OK
 #> * preparing ‘seahtrue’:
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
 #> * checking for empty or unneeded directories
 #> * building ‘seahtrue_0.2.0.tar.gz’
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee01e933c39'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpLFfu6e/temp_libpath2d1b7cf05528'
 #> (as 'lib' is unspecified)
 ```
 
