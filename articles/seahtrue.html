@@ -55,7 +55,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/Introduction_to_seahtrue.html">Introduction_to_seahtrue</a>
     <a class="dropdown-item" href="../articles/validating_experimental_data.html">validating_experimental_data</a>
-    <a class="dropdown-item" href="../articles/validating_input_data.html">UNKNOWN TITLE</a>
+    <a class="dropdown-item" href="../articles/validating_input_data.html">validating_input_data</a>
   </div>
 </li>
       </ul>
@@ -89,9 +89,9 @@
 </h3>
 <p>The seahtrue package offers a set of functions to be able to perform
 reproducible data analysis of extracellular flux analysis. The main
-function <code>revive_xfplate()</code> reads, preprocess and validates
+function <code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code> reads, preprocess and validates
 the input data and outputs experimental details and outcome variables in
-an organized (tidy) way. The output of the <code>revive_xfplate()</code>
+an organized (tidy) way. The output of the <code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code>
 is a nested tibble.</p>
 </div>
 <div class="section level3">
@@ -129,12 +129,12 @@ package are used here, so we have to load them first.</p>
 <span></span>
 <span><span class="co"># in your own workflow you don't have to supresses messages </span></span>
 <span><span class="co"># off course, this is used here only for cleaner vignettes</span></span></code></pre></div>
-<p>The <code>revive_xfplate()</code> takes the .xlsx output file from a
+<p>The <code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code> takes the .xlsx output file from a
 96 well XF experiment as its input.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_file_path</span> <span class="op">&lt;-</span> <span class="st">"/Users/myname/data/my_xf_plate.xlsx"</span> <span class="co"># mac style folder path</span></span>
 <span></span>
-<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">revive_xfplate</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/revive_xfplate.html">revive_xfplate</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Handling files in your preferred IDE, such as RStudio, can be a
 challenge. Working within your own Rstudio project is often advisable,
 where you can put your xlsx files into a <code>data</code> folder. If
@@ -143,7 +143,7 @@ this:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_file_path</span> <span class="op">&lt;-</span> <span class="fu">here</span><span class="fu">::</span><span class="fu">here</span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"my_xf_plate. xlsx"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">revive_xfplate</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/revive_xfplate.html">revive_xfplate</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Otherwise, when you are on a Mac you might want to copy the direct
 path from the finder path bar, by right clicking on the file and
 <code>copy my_xf_plate.xlsx as pathname</code>. You need to have the
@@ -155,9 +155,9 @@ seahtrue package:</p>
 <span>                            <span class="st">"20191219_SciRep_PBMCs_donor_A.xlsx"</span>, </span>
 <span>                            package <span class="op">=</span> <span class="st">"seahtrue"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">revive_xfplate</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/revive_xfplate.html">revive_xfplate</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; → Start function to read seahorse plate data from Excel file:</span></span>
-<span><span class="co">#&gt; /home/runner/work/_temp/Library/seahtrue/extdata/20191219_SciRep_PBMCs_donor_A.xlsx</span></span>
+<span><span class="co">#&gt; 20191219_SciRep_PBMCs_donor_A.xlsx</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Finished collecting assay information.</span></span>
 <span><span class="co">#&gt; → plateid is identified as:V0174416419V</span></span>
 <span><span class="co">#&gt; → Rate was exported WITH background correction</span></span>
