@@ -36,9 +36,8 @@ The `tidyverse` and `seahtrue` package are used here, so we have to load them fi
 
 ```{r load packages}
 suppressPackageStartupMessages({
-  library(tidyverse)
+  library(dplyr)
   library(seahtrue)
-  library(here)
 })
 
 # in your own workflow you don't have to supresses messages 
