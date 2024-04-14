@@ -3,7 +3,7 @@ Type: Package
 Title: Seahtrue revives XF data for structured data analysis
 Version: 0.2.0
 Authors@R: c(person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = c("cre", "aut")),
-        person("Xiang", "Zhang", role = "ctb"),
+        person("Xiang", "Zhang", role = "ctb"), person("Gerwin", "Smits", role = "aut"))
 Maintainer: The package maintainer <gerwin.smits@wur.nl>
 Description:
     Seahtrue organizes data from experiments performed on an XF analyzer into structured nested tibbles.
@@ -45,3 +45,4 @@ Depends:
     R (>= 4.2.0) 
 VignetteBuilder: knitr
 StagedInstall: no
+URL: https://vcjdeboer.github.io/seahtrue/
