@@ -1,116 +1,284 @@
-#' Validate dataframe
-#'
-#' @param df dataframe used for the validation
-#' @param rules validation rules to check the dataframe.
-#'
-#' @return list with failed params and validation pass
-#' @noRd
-#' @keywords internal
-validate_df <- function(df, rules){
 
-  out <- validate::confront(df, rules)
-
-  # this checks whether there are any rows where 'fails' is higher than 0
-  # meaning that the validator rule did not pass for that row
-  if (nrow(validate::summary(out) %>%
-           dplyr::filter(fails > 0)) > 0){
-
-    failed_params <-
-      validate::summary(out) %>%
-      dplyr::filter(fails > 0) %>%
-      dplyr::select(name,expression)
-
-    validation_passed <- FALSE
-
-  } else {
-    failed_params <- NULL
-    validation_passed <- TRUE
+validate_O2_pH_levels <- function(xf_raw_pr, 
+                                  tick_range_rule,
+                                  start_tick_range_rule){
+  # internal functions
+  validate_ticks <- function(nested_df, rule){
+    
+    nested_df %>%  
+      dplyr::mutate(validate =  
+               purrr::map(.x = data, 
+                          .f = ~.x %>%  
+                            validate::confront(., rule) %>%  
+                            validate::summary() %>%  
+                            dplyr::as_tibble() %>% 
+                            dplyr::filter(fails != 0))) %>% 
+      tidyr::unnest(validate) %>% 
+      dplyr::select(-data) %>%
+      tidyr::nest(.by = c(well, expression)) %>%  #pluck("data", 2) %>%  select(measurement)
+      dplyr::mutate(failed = 
+               purrr::map(.x = data,
+                          .f = ~ .x %>%  dplyr::select(measurement) %>% 
+                            dplyr::pull(measurement))) %>% 
+      dplyr::mutate(n_failed = purrr::map_dbl(.x = data,
+                                       .f = ~ .x %>%  nrow())) %>% 
+      dplyr::select(-data)
   }
-
-  return(list(failed_params = failed_params,
-              validation_passed = validation_passed))
-
+  
+  
+  get_failed_values <- function(failed_df, original_df, tick = "first"){
+    
+    if(tick == "first"){
+      
+      df <- failed_df %>% 
+        tidyr::unnest(c(failed)) %>% 
+        dplyr::mutate(values = 
+                 purrr::map2(
+                   .x = failed,
+                   .y = well,
+                   .f = ~ original_df %>% 
+                     dplyr::filter(well == .y) %>% 
+                     dplyr::filter(measurement == .x) %>% 
+                     dplyr::slice(1) %>% 
+                     dplyr::select(O2_mmHg, pH)))  %>% 
+        tidyr::unnest(c(values)) %>% 
+        dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>% 
+        dplyr::mutate(label = "first_tick")
+      
+    }
+    
+    if(tick == "last"){
+      df <- failed_df %>% 
+        tidyr::unnest(c(failed)) %>% 
+        dplyr::mutate(values = 
+                 purrr::map2(
+                   .x = failed,
+                   .y = well,
+                   .f = ~ original_df %>%
+                     dplyr::filter(well == .y) %>%
+                     dplyr::filter(measurement == .x) %>% 
+                     dplyr::slice_tail(n = 1) %>% 
+                     dplyr::select(O2_mmHg, pH)))  %>% 
+        tidyr::unnest(c(values)) %>% 
+        dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>% 
+        dplyr::mutate(label = "last_tick")
+      
+    }
+    
+    if(tick == "start"){
+      df <- failed_df %>% 
+        tidyr::unnest(c(failed)) %>% 
+        dplyr::mutate(values = 
+                 purrr::map2(
+                   .x = failed,
+                   .y = well,
+                   .f = ~ original_df %>% 
+                     dplyr::filter(well == .y) %>% 
+                     dplyr::slice(1) %>% 
+                     dplyr::select(O2_mmHg, pH)))  %>% 
+        tidyr::unnest(c(values)) %>% 
+        dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>% 
+        dplyr::mutate(label = "start_tick")
+    }
+    
+    return(df)
+  }
+  
+  #first tick of measurement fail
+  failed_df_first_tick <- xf_raw_pr %>% 
+    dplyr::slice_head(n=1,
+                      by = c(well, measurement)) %>%
+    tidyr::nest(.by = c(well, measurement)) %>% 
+    validate_ticks(., tick_range_rule) %>% 
+    get_failed_values(., xf_raw_pr, tick = "first")
+  
+  failed_df_last_tick <- xf_raw_pr %>% 
+    dplyr::slice_tail(n=1,
+                      by = c(well, measurement)) %>%
+    tidyr::nest(.by = c(well, measurement)) %>% 
+    validate_ticks(., tick_range_rule) %>% 
+    get_failed_values(., xf_raw_pr, tick = "last")
+  
+  failed_df_start_tick <- xf_raw_pr %>% 
+    dplyr::slice_head(n=1,
+                      by = c(well)) %>%
+    tidyr::nest(.by = c(well, measurement)) %>% 
+    validate_ticks(., start_tick_range_rule) %>% 
+    get_failed_values(., xf_raw_pr, tick = "start")
+  
+  failed_ticks_combined <- dplyr::bind_rows(failed_df_last_tick,
+                                            failed_df_first_tick,
+                                            failed_df_start_tick) %>% 
+    tidyr::nest(.by = c(well, n_failed, param, label)) %>% 
+    dplyr::arrange(well, label)
+  
+  return(failed_ticks_combined)
 }
 
-log_validation <- function(val_output, validated_df_name){
-
-  name = val_output$name
-  rule = val_output$expression
-
-  cli::cli_alert_warning(glue::glue("Validation for '{name}' in
-                         the preprocessed seahorse dataset FAILED.
-                         The '{name}' parameter did not pass the following rule: '{rule}'"))
+validatie_tick_is_linear <- function(xf_raw_pr){
   
-  input<-menu(c("Yes", "No"),title="Do you want to continue?")
+  #is linear for tick
+  xf_raw_pr %>% 
+    dplyr::slice(1, .by = c(measurement, tick)) %>% 
+    dplyr::select(well, measurement, tick, group) %>% 
+    #add_row(well = "A01", measurement =  1, tick = 3.5, group = "background") %>% 
+    dplyr::pull(tick) %>% 
+    validate::is_linear_sequence(begin = 0)
   
-  return(input)
-
 }
 
-
-#' Validate the preprocessed seahorse dataset.
-#'
-#' @param xf The preprocessed seahorse dataset.
-#'
-#' @return None
-#' @importFrom magrittr %T>%
-#' @noRd
-#' @keywords internal
-validate_preprocessed <- function(xf_pr){
+validate_for_NA <- function(xf_raw_pr, NA_rule){
   
-    df1 = xf_pr$raw_data[[1]]
-    df1_name = "raw_data"
-    df2 = xf_pr$assay_info[[1]]
-    df2_name = "assay_info"
-
-    cli::cli_alert_info("Validate the preprocessed data.")
-    
-    # Provide the validation rules.
-    xf_plate_pr_raw_rules <- validate::validator(.file = raw_yaml_path)
-    xf_assay_info_rules <- validate::validator(.file = assay_info_yaml_path)
-
-    # Validate using the validation rules. Collect the failed validation rules for each provided rule group.
-    # If any rules failed the analysis doesn't meet the validation criteria.
-    val_output <- list(raw_val_output = validate_df(df1, xf_plate_pr_raw_rules), 
-                        assay_info_val_output = validate_df(df2, xf_assay_info_rules))
-    
-    # Organise the failed validations.
-    validation_failures <- organise_validation_failures(val_output)
-    
-    xf_pr <- xf_pr %>%
-      mutate(validation_failures = list(validation_failures))
-    
-    return(xf_pr)
+  NA_df_summary <- validate::confront(xf_raw_pr, NA_rule) %>%  
+    validate::summary() %>% 
+    #pull(expression) %>% 
+    dplyr::mutate(param_NA = 
+             purrr::map_chr(.x = expression,
+                            .f = ~stringr::str_extract_all(
+                              .x, "\\([^()]+\\)") %>%  
+                              purrr::pluck(1) %>% 
+                              stringr::str_sub(2, -2) %>% 
+                              paste0(., "_NA"))) %>% 
+    dplyr::as_tibble()
+  
+  df_with_NAs_identified <- validate::confront(xf_raw_pr, NA_rule) %>% 
+    validate::values() %>% 
+    dplyr::as_tibble() %>% 
+    dplyr::rename_with(~NA_df_summary$param_NA, names(.)) %>% 
+    dplyr::select(where(~ any(. == FALSE))) %>% 
+    dplyr::bind_cols(xf_raw_pr %>% 
+                       dplyr::select(well, measurement, tick, group), .) 
+  
+  return(df_with_NAs_identified)
 }
 
-organise_validation_failures <- function(val_output) {
-  # Create an empty data tibble to store data failures.
-  failed_validation_rules_tibble <- tibble()
+validate_well_number <- function(xf_raw_pr){
   
-  # For each rule group (for example from different yaml files) get the failed rules. 
-  # Organise the failed rules to a new tibble.
-  for (failed_rules_validation_output in names(val_output)) {
-    
-    # Extract failed rules from the validation output
-    failed_params <- val_output[[failed_rules_validation_output]]$failed_params
-    
-    # Add the extracted failed rules to a tibble with failed rules.
-    failure_tibble <- tibble(
-      validation_group = rep(failed_rules_validation_output, length(failed_params$name)),
-      failed_rules = failed_params$name,
-      expression = failed_params$expression
+  number_of_wells_per_plate <- 
+    xf_raw_pr %>%  
+    dplyr::pull(well) %>%  
+    unique() %>%  
+    length()
+  
+  all_96_wells_are_present <- number_of_wells_per_plate == 96
+  
+  return(all_96_wells_are_present)
+}
+
+get_timing_info <- function(xf_raw_pr){
+  
+  number_of_ticks_per_measurement <- 
+    xf_raw_pr %>%  
+    dplyr::slice(1, .by = c(measurement, tick)) %>% 
+    count(measurement) %>% 
+    dplyr::rename(number_of_ticks = n)
+  
+  time_info <- xf_raw_pr %>%  
+    dplyr::slice(1, .by = c(measurement, tick)) %>% 
+    dplyr::mutate(st = first(timescale),
+           end = last(timescale),
+           .by = measurement) %>% 
+    dplyr::select(st, end) %>%
+    dplyr::mutate(per_meas = end - st) %>% 
+    unique() %>% 
+    dplyr::mutate(lagged = lag(end)) %>% 
+    dplyr::mutate(lagged = case_when(is.na(lagged) ~ 0,
+                              .default = lagged)) %>% 
+    dplyr::mutate(wait_mix = st -lagged) %>% 
+    dplyr::select(-lagged) %>% 
+    dplyr::bind_cols(number_of_ticks_per_measurement) %>% 
+    dplyr::select(measurement, 
+           number_of_ticks, 
+           st, end, per_meas, wait_mix) %>% 
+    dplyr::mutate(st_min = st/60,
+           end_min = end/60,
+           per_meas_min = per_meas/60,
+           wait_mix_min = wait_mix/60) %>% 
+    dplyr::rename(st_sec = st,
+           end_sec = end,
+           per_meas_sec = per_meas,
+           wait_mix_sec = wait_mix)
+  
+  return(time_info)
+  
+}
+
+validate_preprocessed <- function(preprocessed_xf_plate){
+  
+  
+  xf_raw_pr <- preprocessed_xf_plate %>% 
+    purrr::pluck("raw_data", 1) 
+  
+  #rules
+  tick_range_rule <- validate::validator(
+    in_range(O2_mmHg, min = 10, max = 200), #with packagename in front does not work!
+    in_range(pH, min = 7, max = 7.5))
+  
+  start_tick_range_rule <- validate::validator(
+    in_range(O2_mmHg, min = 140, max = 170),
+    in_range(pH, min = 7.2, max = 7.6))
+  
+  NA_rule <- validate::validator(is_complete(well),
+                       is_complete(measurement),
+                       is_complete(tick),
+                       is_complete(timescale),
+                       is_complete(minutes),
+                       is_complete(group),
+                       is_complete(interval),
+                       is_complete(injection),
+                       is_complete(pH_em_corr),
+                       is_complete(O2_em_corr),
+                       is_complete(O2_mmHg),
+                       is_complete(pH),
+                       is_complete(pH_em_corr_corr),
+                       is_complete(O2_em_corr_bkg),
+                       is_complete(pH_em_corr_bkg),
+                       is_complete(O2_mmHg_bkg),
+                       is_complete(pH_bkgd),
+                       is_complete(pH_em_corr_corr_bkg),
+                       is_complete(bufferfactor),
+                       is_complete(cell_n),
+                       is_complete(flagged_well))
+  
+  
+  #call validate functions
+  df_with_NAs_identified <- 
+    validate_for_NA(xf_raw_pr, NA_rule)
+  all_96_wells_are_present <- 
+    validate_well_number(xf_raw_pr)
+  time_info <- 
+    get_timing_info(xf_raw_pr)
+  tick_is_linear <- 
+    validatie_tick_is_linear(xf_raw_pr)
+  failed_ticks_combined <- 
+    validate_O2_pH_levels(xf_raw_pr, 
+                          tick_range_rule,
+                          start_tick_range_rule)
+  
+  
+  all_validator_rules <- 
+    list(NA_rule = NA_rule, 
+         tick_range_rule = tick_range_rule, 
+         start_tick_range_rule = start_tick_range_rule, 
+         "is_linear_sequence_tick" = "is_linear_sequence_tick",
+         "all_96_wells_are_present" = "all_96_wells_are_present")
+  
+  validation_output <- 
+    list(all_96_wells_are_present = all_96_wells_are_present,
+         tick_is_linear = tick_is_linear,
+         time_info = time_info,
+         df_with_NAs_identified = df_with_NAs_identified,
+         failed_ticks_combined = failed_ticks_combined,
+         all_validator_rules = all_validator_rules
     )
-    
-    # Check for duplicates. 
-    # Only add non-duplicates values to the tibble with failed rules.
-    failure_tibble <- failure_tibble[!duplicated(failure_tibble), ]
-    
-    # Failures from each validation yaml group are added to the eventual failed tibble that will be returned.
-    failed_validation_rules_tibble <- bind_rows(failed_validation_rules_tibble, failure_tibble)
-  }
   
-  # Return the resulting tibble.
-  return(failed_validation_rules_tibble)
+  cli::cli_alert_info("Finished validating the input data")
+  
+  
+  return( preprocessed_xf_plate %>% 
+            dplyr::mutate(validation_output = list(validation_output)))
+  
 }
+
 
 
