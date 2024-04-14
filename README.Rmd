@@ -23,7 +23,7 @@ seahtrue is a package for analyzing extracellular flux data. It organizes data f
 You can install the latest version of seahtrue with the following command:
 
 ```{r install_github, message=TRUE, warning=FALSE}
-devtools::install_github("vcjdeboer/seahtrue", ref = "main")
+devtools::install_github("vcjdeboer/seahtrue", ref = "main", quiet = TRUE)
 ```
 
 ### Getting Help
