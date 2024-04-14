@@ -25,6 +25,8 @@ LazyData: true
 Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
+    tidyverse (>= 1.3.0)
+    here (>=1.0.1)
 Imports:
     dplyr (>= 1.1.2),
     readxl (>= 1.4.1),
