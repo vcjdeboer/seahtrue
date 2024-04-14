@@ -4,7 +4,9 @@ pkgdown_sha: ~
 articles:
   Introduction_to_seahtrue: Introduction_to_seahtrue.html
   seahtrue: seahtrue.html
-last_built: 2024-04-14T12:40Z
+  validating_experimental_data: validating_experimental_data.html
+  validating_input_data: validating_input_data.html
+last_built: 2024-04-14T15:33Z
 urls:
   reference: https://vcjdeboer.github.io/seahtrue/reference
   article: https://vcjdeboer.github.io/seahtrue/articles
