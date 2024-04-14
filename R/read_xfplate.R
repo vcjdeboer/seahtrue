@@ -18,7 +18,7 @@ read_xfplate <- function(filepath_seahorse) {
 
     cli::cli_alert(
       glue::glue("Start function to read seahorse plate data from 
-                 Excel file: {filepath_seahorse}"),
+                 Excel file: {basename(filepath_seahorse)}"),
       wrap = TRUE)
 
     # read data
