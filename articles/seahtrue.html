@@ -89,7 +89,7 @@
 </h3>
 <p>The seahtrue package offers a set of functions to be able to perform
 reproducible data analysis of extracellular flux analysis. The main
-function <code>revieve_xfplate()</code> reads, preprocess and validates
+function <code>revive_xfplate()</code> reads, preprocess and validates
 the input data and outputs experimental details and outcome variables in
 an organized (tidy) way. The output of the <code>revive_xfplate()</code>
 is a nested tibble.</p>
@@ -119,9 +119,8 @@ mitostress test.</p>
 <div class="section level3">
 <h3 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h3>
-<p>The <code>tidyverse</code> and <code>seahtrue</code> package are used
-here, so we have to load them first. Also, the <code>here</code> package
-can be usefull.</p>
+<p>The <code>tidyverse</code> pipe symbol and <code>seahtrue</code>
+package are used here, so we have to load them first.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -152,11 +151,13 @@ finder path bar set to <code>Show</code> for this.</p>
 <p>In this vignette we use an xlsx file that we included with the
 seahtrue package:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_file_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"20191219_SciRep_PBMCs_donor_A.xlsx"</span>, package <span class="op">=</span> <span class="st">"seahtrue"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_file_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, </span>
+<span>                            <span class="st">"20191219_SciRep_PBMCs_donor_A.xlsx"</span>, </span>
+<span>                            package <span class="op">=</span> <span class="st">"seahtrue"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_plate</span> <span class="op">&lt;-</span> <span class="va">my_file_path</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">revive_xfplate</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; → Start function to read seahorse plate data from </span></span>
-<span><span class="co">#&gt; Excel file: /home/runner/work/_temp/Library/seahtrue/extdata/20191219_SciRep_PBMCs_donor_A.xlsx</span></span>
+<span><span class="co">#&gt; → Start function to read seahorse plate data from Excel file:</span></span>
+<span><span class="co">#&gt; /home/runner/work/_temp/Library/seahtrue/extdata/20191219_SciRep_PBMCs_donor_A.xlsx</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Finished collecting assay information.</span></span>
 <span><span class="co">#&gt; → plateid is identified as:V0174416419V</span></span>
 <span><span class="co">#&gt; → Rate was exported WITH background correction</span></span>
