@@ -3,10 +3,6 @@ title: "Seahtrue"
 output: github_document
 ---
 
-```{r echo=FALSE, fig.align='center', fig.cap='', out.width='100%'}
-knitr::include_graphics('man/figures/logo.png')
-```
-
 <a href="https://vcjdeboer.github.io/seahtrue/"><img src="man/figures/logo.png" align="right" height="138" alt="seahtrue website" /></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
