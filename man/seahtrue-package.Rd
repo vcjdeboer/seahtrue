@@ -6,6 +6,8 @@
 \alias{seahtrue-package}
 \title{seahtrue: Seahtrue revives XF data for structured data analysis}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Seahtrue organizes data from experiments performed on an XF analyzer into structured nested tibbles. This allows for detailed processing of raw data and advanced data visualization and statistics. Seahtrue version introduces an open and reproducible way to analyze these XF experiments. It uses file paths to XF Excel files. These files are created from the assay result files (.asyr) which are derived from the Agilent Seahorse XF Wave software. They contain different sheets of important data for the experiment: 1. Assay Information: Details about how the experiment was set up. 2. Rate Data: Information about the OCR and ECAR rates. 3. Raw Data: The original raw data collected during the experiment. 4. Calibration Data: Data related to calibrating the instrument. Seahtrue version focuses on getting the specific data needed for analysis. Once this data is extracted, it's prepared for calculations through preprocessing. To make sure everything is accurate, both the initial data and the preprocessed data go through thorough checks.
 }
 \seealso{

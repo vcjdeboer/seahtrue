@@ -7,18 +7,17 @@
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
 #'
 #' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
-#'  * plate_id = Barcode from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
-#'  * filepath_seahorse = Path to Seahorse Excel file. \cr
-#'  * date_run = Date derived from 'Assay Configuration' sheet of the Seahorse Excel file. \cr
-#'  * date_processed = Date and time that this function was run. \cr
-#'  * assay_info = Dataframe with information from the 'Assay Configuration' sheet from the Seahorse Excel file. \cr
-#'  * injection_info = Dataframe with information derived from 'Operation log' sheet. \cr
-#'  * raw_data = Preprocessed raw dataframe from Seahorse 'Raw' sheet. \cr
+#'  * plate_id = Barcode plate id of the well plate containing the samples \cr
+#'  * filepath_seahorse = PPath, and basename to .xlsx input file \cr
+#'  * date_run = Date and time when the plate was run \cr
+#'  * date_processed = Date and time this output from revive_xfplate() was generated \cr
+#'  * assay_info = Meta information from 'Assay Configuration' sheet and 'Calibration' sheet \cr
+#'  * injection_info = Dataframe with information from the 'Operation log' sheet. \cr
+#'  * raw_data = Preprocessed raw dataframe from 'Raw' sheet \cr
 #'  * rate_data = Preprocessed rate data from 'Rate' sheet.
 #'  
 #' @export
 #' @import logger rlang cli glue readxl 
-
 #' @examples
 #' revive_xfplate(
 #'   system.file("extdata", 

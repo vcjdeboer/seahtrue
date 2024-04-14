@@ -832,7 +832,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #' Verify xf assay info
 #'
 #' @param xfassay_info tibble with collected data in get_xf_assayinfo()
-#'
+#' @noRd
 #' @keywords internal
 #' @examples
 #' xfassay_info <-get_xf_assayinfo(

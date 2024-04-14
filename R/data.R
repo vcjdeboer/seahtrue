@@ -11,16 +11,16 @@
 #' @format A data frame with 1 row and 7 variables.
 #' \describe{
 #'   \item{plate_id}{Barcode plate id of the well plate containing the samples}
-#'   \item{filepath_seahorse}{Path, and basename to Seahorse Excel file}
+#'   \item{filepath_seahorse}{Path, and basename to .xlsx file}
 #'   \item{date_run}{Date and time when the plate was run}
 #'.  \item{date_processed}{Date and time this output from revive_xfplate() was generated}
 #'   \item{assay_info}{Meta information from 'Assay Configuration' sheet and 'Calibration' sheet}
 #'   \item{injection_info}{Dataframe with information from the 'Operation log' sheet}
-#'   \item{raw_data}{Preprocessed raw dataframe from 'Raw' sheet.}
+#'   \item{raw_data}{Preprocessed raw dataframe from 'Raw' sheet}
 #'   \item{rate_data}{Preprocessed rate data from 'Rate' sheet.}
 #' }
 #' @source Janssen et al. 2021 Sci Rep 11:1162 <https://doi.org/10.1038/s41598-021-81217-4>
-"revive_output_PBMC_donor_A"
+"seahtrue_output_donor_A"
 
 
 
