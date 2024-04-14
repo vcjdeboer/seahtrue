@@ -1,6 +1,8 @@
 Seahtrue
 ================
 
+<img src="man/figures/logo.png" width="100%" style="display: block; margin: auto;" />
+
 <a href="https://vcjdeboer.github.io/seahtrue/"><img src="man/figures/logo.png" align="right" height="138" alt="seahtrue website" /></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,19 +21,19 @@ devtools::install_github("vcjdeboer/seahtrue", ref = "main")
 #> Downloading GitHub repo vcjdeboer/seahtrue@main
 #> knitr (1.45 -> 1.46) [CRAN]
 #> Installing 1 packages: knitr
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee03fce3b64'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee01e933c39'
 #> (as 'lib' is unspecified)
 #> 
 #> The downloaded binary packages are in
-#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmpBy5nBn/downloaded_packages
+#>  /var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T//RtmpCx9T8S/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpBy5nBn/remotes21f83e1dc192/vcjdeboer-seahtrue-770dc07/DESCRIPTION’ ... OK
+#> * checking for file ‘/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/RtmpCx9T8S/remotes23ec2d19038c/vcjdeboer-seahtrue-edc474c/DESCRIPTION’ ... OK
 #> * preparing ‘seahtrue’:
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
 #> * checking for empty or unneeded directories
 #> * building ‘seahtrue_0.2.0.tar.gz’
-#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee03fce3b64'
+#> Installing package into '/private/var/folders/27/brlq29b170xfkshv_mmttv3c0000gn/T/Rtmph6etMS/temp_libpath1ee01e933c39'
 #> (as 'lib' is unspecified)
 ```
 
