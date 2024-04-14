@@ -829,7 +829,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #'
 #' @param xfassay_info tibble with collected data in get_xf_assayinfo()
 #'
-#'
+#' @keywords internal
 #' @examples
 #' xfassay_info <-get_xf_assayinfo(
 #'   system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
