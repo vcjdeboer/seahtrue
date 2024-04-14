@@ -8,7 +8,7 @@
 #'
 #' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
 #'  * plate_id = Barcode plate id of the well plate containing the samples \cr
-#'  * filepath_seahorse = PPath, and basename to .xlsx input file \cr
+#'  * filepath_seahorse = Path, and basename to .xlsx input file \cr
 #'  * date_run = Date and time when the plate was run \cr
 #'  * date_processed = Date and time this output from revive_xfplate() was generated \cr
 #'  * assay_info = Meta information from 'Assay Configuration' sheet and 'Calibration' sheet \cr

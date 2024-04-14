@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 # seahtrue <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
-seahtrue is a package for analyzing extracellular flux data. It organizes data from excel files into nested tibbles and allows for multi-experiment analysis detailed raw data processing.
+seahtrue is a package for analyzing extracellular flux data. It organizes data from excel files into nested tibbles and allows for multi-experiment analysis, and detailed raw data processing.
 
 ### Installation
 
