@@ -1,5 +1,4 @@
 ---
-title: "Introduction to Seahtrue"
 output: rmarkdown::html_vignette
 description: |
   Overview of the Seahtrue package.
@@ -8,9 +7,8 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   ---
-
 ---
----
+## The seahtrue package
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -19,81 +17,64 @@ knitr::opts_chunk$set(
 )
 ```
 
-### Seahtrue Overview
+### Seahtrue overview
 
-The Seahtrue package introduces notable refinements in the realm of OCR and ECAR 
-calculations, enhancing our ability to analyze cellular respiration and 
-metabolic processes. These improvements are characterized by:
+The seahtrue package offers a set of functions to be able to perform reproducible data analysis of extracellular flux analysis. The main function `revieve_xfplate()` reads, preprocess and validates the input data and outputs experimental details and outcome variables in an organized (tidy) way. The output of the `revive_xfplate()` is a nested tibble.
 
-### Advantages / Disadvantages
+### Extracellular flux analysis scientific primer
 
-The software from Agilent called Wave is used while conducting experiments with these systems. Seahorse data can be obtained/visualized using Wave.
+With instruments such as the Seahorse XF analyzer from Agilent, but also the O2K from Oroboros, other oyxgraphs (from Hansatech instruments for example) and the ReSipher from Lucid Scientific, scientists are able to analyze oxygen consumption of living biological samples. 
 
-However, Wave's current software has some drawbacks when measuring OCR. These drawbacks may affect results, and may lead to aberrant OCR. An abnormal OCR could, for example, lead to incorrect research conclusions regarding energy management in cells. Hence, a script is written to overcome these drawbacks.
+Oxygen consumption of cells or small model organism can provide insights into the function of the mitochondria, since mitochondria are most of the time the main O2 consumers of cells. Apart form oxygen consumption the Seahorse XF analyzer is able to analyze in parallel the extracellular acidification of the culture medium in which the sample is emerged. This can be a proxy for glycolytic activity of samples. 
 
-Advantages Seahtrue over Agilent's Wave:
+Seahorse extracellular flux instruments performs analysis of O2 and pH in either 96 wells, 24 wells or 8 wells, and typically O2 and pH are monitored over a period of around 1 hour, in discrete measurements of typically 3 minutes each. Furthermore, perturbations of cellular functional states can be induced by adding compounds while performing the assay. The most common perturbations that are performed are injections of oligomycin, fccp and anitmycin/rotenone, known as a mitostress test. 
+
+### Getting started
+
+The `tidyverse` and `seahtrue` package are used here, so we have to load them first. Also, the `here` package can be usefull.
+
+```{r load packages}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(seahtrue)
+  library(here)
+})
+
+# in your own workflow you don't have to supresses messages 
+# off course, this is used here only for cleaner vignettes
 
 
-### Seahorse Backgound information
-
-With the Seahorse XF systems of Agilent, scientists are able to get information about the biological energy transduction and mitochondrial functions in cells.
-
-Biological energy transduction is the base of all physiological phenomena in cells. The metabolic processes associated with this energy transduction are related to diseases such as diabetes, cancer, rare genetic disease and aberrant cell death (1).
-
-Agilent's systems are capable of measuring both oxygen concentration and pH within cell culture medium. The O2/pH is measured by fluorescent probes (sensitive to O2/pH). Probes are placed just above samples (cultured cells). This will result in a small chamber of a few microliters. This small volume makes it possible to measure changes in O2 concentration and pH. 
-
-Cells use oxigen to make ATP in mitochondria. This results in a decreased oxygen concentration in the medium due to mitochondrial activity. Oxygen consumption is expressed as oxygen consumption rate (OCR). 
-
-Cells produce lactate when burning glucose at glycolysis. Lactate is (for the most part) responsible for acidification of the medium. The change in pH is called extracellular acidification rate (ECAR). 
-
-Mitochondrial cell respiration (oxidative phosphorylation) and glycolysis (non-mitochondrial) can be indirectly quantified by using the OCR and ECAR. Both processes contribute to the production of ATP in mammals (2). ATP is an energy carrier that provides cells with energy. So with this method scientists will get an insight for the energy management of cells. 
-
-### Seahtrue Summary
-
-### Script
-The Seahtrue script consists of several parts:
-
-1. Seahorse Excel files are loaded through Seahtrue. The Agilent Wave software automatically generates test results (.asyr) data. These data are converted to an Excel file (.xls). Wave includes a function to realize this conversion. 
-
-2. Useful information will be extracted from the Excel file. Information is considered useful if it's relevant to the end user. For example, it's useful to get some metadata of the project/experiment. Also data regarding our Seahtrue calculations are important. For example, oxigen and pH related calculations require 'O2 mmhg' an 'pH' data from the 'Raw' sheet of the Seahorse Excel file. With these data we can make calculations regarding OCR and ECAR.
-
-3. Calculations will be applied, including calulations to measure Oxigen Consumption rate (OCR) and Extracellular acidification rate (ECAR). This will be performed for both Wave and our alternative Seahtrue method. Calculations are performed on data from both background wells and cell-containing wells.
-
-4. Relevant information will be visualized with plots. (See heading 'Figure' under 'Application')
-
-Note 1: This vignette will show a chronological procedure of our seahtrue script. With the interactive seahtrue Shiny app, we don't have to pursue this chronological order. For example, the user may decide which plot will be visualised and it's possible to skip unwanted plots. This is possible due to 'reactivity'. The Shiny application will make Seahtrue userfriendly. 
-
-Note 2: Seahtrue allows us to perform calculations (OCR, ECAR and fluorescence (AU)) on Seahorse data. We expect Seahtrue to perform better in certain results. This still requires prove. 
-
-### Run application 
-
-#### Get all essential Seahorse information
-
-Read all the nessecary Seahorse information from the Excel file, 
-
-including data from the 'Assay Configuration' and 'Raw' sheet.
-
-A tibble with these data will be returned.
-```{r read_plate_data}
-# plate_df <- read_plate_data(filePathSeahorse, injscheme)
-# print(plate_df)
 ```
 
-#### Preprocess Seahorse information
+The `revive_xfplate()` takes the .xlsx output file from a 96 well XF experiment as its input.
 
-We will preprocess our returned plate_df (containing all the nessary Seahorse data we need).
+```{r read_plate_data, eval=FALSE, include=TRUE}
+my_file_path <- "/Users/myname/data/my_xf_plate.xlsx" # mac style folder path
 
-* The preprocess_plate_data function preprocesses the data by:
-* changing columns names
-* adding new time columns
-* adding injection info columns
-* add plate_id column
-* calculating background data
-* calculating raw pH emission data
+my_plate <- my_file_path %>% revive_xfplate()
 
-A nested tibble will be returned, containing all the information we need to perform our Seahtrue calculations.
+```
 
-Note: The nested tibble includes raw data from the 'Raw' Seahorse xls datasheet)
+Handling files in your preferred IDE, such as RStudio, can be a challenge. Working within your own Rstudio project is often advisable, where you can put your xlsx files into a `data` folder. If this is your workflow you can use relative paths, for example like this:
+
+```{r file handling, eval=FALSE, include=TRUE}
+my_file_path <- here::here("data", "my_xf_plate. xlsx")
+
+my_plate <- my_file_path %>% revive_xfplate()
+
+```
+
+Otherwise, when you are on a Mac you might want to copy the direct path from the finder path bar, by right clicking on the file and `copy my_xf_plate.xlsx as pathname`. You need to have the finder path bar set to `Show` for this. 
+
+In this vignette we use an xlsx file that we included with the seahtrue package:
+
+```{r example revive}
+my_file_path <- system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue")
+
+my_plate <- my_file_path %>% revive_xfplate()
+
+```
+
 
 Information received from the 'Raw' Seahorse datasheet.
 
