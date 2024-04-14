@@ -8,11 +8,11 @@ output: github_document
 ```{r, include = FALSE}
  
 knitr::opts_chunk$set(
-  echo = TRUE,
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/",
-  out.width = "100%"
+  echo = TRUE
+  # collapse = TRUE,
+  # comment = "#>",
+  # fig.path = "man/figures/",
+  # out.width = "100%"
 )
 ```
 
@@ -22,8 +22,8 @@ seahtrue is a package for analyzing extracellular flux data. It organizes data f
 
 You can install the latest version of seahtrue with the following command:
 
-```{r install_github, message=TRUE, warning=FALSE}
-devtools::install_github("vcjdeboer/seahtrue", ref = "main", quiet = TRUE)
+```{r install_github, eval=FALSE, message=TRUE}
+devtools::install_github("vcjdeboer/seahtrue", ref = "main")
 ```
 
 ### Getting Help
