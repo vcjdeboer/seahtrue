@@ -36,7 +36,7 @@ revive_xfplate <- function(filepath_seahorse) {
   if (!file.exists(filepath_seahorse)) {
     cli::cli_abort(
       glue::glue("The following file 
-                  does not exist: {filepath_seahorse}"),
+                  does not exist: {basename(filepath_seahorse)}"),
       wrap = TRUE)}
   
   # Check if required sheets are available in input file
