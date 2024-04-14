@@ -18,7 +18,7 @@ read_xfplate <- function(filepath_seahorse) {
 
     cli::cli_alert(
       glue::glue("Start function to read seahorse plate data from 
-                 Excel file: {filepath_seahorse}"),
+                 Excel file: {basename(filepath_seahorse)}"),
       wrap = TRUE)
 
     # read data
@@ -832,7 +832,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
 #' Verify xf assay info
 #'
 #' @param xfassay_info tibble with collected data in get_xf_assayinfo()
-#'
+#' @noRd
 #' @keywords internal
 #' @examples
 #' xfassay_info <-get_xf_assayinfo(

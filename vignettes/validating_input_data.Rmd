@@ -1,4 +1,4 @@
-use---
+---
 title: "validating_input_data"
 output: rmarkdown::html_vignette
 vignette: >
