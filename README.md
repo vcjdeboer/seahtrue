@@ -5,7 +5,7 @@
 
 seahtrue is a package for analyzing extracellular flux data. It
 organizes data from excel files into nested tibbles and allows for
-multi-experiment analysis detailed raw data processing.
+multi-experiment analysis, and detailed raw data processing.
 
 ### Installation
 

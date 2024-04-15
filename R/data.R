@@ -13,7 +13,7 @@
 #'   \item{plate_id}{Barcode plate id of the well plate containing the samples}
 #'   \item{filepath_seahorse}{Path, and basename to .xlsx file}
 #'   \item{date_run}{Date and time when the plate was run}
-#'.  \item{date_processed}{Date and time this output from revive_xfplate() was generated}
+#'   \item{date_processed}{Date and time this output from revive_xfplate() was generated}
 #'   \item{assay_info}{Meta information from 'Assay Configuration' sheet and 'Calibration' sheet}
 #'   \item{injection_info}{Dataframe with information from the 'Operation log' sheet}
 #'   \item{raw_data}{Preprocessed raw dataframe from 'Raw' sheet}
@@ -21,6 +21,3 @@
 #' }
 #' @source Janssen et al. 2021 Sci Rep 11:1162 <https://doi.org/10.1038/s41598-021-81217-4>
 "seahtrue_output_donor_A"
-
-
-
