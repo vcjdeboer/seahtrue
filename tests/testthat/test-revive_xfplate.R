@@ -77,7 +77,7 @@ testthat::test_that("norm_has_type_logical_attribute", {
     get_xf_norm() %>% 
     verify_xf_norm()
   
-  my_norm_attribute <- attributes(xf_norm) %>%  pluck("norm_available")
+  my_norm_attribute <- attributes(xf_norm) %>%  purrr::pluck("norm_available")
   
   testthat::expect_type(my_norm_attribute, "logical")
   
@@ -137,9 +137,9 @@ testthat::test_that("assayinfo_check", {
   xf_raw <- get_xf_raw(my_filepath)
   xf_assayinfo <- get_xf_assayinfo(my_filepath, xf_raw)
   
-  KSV <- xf_assayinfo %>%  pluck("KSV")
-  F0 <-  xf_assayinfo %>%  pluck("F0")
-  min_to_st <- xf_assayinfo %>%  pluck("minutes_to_start_measurement_one") 
+  KSV <- xf_assayinfo %>%  purrr::pluck("KSV")
+  F0 <-  xf_assayinfo %>%  purrr::pluck("F0")
+  min_to_st <- xf_assayinfo %>%  purrr::pluck("minutes_to_start_measurement_one") 
   testthat::expect_type(KSV, "double")
   testthat::expect_type(F0, "double")
   testthat::expect_type(min_to_st, "double")
