@@ -189,8 +189,10 @@ verify_xf_norm <- function(xf_norm){
 #' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
 get_xf_flagged <- function(filepath_seahorse){
 
+  
+    
+  
     x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
-
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
     # subset to only the platelayout with the cells that show the "unselected" wells by user
@@ -255,7 +257,6 @@ get_xf_flagged <- function(filepath_seahorse){
 #'
 #' @examples
 #' get_xf_rate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue"))
-
 
 get_xf_rate <- function(filepath_seahorse){
 
@@ -359,7 +360,6 @@ verify_xf_rate <- function(xf_rate, xf_flagged){
     #do background substraction for wave table
     background <- xf_rate %>%
       dplyr::filter(group=="Background") %>%
-
       dplyr::summarize(bkg_OCR_wave = mean(OCR_wave),
                        bkg_ECAR_wave = mean(ECAR_wave),
                        .by = measurement)
@@ -367,7 +367,6 @@ verify_xf_rate <- function(xf_rate, xf_flagged){
     xf_rate <- dplyr::left_join(xf_rate,
                                 background,
                                 by = c("measurement"))
-
 
     xf_rate$OCR_wave_bc <- xf_rate$OCR_wave - xf_rate$bkg_OCR_wave
     xf_rate$ECAR_wave_bc <- xf_rate$ECAR_wave - xf_rate$bkg_ECAR_wave
