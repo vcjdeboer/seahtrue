@@ -14,8 +14,18 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(seahtrue)
+
+### load libraries
+
+```{r load packages}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(seahtrue)
+})
+
+# in your own workflow you don't have to supresses messages 
+# off course, this is used here only for cleaner vignettes
+
 ```
 
 ### Inspect the revived data
