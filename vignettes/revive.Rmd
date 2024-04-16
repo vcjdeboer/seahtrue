@@ -1,0 +1,76 @@
+---
+title: "revive"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{revive}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(seahtrue)
+```
+
+### load libraries
+
+The `tidyverse` pipe symbol and `seahtrue` package are used here, so we have to load them first.
+
+```{r load packages}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(seahtrue)
+})
+
+# in your own workflow you don't have to supresses messages 
+# off course, this is used here only for cleaner vignettes
+
+
+```
+
+### Identify the path to your file
+
+The `revive_xfplate()` takes the .xlsx output file from a 96 well XF experiment as its input.
+
+```{r read_plate_data, eval=FALSE, include=TRUE}
+#not run
+my_file_path <- 
+  "/Users/myname/data/my_xf_plate.xlsx" # mac style path
+
+my_plate <- my_file_path %>% revive_xfplate()
+
+```
+
+Handling files in your preferred IDE, such as RStudio, can be a challenge. Working within your own Rstudio project is often advisable, where you can put your xlsx files into a `data` folder. If this is your workflow you can use relative paths, for example like this:
+
+```{r file handling, eval=FALSE, include=TRUE}
+#not run
+my_file_path <- here::here("data", "my_xf_plate. xlsx")
+
+my_plate <- my_file_path %>% revive_xfplate()
+
+```
+
+Otherwise, when you are on a Mac you might want to copy the direct path from the finder path bar, by right clicking on the file and `copy my_xf_plate.xlsx as pathname`. You need to have the finder path bar set to `Show` for this. 
+
+#### Run the revive on an input .xlsx file
+
+In this vignette we use an xlsx file that we included with the seahtrue package:
+
+```{r example revive}
+my_file_path <- 
+  system.file("extdata", 
+              "20191219_SciRep_PBMCs_donor_A.xlsx", 
+              package = "seahtrue")
+
+revive_output_donor_A <- my_file_path %>% revive_xfplate()
+
+```
+
+The .xlsx file was read, and processed, now we can explore the output.
