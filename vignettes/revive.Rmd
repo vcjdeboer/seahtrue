@@ -1,5 +1,5 @@
 ---
-title: "revive"
+title: "Revive"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{revive}
@@ -14,8 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-### load libraries
+### Load libraries
 
 The `tidyverse` pipe symbol and `seahtrue` package are used here, so we have to load them first.
 

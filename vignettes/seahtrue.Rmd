@@ -40,7 +40,8 @@ Gerencser, A. A., A. Neilson, S. W. Choi, U. Edman, N. Yadava, R. J. Oh, D. A. F
 
 Janssen, J. J. E., B. Lagerwaard, A. Bunschoten, H. F. J. Savelkoul, R. J. J. van Neerven, J. Keijer, and V. C. J. de Boer. “Novel Standardized Method for Extracellular Flux Analysis of Oxidative and Glycolytic Metabolism in Peripheral Blood Mononuclear Cells.” Sci Rep 11, no. 1 (January 18, 2021): 1662. https://doi.org/10.1038/s41598-021-81217-4.
 
-Zhang, Xiang, Taolin Yuan, Jaap Keijer, and Vincent C.J. De Boer. “OCRbayes: A Bayesian Hierarchical Modeling Framework for Seahorse Extracellular Flux Oxygen Consumption Rate Data Analysis.” PLoS ONE 16, no. 7 July 2021 (2021). https://edepot.wur.nl/551564.
+Zhang, Xiang, Taolin Yuan, Jaap Keijer, and Vincent C. J. de Boer. “OCRbayes: A Bayesian Hierarchical Modeling Framework for Seahorse Extracellular Flux Oxygen Consumption Rate Data Analysis.” PLOS ONE 16, no. 7 (July 15, 2021): e0253926. https://doi.org/10.1371/journal.pone.0253926.
+
 
 
 
