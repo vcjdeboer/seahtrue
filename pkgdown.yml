@@ -2,11 +2,10 @@ pandoc: 3.1.11
 pkgdown: 2.0.8
 pkgdown_sha: ~
 articles:
-  Introduction_to_seahtrue: Introduction_to_seahtrue.html
+  inspect: inspect.html
+  revive: revive.html
   seahtrue: seahtrue.html
-  validating_experimental_data: validating_experimental_data.html
-  validating_input_data: validating_input_data.html
-last_built: 2024-04-16T08:20Z
+last_built: 2024-04-16T10:27Z
 urls:
   reference: https://vcjdeboer.github.io/seahtrue/reference
   article: https://vcjdeboer.github.io/seahtrue/articles
