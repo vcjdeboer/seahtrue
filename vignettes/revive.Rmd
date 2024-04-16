@@ -55,7 +55,7 @@ my_plate <- my_file_path %>% revive_xfplate()
 
 Otherwise, when you are on a Mac you might want to copy the direct path from the finder path bar, by right clicking on the file and `copy my_xf_plate.xlsx as pathname`. You need to have the finder path bar set to `Show` for this. 
 
-#### Run the revive on an input .xlsx file
+### Run the revive on an input .xlsx file
 
 In this vignette we use an xlsx file that we included with the seahtrue package:
 
