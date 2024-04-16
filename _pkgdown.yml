@@ -1,11 +1,16 @@
 url: https://vcjdeboer.github.io/seahtrue/
 template:
   bootstrap: 5
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
 articles:
 - title: Articles
   navbar: ~
   contents:
   - seahtrue
-  - inspect
   - revive
+  - inspect
+
 
