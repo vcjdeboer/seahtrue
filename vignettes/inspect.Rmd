@@ -1,5 +1,5 @@
 ---
-title: "inspect"
+title: "Inspect"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{inspect}
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 
-### load libraries
+### Load libraries
 
 ```{r load packages}
 suppressPackageStartupMessages({
