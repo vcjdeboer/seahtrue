@@ -12,8 +12,8 @@ navbar:
       aria-label: Twitter
     github:
       icon: fa-github
-      href: http://githubt.com/vcjdeboer/seahtrue
-       aria-label: Github
+      href: http://github.com/vcjdeboer/seahtrue
+      aria-label: Github
 articles:
 - title: Articles
   navbar: ~
@@ -21,6 +21,7 @@ articles:
   - seahtrue
   - revive
   - inspect
+  - plot
   
 
 

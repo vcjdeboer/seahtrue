@@ -8,6 +8,12 @@
 <meta name="description" content="Overview of the Seahtrue package.
 ">
 <title>Introduction to Seahtrue • seahtrue</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -15,6 +21,7 @@
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to Seahtrue">
 <meta property="og:description" content="Overview of the Seahtrue package.
 ">
+<meta property="og:image" content="https://vcjdeboer.github.io/seahtrue/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -28,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">seahtrue</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,12 +50,36 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/revive.html">Revive</a>
+    <a class="dropdown-item" href="../articles/inspect.html">Inspect</a>
+    <a class="dropdown-item" href="../articles/plot.html">Plot</a>
+  </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://github.com/vcjdeboer/seahtrue" aria-label="Github">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://twitter.com/vcjdeboer" aria-label="Twitter">
+    <span class="fa fa-twitter"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -60,7 +91,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Introduction to Seahtrue</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Introduction to Seahtrue</h1>
             
       
       
@@ -69,263 +100,57 @@
 
     
     
-<hr>
 <div class="section level3">
-<h3 id="seahtrue-overview">Seahtrue Overview<a class="anchor" aria-label="anchor" href="#seahtrue-overview"></a>
+<h3 id="seahtrue-overview">Seahtrue overview<a class="anchor" aria-label="anchor" href="#seahtrue-overview"></a>
 </h3>
-<p>The Seahtrue package introduces notable refinements in the realm of
-OCR and ECAR calculations, enhancing our ability to analyze cellular
-respiration and metabolic processes. These improvements are
-characterized by:</p>
-</div>
-<div class="section level3">
-<h3 id="advantages-disadvantages">Advantages / Disadvantages<a class="anchor" aria-label="anchor" href="#advantages-disadvantages"></a>
-</h3>
-<p>The software from Agilent called Wave is used while conducting
-experiments with these systems. Seahorse data can be obtained/visualized
-using Wave.</p>
-<p>However, Wave’s current software has some drawbacks when measuring
-OCR. These drawbacks may affect results, and may lead to aberrant OCR.
-An abnormal OCR could, for example, lead to incorrect research
-conclusions regarding energy management in cells. Hence, a script is
-written to overcome these drawbacks.</p>
-<p>Advantages Seahtrue over Agilent’s Wave:</p>
+<p>The seahtrue package offers a set of functions to be able to perform
+reproducible data analysis of extracellular flux analysis. The main
+function <code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code> reads, preprocess and validates
+the input data and outputs experimental details and outcome variables in
+an organized (tidy) way. The output of the <code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code>
+is a nested tibble.</p>
 </div>
 <div class="section level3">
-<h3 id="seahorse-backgound-information">Seahorse Backgound information<a class="anchor" aria-label="anchor" href="#seahorse-backgound-information"></a>
+<h3 id="extracellular-flux-analysis-scientific-primer">Extracellular flux analysis scientific primer<a class="anchor" aria-label="anchor" href="#extracellular-flux-analysis-scientific-primer"></a>
 </h3>
-<p>With the Seahorse XF systems of Agilent, scientists are able to get
-information about the biological energy transduction and mitochondrial
-functions in cells.</p>
-<p>Biological energy transduction is the base of all physiological
-phenomena in cells. The metabolic processes associated with this energy
-transduction are related to diseases such as diabetes, cancer, rare
-genetic disease and aberrant cell death (1).</p>
-<p>Agilent’s systems are capable of measuring both oxygen concentration
-and pH within cell culture medium. The O2/pH is measured by fluorescent
-probes (sensitive to O2/pH). Probes are placed just above samples
-(cultured cells). This will result in a small chamber of a few
-microliters. This small volume makes it possible to measure changes in
-O2 concentration and pH.</p>
-<p>Cells use oxigen to make ATP in mitochondria. This results in a
-decreased oxygen concentration in the medium due to mitochondrial
-activity. Oxygen consumption is expressed as oxygen consumption rate
-(OCR).</p>
-<p>Cells produce lactate when burning glucose at glycolysis. Lactate is
-(for the most part) responsible for acidification of the medium. The
-change in pH is called extracellular acidification rate (ECAR).</p>
-<p>Mitochondrial cell respiration (oxidative phosphorylation) and
-glycolysis (non-mitochondrial) can be indirectly quantified by using the
-OCR and ECAR. Both processes contribute to the production of ATP in
-mammals (2). ATP is an energy carrier that provides cells with energy.
-So with this method scientists will get an insight for the energy
-management of cells.</p>
+<p>With instruments such as the Seahorse XF analyzer from Agilent, but
+also the O2K from Oroboros, other oyxgraphs (from Hansatech instruments
+for example) and the ReSipher from Lucid Scientific, scientists are able
+to analyze oxygen consumption of living biological samples.</p>
+<p>Oxygen consumption of cells or small model organism can provide
+insights into the function of the mitochondria, since mitochondria are
+most of the time the main O2 consumers of cells. Apart form oxygen
+consumption the Seahorse XF analyzer is able to analyze in parallel the
+extracellular acidification of the culture medium in which the sample is
+emerged. This can be a proxy for glycolytic activity of samples.</p>
+<p>Seahorse extracellular flux instruments performs analysis of O2 and
+pH in either 96 wells, 24 wells or 8 wells, and typically O2 and pH are
+monitored over a period of around 1 hour, in discrete measurements of
+typically 3 minutes each. Furthermore, perturbations of cellular
+functional states can be induced by adding compounds while performing
+the assay. The most common perturbations that are performed are
+injections of oligomycin, fccp and anitmycin/rotenone, known as a
+mitostress test.</p>
 </div>
 <div class="section level3">
-<h3 id="seahtrue-summary">Seahtrue Summary<a class="anchor" aria-label="anchor" href="#seahtrue-summary"></a>
+<h3 id="resources">Resources<a class="anchor" aria-label="anchor" href="#resources"></a>
 </h3>
-</div>
-<div class="section level3">
-<h3 id="script">Script<a class="anchor" aria-label="anchor" href="#script"></a>
-</h3>
-<p>The Seahtrue script consists of several parts:</p>
-<ol style="list-style-type: decimal">
-<li><p>Seahorse Excel files are loaded through Seahtrue. The Agilent
-Wave software automatically generates test results (.asyr) data. These
-data are converted to an Excel file (.xls). Wave includes a function to
-realize this conversion.</p></li>
-<li><p>Useful information will be extracted from the Excel file.
-Information is considered useful if it’s relevant to the end user. For
-example, it’s useful to get some metadata of the project/experiment.
-Also data regarding our Seahtrue calculations are important. For
-example, oxigen and pH related calculations require ‘O2 mmhg’ an ‘pH’
-data from the ‘Raw’ sheet of the Seahorse Excel file. With these data we
-can make calculations regarding OCR and ECAR.</p></li>
-<li><p>Calculations will be applied, including calulations to measure
-Oxigen Consumption rate (OCR) and Extracellular acidification rate
-(ECAR). This will be performed for both Wave and our alternative
-Seahtrue method. Calculations are performed on data from both background
-wells and cell-containing wells.</p></li>
-<li><p>Relevant information will be visualized with plots. (See heading
-‘Figure’ under ‘Application’)</p></li>
-</ol>
-<p>Note 1: This vignette will show a chronological procedure of our
-seahtrue script. With the interactive seahtrue Shiny app, we don’t have
-to pursue this chronological order. For example, the user may decide
-which plot will be visualised and it’s possible to skip unwanted plots.
-This is possible due to ‘reactivity’. The Shiny application will make
-Seahtrue userfriendly.</p>
-<p>Note 2: Seahtrue allows us to perform calculations (OCR, ECAR and
-fluorescence (AU)) on Seahorse data. We expect Seahtrue to perform
-better in certain results. This still requires prove.</p>
-</div>
-<div class="section level3">
-<h3 id="run-application">Run application<a class="anchor" aria-label="anchor" href="#run-application"></a>
-</h3>
-<div class="section level4">
-<h4 id="get-all-essential-seahorse-information">Get all essential Seahorse information<a class="anchor" aria-label="anchor" href="#get-all-essential-seahorse-information"></a>
-</h4>
-<p>Read all the nessecary Seahorse information from the Excel file,</p>
-<p>including data from the ‘Assay Configuration’ and ‘Raw’ sheet.</p>
-<p>A tibble with these data will be returned.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plate_df &lt;- read_plate_data(filePathSeahorse, injscheme)</span></span>
-<span><span class="co"># print(plate_df)</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="preprocess-seahorse-information">Preprocess Seahorse information<a class="anchor" aria-label="anchor" href="#preprocess-seahorse-information"></a>
-</h4>
-<p>We will preprocess our returned plate_df (containing all the nessary
-Seahorse data we need).</p>
-<ul>
-<li>The preprocess_plate_data function preprocesses the data by:</li>
-<li>changing columns names</li>
-<li>adding new time columns</li>
-<li>adding injection info columns</li>
-<li>add plate_id column</li>
-<li>calculating background data</li>
-<li>calculating raw pH emission data</li>
-</ul>
-<p>A nested tibble will be returned, containing all the information we
-need to perform our Seahtrue calculations.</p>
-<p>Note: The nested tibble includes raw data from the ‘Raw’ Seahorse xls
-datasheet)</p>
-<p>Information received from the ‘Raw’ Seahorse datasheet.</p>
-<table class="table">
-<thead><tr class="header">
-<th>Constant</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>Measurement</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Tick</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Well</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Group</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>TimeStamp</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Well Temperature</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Env. Temperature</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>O2 is Valid</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>O2 (MmHg)</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>O2 Light Emision</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>O2 Dark Emission</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>O2 Ref Light</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>O2 Corrected Em</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>pH is Valid, pH</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>pH Light</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>pH Dark</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>pH Ref Light</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>pH Ref Dar</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>pH Corrected Em.</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p>Information received from the ‘Assay information’ Seahorse
-datasheet.</p>
-<table class="table">
-<thead><tr class="header">
-<th>Constant</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>F0</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>V_C</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Tau_AC</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Tau_W</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Tau_C</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Tau_P</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>KSV</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>gain1</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>gain2</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>pH_0</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>Divakaruni, Ajit S., and Martin Jastroch. “A Practical Guide for the
+Analysis, Standardization and Interpretation of Oxygen Consumption
+Measurements.” Nature Metabolism 4, no. 8 (August 15, 2022): 978–94. <a href="https://doi.org/10.1038/s42255-022-00619-4" class="external-link uri">https://doi.org/10.1038/s42255-022-00619-4</a>.</p>
+<p>Gerencser, A. A., A. Neilson, S. W. Choi, U. Edman, N. Yadava, R. J.
+Oh, D. A. Ferrick, D. G. Nicholls, and M. D. Brand. “Quantitative
+Microplate-Based Respirometry with Correction for Oxygen Diffusion.”
+Anal Chem 81, no. 16 (August 15, 2009): 6868–78. <a href="https://doi.org/10.1021/ac900881z" class="external-link uri">https://doi.org/10.1021/ac900881z</a>.</p>
+<p>Janssen, J. J. E., B. Lagerwaard, A. Bunschoten, H. F. J. Savelkoul,
+R. J. J. van Neerven, J. Keijer, and V. C. J. de Boer. “Novel
+Standardized Method for Extracellular Flux Analysis of Oxidative and
+Glycolytic Metabolism in Peripheral Blood Mononuclear Cells.” Sci Rep
+11, no. 1 (January 18, 2021): 1662. <a href="https://doi.org/10.1038/s41598-021-81217-4" class="external-link uri">https://doi.org/10.1038/s41598-021-81217-4</a>.</p>
+<p>Zhang, Xiang, Taolin Yuan, Jaap Keijer, and Vincent C. J. de Boer.
+“OCRbayes: A Bayesian Hierarchical Modeling Framework for Seahorse
+Extracellular Flux Oxygen Consumption Rate Data Analysis.” PLOS ONE 16,
+no. 7 (July 15, 2021): e0253926. <a href="https://doi.org/10.1371/journal.pone.0253926" class="external-link uri">https://doi.org/10.1371/journal.pone.0253926</a>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -335,7 +160,7 @@ datasheet.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by The package maintainer.</p>
+<p>Developed by Vincent de Boer, Gerwin Smits, Xiang Zhang.</p>
 </div>
 
 <div class="pkgdown-footer-right">
