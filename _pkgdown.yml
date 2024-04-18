@@ -22,6 +22,17 @@ articles:
   - revive
   - inspect
   - plot
+reference:
+- title: Revive and glue
+- contents:
+  - revive_xfplate
+  - glue_xfplates
+- title: Plot 
+- contents:
+  - starts_with("sketch_")
+- title: Data
+- contents:
+  - revive_output_donor_A
   
 
 
