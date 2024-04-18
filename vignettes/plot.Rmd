@@ -1,0 +1,58 @@
+---
+title: "Plot"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r load packages, include=FALSE}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(seahtrue)
+  library(ggplot2)
+})
+
+# in your own workflow you don't have to supresses messages 
+# off course, this is used here only for cleaner vignettes
+
+```
+
+
+
+```{r include=FALSE}
+my_file_path <- 
+  system.file("extdata", 
+              "20191219_SciRep_PBMCs_donor_A.xlsx", 
+              package = "seahtrue")
+
+revive_output_donor_A <- my_file_path %>% revive_xfplate()
+
+```
+
+Generating visual output of the revived data can be done in multiple ways. We will provide a number of examples here.
+
+#### Plate maps
+
+Typically, scientists use multiple conditions in their 96 well plate set-up. These conditions are labeled as groups. Each group typically is associated with multiple wells. We can plot a plate-map using the `sketch_plate()` function.
+
+```{r}
+revive_output_donor_A %>%
+  purrr::pluck("raw_data", 1)  %>%
+  sketch_plate(reorder_legend = TRUE)
+
+```
+
+
+
+

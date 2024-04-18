@@ -2,7 +2,7 @@
 title: "Inspect"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{inspect}
+  %\VignetteIndexEntry{Inspect}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,9 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 
-### Load libraries
-
-```{r load packages}
+```{r load packages, include=FALSE}
 suppressPackageStartupMessages({
   library(dplyr)
   library(seahtrue)
@@ -30,7 +28,19 @@ suppressPackageStartupMessages({
 
 ### Inspect the revived data
 
-```{r explore output 1}
+```{r include=FALSE}
+my_file_path <- 
+  system.file("extdata", 
+              "20191219_SciRep_PBMCs_donor_A.xlsx", 
+              package = "seahtrue")
+
+revive_output_donor_A <- my_file_path %>% revive_xfplate()
+
+```
+
+Take a glimpse at the generated data from the `revive_xfplate()` function:
+
+```{r}
 revive_output_donor_A %>%  
   dplyr::glimpse()
 

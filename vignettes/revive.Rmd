@@ -2,7 +2,7 @@
 title: "Revive"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{revive}
+  %\VignetteIndexEntry{Revive}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
