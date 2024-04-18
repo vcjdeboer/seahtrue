@@ -35,6 +35,7 @@ preprocess_xfplate <- function(xf){
 
   xf_rate_pr <- preprocess_xf_rate(xf$rate,
                                    xf$norm,
+                                   xf$inj,
                                    xf$flagged)
 
   xf_plate_pr <- xf_raw_pr %>%
@@ -166,10 +167,10 @@ preprocess_xf_raw <- function(xf_raw,
 #'
 #' @note The final preprocessed tibble contains data from both the seahorse "Rate" sheet and "Assay Configuration" sheet.
 #'
-#' @param xf_rate List that contains [1] original rate data tibble and [2] background correction info (if correction was performed).
-#' @param xf_norm List consisting [1] well names and the corresponding normalization values and
-#' [2] check if normalization data is available (TRUE/FALSE).
-#' @param xf_flagged Vector that contains wells that were "unselected" (flagged).
+#' @param xf_rate Tibble that contains original rate data tibble
+#' @param xf_norm Tibble consisting of well names and the corresponding normalization values
+#' @param xf_inj Tibble of injection info
+#' @param xf_flagged Tibble that contains wells that were "unselected" (flagged).
 #'
 #' @return Preprocessed Rate tibble
 #'
@@ -181,10 +182,14 @@ preprocess_xf_raw <- function(xf_raw,
 
 preprocess_xf_rate <- function(xf_rate,
                                xf_norm,
+                               xf_inj,
                                xf_flagged){
   #add norm_info to rate data
   OCR_from_excel <- xf_rate %>% 
     dplyr::left_join(xf_norm, by = c("well"))
+  
+  OCR_from_excel <- OCR_from_excel %>% 
+    dplyr::left_join(xf_inj, by = c("measurement"))
 
   OCR_from_excel$flagged_well <- FALSE
   OCR_from_excel$flagged_well[OCR_from_excel$well %in% xf_flagged] <- TRUE
