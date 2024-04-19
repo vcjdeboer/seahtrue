@@ -405,8 +405,8 @@ sketch_assimilate_raw <- function(my_df, param = "O2_mmHg"){
 #' mito stress test.
 #'
 #' @return a ggplot object
-#' @export
-#'
+#' @export 
+#' @importFrom ggplot2 scale_color_brewer
 #' @examples
 #' suppressMessages(
 #' c(system.file("extdata",
