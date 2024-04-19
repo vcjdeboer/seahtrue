@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">seahtrue</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/revive.html">Revive</a>
     <a class="dropdown-item" href="../articles/inspect.html">Inspect</a>
+    <a class="dropdown-item" href="../articles/plot.html">Plot</a>
   </div>
 </li>
 <li class="nav-item">
@@ -63,7 +64,20 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://github.com/vcjdeboer/seahtrue" aria-label="Github">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://twitter.com/vcjdeboer" aria-label="Twitter">
+    <span class="fa fa-twitter"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -123,9 +137,10 @@ this:</p>
 path from the finder path bar, by right clicking on the file and
 <code>copy my_xf_plate.xlsx as pathname</code>. You need to have the
 finder path bar set to <code>Show</code> for this.</p>
-<div class="section level4">
-<h4 id="run-the-revive-on-an-input--xlsx-file">Run the revive on an input .xlsx file<a class="anchor" aria-label="anchor" href="#run-the-revive-on-an-input--xlsx-file"></a>
-</h4>
+</div>
+<div class="section level3">
+<h3 id="run-the-revive-on-an-input--xlsx-file">Run the revive on an input .xlsx file<a class="anchor" aria-label="anchor" href="#run-the-revive-on-an-input--xlsx-file"></a>
+</h3>
 <p>In this vignette we use an xlsx file that we included with the
 seahtrue package:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -145,7 +160,6 @@ seahtrue package:</p>
 <p>The .xlsx file was read, and processed, now we can explore the
 output.</p>
 </div>
-</div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>
@@ -154,7 +168,7 @@ output.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Vincent de Boer, Gerwin Smits.</p>
+<p>Developed by Vincent de Boer, Gerwin Smits, Xiang Zhang.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">seahtrue</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/revive.html">Revive</a>
     <a class="dropdown-item" href="../articles/inspect.html">Inspect</a>
+    <a class="dropdown-item" href="../articles/plot.html">Plot</a>
   </div>
 </li>
 <li class="nav-item">
@@ -63,7 +64,20 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://github.com/vcjdeboer/seahtrue" aria-label="Github">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+<li class="nav-item">
+  <a class="external-link nav-link" href="http://twitter.com/vcjdeboer" aria-label="Twitter">
+    <span class="fa fa-twitter"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -85,33 +99,23 @@
     
     
 <div class="section level3">
-<h3 id="load-libraries">Load libraries<a class="anchor" aria-label="anchor" href="#load-libraries"></a>
-</h3>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vcjdeboer.github.io/seahtrue/">seahtrue</a></span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># in your own workflow you don't have to supresses messages </span></span>
-<span><span class="co"># off course, this is used here only for cleaner vignettes</span></span></code></pre></div>
-</div>
-<div class="section level3">
 <h3 id="inspect-the-revived-data">Inspect the revived data<a class="anchor" aria-label="anchor" href="#inspect-the-revived-data"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
+<p>Take a glimpse at the generated data from the
+<code><a href="../reference/revive_xfplate.html">revive_xfplate()</a></code> function:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 1</span></span>
 <span><span class="co">#&gt; Columns: 9</span></span>
 <span><span class="co">#&gt; $ plate_id          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "V0174416419V"</span></span>
 <span><span class="co">#&gt; $ filepath_seahorse <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[1 x 3]&gt;]</span></span>
 <span><span class="co">#&gt; $ date_run          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "19-12-2019 17:25"</span></span>
-<span><span class="co">#&gt; $ date_processed    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span> 2024-04-15 19:39:40</span></span>
+<span><span class="co">#&gt; $ date_processed    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span> 2024-04-19 09:02:12</span></span>
 <span><span class="co">#&gt; $ assay_info        <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[1 x 24]&gt;]</span></span>
 <span><span class="co">#&gt; $ injection_info    <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[12 x 3]&gt;]</span></span>
 <span><span class="co">#&gt; $ raw_data          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[13824 x 21]&gt;]</span></span>
-<span><span class="co">#&gt; $ rate_data         <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[1140 x 10]&gt;]</span></span>
+<span><span class="co">#&gt; $ rate_data         <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [&lt;tbl_df[1140 x 12]&gt;]</span></span>
 <span><span class="co">#&gt; $ validation_output <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> [TRUE, TRUE, [&lt;tbl_df[12 x 10]&gt;], [&lt;tbl_df[13824 x 4…</span></span></code></pre></div>
 <p>Our data starts with 4 columns of identifiers. <code>plate_id</code>,
 <code>filepath_seahorse</code>, <code>date_run</code> and
@@ -138,10 +142,10 @@ values, together with the PER (proton efflux rate). The PER is
 calculated from ECAR when the buffer capacity is known and set in the
 experiment. In our <code>rate_data</code> we only have the OCR and ECAR
 data, since PER can be easily calculated.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"rate_data"</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,140 × 10</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,140 × 12</span></span></span>
 <span><span class="co">#&gt;    measurement well  group time_wave OCR_wave OCR_wave_bc ECAR_wave ECAR_wave_bc</span></span>
 <span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>           1 A01   Back…      1.31        0        0            0         0   </span></span>
@@ -155,7 +159,8 @@ data, since PER can be easily calculated.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>           1 A09   250.…      1.31        0       58.8          0         7.39</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>           1 A10   250.…      1.31        0       59.4          0         6.88</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,130 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: cell_n &lt;dbl&gt;, flagged_well &lt;lgl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: cell_n &lt;dbl&gt;, interval &lt;dbl&gt;, injection &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   flagged_well &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>The <code>rate_data</code> has
 <code>well</code>,<code>measurement</code>, <code>group</code>
 identifiers for each row followed by the <code>time_wave</code> column
@@ -186,8 +191,8 @@ an <code>interval</code> and <code>injection</code> id. Also, the
 background corrected raw data values for pH, O2 and its emissions are
 given. Again, just like in the <code>rate_data</code> tibble, the
 <code>cell_n</code> and <code>flagged_well</code> status is given.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"raw_data"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 13,824 × 21</span></span></span>
 <span><span class="co">#&gt;    well  measurement  tick timescale minutes group interval injection O2_em_corr</span></span>
@@ -214,10 +219,10 @@ given. Again, just like in the <code>rate_data</code> tibble, the
 <p>The <code>assay_info</code> has information from user or software
 provided meta data that is associated with the experiment and plate. For
 example, the barcode of the cartridge that was used:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">cartridge_barcode</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">pull</span><span class="op">(</span><span class="va">cartridge_barcode</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "W0013917519B**+405-6+101-2300F+240-2***000A+219-4**+450-1125&amp;"</span></span></code></pre></div>
 <p>The XF analyzer reads for each cartridge a barcode that is then
 associated with the assay. There is some information in the barcode that
@@ -228,18 +233,18 @@ diffusion. Anal Chem 81:6868, for details) is derived from the
 Stern-Volmer constant <code>KSV</code>. Where the emission at ambient
 oxygen is typically set at 12500 AU and ambient oxygen levels in wells
 in culture medium is set to 151.6900241 mmHg.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># KSV in barcode</span></span>
-<span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">cartridge_barcode</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">pull</span><span class="op">(</span><span class="va">cartridge_barcode</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_sub.html" class="external-link">str_sub</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span>, <span class="op">-</span><span class="fl">13</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "+219-4"</span></span>
 <span>  </span>
 <span><span class="co"># KSV in assay info sheet</span></span>
-<span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">KSV</span><span class="op">)</span> </span>
+<span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">pull</span><span class="op">(</span><span class="va">KSV</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; [1] 0.0219</span></span>
 <span></span>
 <span><span class="co"># F0 can be calculated using the stern-volmer equation</span></span>
@@ -252,9 +257,9 @@ in culture medium is set to 151.6900241 mmHg.</p>
 <span><span class="co"># F0 = (1+ KSV*151.69)*12500</span></span>
 <span></span>
 <span><span class="co"># F0 from assay info sheet</span></span>
-<span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">F0</span><span class="op">)</span> </span>
+<span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">pull</span><span class="op">(</span><span class="va">F0</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; [1] 54025.14</span></span></code></pre></div>
 <p>Apart from user and software generated meta info, the functions in
 the seahtrue package also put some relevant info into this tibble. Such
@@ -263,19 +268,19 @@ as the time to start the actual measurements
 user took to insert the cell plate and start running the measurements.
 The timer starts at t = 0 minutes when the cartridge is calibrated by
 the user.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">minutes_to_start_measurement_one</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"assay_info"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">pull</span><span class="op">(</span><span class="va">minutes_to_start_measurement_one</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 37.23333</span></span></code></pre></div>
 <p>Apart from the <code>assay_info</code> there can be some more meta
 info associated with the data tibbles in the form of
 <code>attributes</code>. These can also be viewed as shown in the
 following examples:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"rate_data"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; tibble [1,140 × 10] (S3: tbl_df/tbl/data.frame)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"rate_data"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tibble [1,140 × 12] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;  $ measurement : num [1:1140] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
 <span><span class="co">#&gt;  $ well        : chr [1:1140] "A01" "A02" "A03" "A04" ...</span></span>
 <span><span class="co">#&gt;  $ group       : chr [1:1140] "Background" "50.000" "100.000" "100.000" ...</span></span>
@@ -285,12 +290,14 @@ following examples:</p>
 <span><span class="co">#&gt;  $ ECAR_wave   : num [1:1140] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
 <span><span class="co">#&gt;  $ ECAR_wave_bc: num [1:1140] 0 2.9 5.87 4.4 12.36 ...</span></span>
 <span><span class="co">#&gt;  $ cell_n      : num [1:1140] 0 32472 114732 83567 153510 ...</span></span>
+<span><span class="co">#&gt;  $ interval    : num [1:1140] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span><span class="co">#&gt;  $ injection   : chr [1:1140] "Baseline" "Baseline" "Baseline" "Baseline" ...</span></span>
 <span><span class="co">#&gt;  $ flagged_well: logi [1:1140] FALSE FALSE FALSE FALSE FALSE FALSE ...</span></span>
 <span><span class="co">#&gt;  - attr(*, "was_background_corrected")= logi TRUE</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span>  <span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"rate_data"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"rate_data"</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"was_background_corrected"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -301,8 +308,8 @@ following examples:</p>
 nutrients the <code>injection_info</code> is important for
 interpretation of the experiment. The injection info can be plucked from
 the data tibble.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span>  <span class="va">revive_output_donor_A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="va">revive_output_donor_A</span> <span class="op">%&gt;%</span>  </span>
 <span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="st">"injection_info"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">#&gt;    measurement interval injection       </span></span>
@@ -335,7 +342,7 @@ separate vignette.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Vincent de Boer, Gerwin Smits.</p>
+<p>Developed by Vincent de Boer, Gerwin Smits, Xiang Zhang.</p>
 </div>
 
 <div class="pkgdown-footer-right">
