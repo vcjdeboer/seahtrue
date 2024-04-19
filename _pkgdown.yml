@@ -24,14 +24,19 @@ articles:
   - plot
 reference:
 - title: Revive and glue
-- contents:
-  - starts_with("revive_")
-  - starts_with("glue_")
+  desc: Read single or multiple plates.
+  contents:
+  - revive_xfplate
+  - glue_xfplates
+  
 - title: Plot 
-- contents:
+  desc: Generate plots.
+  contents:
   - starts_with("sketch_")
+  
 - title: Data
-- contents:
+  desc: Example data output.
+  contents:
   - revive_output_donor_A
   
 
