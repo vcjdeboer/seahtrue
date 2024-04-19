@@ -25,8 +25,8 @@ articles:
 reference:
 - title: Revive and glue
 - contents:
-  - revive_xfplate
-  - glue_xfplates
+  - starts_with("revive_")
+  - starts_with("glue_")
 - title: Plot 
 - contents:
   - starts_with("sketch_")
