@@ -23,11 +23,7 @@ Useful links:
 Authors:
 \itemize{
   \item Gerwin Smits
-}
-
-Other contributors:
-\itemize{
-  \item Xiang Zhang [contributor]
+  \item Xiang Zhang
 }
 
 }

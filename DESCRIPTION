@@ -1,10 +1,13 @@
 Package: seahtrue
 Type: Package
 Title: Seahtrue revives XF data for structured data analysis
-Version: 0.2.0
-Authors@R: c(person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = c("cre", "aut")),
-        person("Xiang", "Zhang", role = "ctb"), person("Gerwin", "Smits", role = "aut"))
-Maintainer: The package maintainer <gerwin.smits@wur.nl>
+Version: 0.3.0
+Authors@R: c(
+          person("Vincent", "de Boer", email = "vincent.deboer@wur.nl", role = c("cre", "aut")),
+          person("Gerwin", "Smits", role = c("aut")),
+          person("Xiang", "Zhang", role = c("aut"))
+          )
+Maintainer: vincent de boer <vincent.deboer@wur.nl>
 Description:
     Seahtrue organizes data from experiments performed on an XF analyzer into structured nested tibbles.
     This allows for detailed processing of raw data and advanced data visualization and statistics.
@@ -24,7 +27,7 @@ Encoding: UTF-8
 LazyData: true
 Suggests:
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
 Imports:
     dplyr (>= 1.1.2),
     readxl (>= 1.4.1),
@@ -40,7 +43,14 @@ Imports:
     rlang (>= 1.0.0),
     glue (>= 1.6.2),
     cli (>= 3.4.1),
-    janitor (>= 2.2.0)
+    janitor (>= 2.2.0),
+    ggplot2 (>= 3.5.0),
+    RColorBrewer (>= 1.1.3),
+    colorspace (>= 2.1.0),
+    forcats (>= 1.0.0),
+    ggridges (>= 0.5.6),
+    readr (>= 2.1.5),
+    scales (>= 1.3.0),
 RoxygenNote: 7.3.1
 Depends:
     R (>= 4.2.0) 

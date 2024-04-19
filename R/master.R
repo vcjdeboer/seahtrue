@@ -1,7 +1,7 @@
 #' Running the read, preprocess and validate
 #'
 #' @description
-#' This function takes the Seahorse Wave excel file and computes it through
+#' This function takes the Seahorse Wave .xlsx file and computes it through
 #' read, validate and preprocess
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
@@ -76,4 +76,72 @@ revive_xfplate <- function(filepath_seahorse) {
   
   return(preprocessed_xf_plate)
 }
+
+#' Glueing mulltiple plates from a folder
+#'
+#' @description
+#' This function takes a folder path and on the available .xlsx files
+#' the revive_xfplate() function is run and output in one nested tibble.
+#' 
+#' @param folderpath_seahorse the path to a folder where the .xlsx files
+#' are located or a vector of strings pointing to the path of each individual file
+#' @param arg_is_folder either TRUE or FALSE. When the input is a vector of path strings
+#' use FALSE, is it points to a folder use TRUE
+#' @return a nested tibble with all files organized in a row
+#' @export
+#'
+#' @examples
+#' c(system.file("extdata",
+#'   "20191219_SciRep_PBMCs_donor_A.xlsx", 
+#'   package = "seahtrue"),
+#'   system.file("extdata",
+#'   "20200110_SciRep_PBMCs_donor_B.xlsx", 
+#'   package = "seahtrue"),
+#'   system.file("extdata",
+#'   "20200110_SciRep_PBMCs_donor_C.xlsx", 
+#'   package = "seahtrue")) |> 
+#'   glue_xfplates(arg_is_folder = FALSE)
+glue_xfplates <- function(folderpath_seahorse, arg_is_folder){
+  
+  logger::log_info("Start glueing")
+  rlang::check_required(folderpath_seahorse)
+  
+  if(arg_is_folder){
+    if (!dir.exists(folderpath_seahorse)) {
+      cli::cli_abort(
+        glue::glue("The following folder 
+                    does not exist: 
+                   {basename(folderpath_seahorse)}"),
+        wrap = TRUE)}
+    
+    file_list <- list.files(folderpath_seahorse,
+                            pattern='*.xlsx', 
+                            full.names = TRUE) %>% 
+            stringr::str_subset(., 
+                          fixed('~$'), negate = TRUE)
+  } else {
+    file_list <- folderpath_seahorse
+  }
+  
+  if(is.null(file_list)){
+    cli::cli_abort(
+      glue::glue("There are zero .xlsx files in 
+                 {(folderpath_seahorse)}"),
+      wrap = TRUE)
+  }
+  
+  df <- file_list %>% 
+    purrr::map(~ .x %>% revive_xfplate()) %>% 
+    purrr::list_rbind()
+  
+  logger::log_info("Finished glueing")
+  
+  return(df)
+  
+}
+
+
+
+
+
 

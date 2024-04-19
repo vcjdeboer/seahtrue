@@ -16,12 +16,13 @@ A preprocessed seahorse dataset is returned as an output. This is a nested tibbl
  * date_run = Date and time when the plate was run \cr
  * date_processed = Date and time this output from revive_xfplate() was generated \cr
  * assay_info = Meta information from 'Assay Configuration' sheet and 'Calibration' sheet \cr
- * injection_info = Dataframe with information from the 'Operation log' sheet. \cr
+ * injection_info = Dataframe with information from the 'Operation log' sheet \cr
  * raw_data = Preprocessed raw dataframe from 'Raw' sheet \cr
- * rate_data = Preprocessed rate data from 'Rate' sheet.
+ * rate_data = Preprocessed rate data from 'Rate' sheet \cr
+ # validation_output = Output of the data checks. including rules
 }
 \description{
-This function takes the Seahorse Wave excel file and computes it through
+This function takes the Seahorse Wave .xlsx file and computes it through
 read, validate and preprocess
 }
 \examples{

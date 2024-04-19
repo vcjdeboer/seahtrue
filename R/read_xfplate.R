@@ -84,9 +84,9 @@ get_xf_raw <- function(filepath_seahorse){
                                  sheet = "Raw") %>%  
       dplyr::rename_all(., toupper) %>% 
       janitor::clean_names() %>% 
-      dplyr::rename_with(~str_replace(., 'o2', 'O2')) %>% 
-      dplyr::rename_with(~str_replace(., 'ph', 'pH')) %>% 
-      dplyr::rename_with(~str_replace(., 'hg', 'Hg')) %>% 
+      dplyr::rename_with(~stringr::str_replace(., 'o2', 'O2')) %>% 
+      dplyr::rename_with(~stringr::str_replace(., 'ph', 'pH')) %>% 
+      dplyr::rename_with(~stringr::str_replace(., 'hg', 'Hg')) %>% 
       dplyr::rename(pH_em_corr = pH_corrected_em,
                     O2_em_corr = O2_corrected_em)
       

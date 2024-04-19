@@ -1,3 +1,8 @@
+# seahtrue 0.3.0
+
+* Plotting functions are now written and included. These are the `sketch_plate()`, `sketch_rate()`, `sketch_assimilate_raw()` and `sketch_assimilate_rate()` functions
+* The vignettes and pkgdown gh pages are updated with examples on how to use the plotting functions
+
 # seahtrue 0.2.0
 
 * Master function name changed from `run_seahorse()` to `revive_xfplate()`

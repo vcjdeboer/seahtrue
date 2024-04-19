@@ -12,8 +12,8 @@ navbar:
       aria-label: Twitter
     github:
       icon: fa-github
-      href: http://githubt.com/vcjdeboer/seahtrue
-       aria-label: Github
+      href: http://github.com/vcjdeboer/seahtrue
+      aria-label: Github
 articles:
 - title: Articles
   navbar: ~
@@ -21,6 +21,18 @@ articles:
   - seahtrue
   - revive
   - inspect
+  - plot
+reference:
+- title: Revive and glue
+- contents:
+  - revive_xfplate
+  - glue_xfplates
+- title: Plot 
+- contents:
+  - starts_with("sketch_")
+- title: Data
+- contents:
+  - revive_output_donor_A
   
 
 
