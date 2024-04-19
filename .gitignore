@@ -6,7 +6,7 @@ seahtrue.Rcheck/
 seahtrue*.tar.gz
 seahtrue*.tgz
 untitled.R
-man/
-docs/
-docs
+#man/
+#docs/
+#docs
 inst/doc
