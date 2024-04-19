@@ -19,6 +19,7 @@
 #'  
 #' @export
 #' @import logger rlang cli glue readxl 
+#' @family {read}
 #' @examples
 #' revive_xfplate(
 #'   system.file("extdata", 
@@ -89,7 +90,7 @@ revive_xfplate <- function(filepath_seahorse) {
 #' use FALSE, is it points to a folder use TRUE
 #' @return a nested tibble with all files organized in a row
 #' @export
-#'
+#' @family {read}
 #' @examples
 #' c(system.file("extdata",
 #'   "20191219_SciRep_PBMCs_donor_A.xlsx", 

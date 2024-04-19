@@ -25,10 +25,7 @@ articles:
 reference:
 - title: Revive and glue
   desc: Read single or multiple plates.
-  contents:
-  - glue_xfplates
-  - revive_xfplate
-
+  contents: has_concept("read")
   
 - title: Plot 
   desc: Generate plots.
