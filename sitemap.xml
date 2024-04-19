@@ -34,6 +34,9 @@
     <loc>https://vcjdeboer.github.io/seahtrue/news/index.html</loc>
   </url>
   <url>
+    <loc>https://vcjdeboer.github.io/seahtrue/reference/glue_xfplates.html</loc>
+  </url>
+  <url>
     <loc>https://vcjdeboer.github.io/seahtrue/reference/index.html</loc>
   </url>
   <url>
@@ -44,5 +47,17 @@
   </url>
   <url>
     <loc>https://vcjdeboer.github.io/seahtrue/reference/seahtrue-package.html</loc>
+  </url>
+  <url>
+    <loc>https://vcjdeboer.github.io/seahtrue/reference/sketch_assimilate_rate.html</loc>
+  </url>
+  <url>
+    <loc>https://vcjdeboer.github.io/seahtrue/reference/sketch_assimilate_raw.html</loc>
+  </url>
+  <url>
+    <loc>https://vcjdeboer.github.io/seahtrue/reference/sketch_plate.html</loc>
+  </url>
+  <url>
+    <loc>https://vcjdeboer.github.io/seahtrue/reference/sketch_rate.html</loc>
   </url>
 </urlset>
