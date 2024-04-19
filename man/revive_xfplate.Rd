@@ -32,3 +32,8 @@ revive_xfplate(
   package = "seahtrue"))
 
 }
+\seealso{
+Other {read functions}: 
+\code{\link{glue_xfplates}()}
+}
+\concept{{read functions}}
