@@ -112,7 +112,9 @@ preprocess_xf_raw <- function(xf_raw,
   # convert time column
   xf_raw_pr <- convert_timestamp(xf_raw)
   
-
+  #add flag well columnn
+  xf_raw_pr$flagged_well <- FALSE
+  xf_raw_pr$flagged_well[xf_raw_pr$well %in% xf_flagged] <- TRUE
 
   # correct pH_em_corr
   xf_raw_pr$pH_em_corr_corr <- 
@@ -120,6 +122,7 @@ preprocess_xf_raw <- function(xf_raw,
                       xf_pHcal$pH_cal_em,
                       xf_assayinfo$pH_targetEmission[1])
 
+  
   # calculate backgrounds and join
   background <- calc_background(xf_raw_pr)
   xf_raw_pr <- xf_raw_pr %>%
@@ -140,9 +143,7 @@ preprocess_xf_raw <- function(xf_raw,
   xf_raw_pr <- xf_raw_pr %>% 
     dplyr::left_join(xf_buffer, by = c("well"))
 
-  #add flag well columnn
-  xf_raw_pr$flagged_well <- FALSE
-  xf_raw_pr$flagged_well[xf_raw_pr$well %in% xf_flagged] <- TRUE
+
 
   # select columns that are needed
   xf_raw_pr <- xf_raw_pr %>% 
@@ -272,6 +273,7 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission){
 calc_background <- function(xf_raw_pr){
 
   background <- xf_raw_pr %>%
+    filter(flagged_well == FALSE) %>% 
     dplyr::select(group, well, tick, O2_em_corr,
            pH_em_corr, O2_mmHg, pH, pH_em_corr_corr) %>%
     dplyr::filter(group == "Background") %>%
