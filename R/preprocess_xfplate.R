@@ -113,6 +113,7 @@ preprocess_xf_raw <- function(xf_raw,
   xf_raw_pr <- convert_timestamp(xf_raw)
   
   #add flag well columnn
+  xf_flagged <- xf_flagged %>%  pull(well)
   xf_raw_pr$flagged_well <- FALSE
   xf_raw_pr$flagged_well[xf_raw_pr$well %in% xf_flagged] <- TRUE
 
