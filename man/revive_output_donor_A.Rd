@@ -23,7 +23,7 @@ A data frame with 1 row and 7 variables.
 Janssen et al. 2021 Sci Rep 11:1162 <https://doi.org/10.1038/s41598-021-81217-4>
 }
 \usage{
-revive_output_donor_A
+data(revive_output_donor_A)
 }
 \description{
 A dataset containing output for the "20191219_SciRep_PBMCs_donor_A.xlsx" file. This experiment was

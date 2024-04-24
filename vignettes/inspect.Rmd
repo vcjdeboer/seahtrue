@@ -29,15 +29,26 @@ suppressPackageStartupMessages({
 ### Inspect the revived data
 
 ```{r include=FALSE}
-my_file_path <- 
-  system.file("extdata", 
-              "20191219_SciRep_PBMCs_donor_A.xlsx", 
-              package = "seahtrue")
-
-revive_output_donor_A <- my_file_path %>% revive_xfplate()
+# my_file_path <- 
+#   system.file("extdata", 
+#               "20191219_SciRep_PBMCs_donor_A.xlsx", 
+#               package = "seahtrue")
+# 
+# revive_output_donor_A <- my_file_path %>% revive_xfplate()
 
 ```
 
+
+```{r include=FALSE}
+data_file_path <- 
+  system.file("data", 
+              "revive_output_donor_A.rda", 
+              package = "seahtrue")
+
+load(data_file_path)
+
+
+```
 Take a glimpse at the generated data from the `revive_xfplate()` function:
 
 ```{r}

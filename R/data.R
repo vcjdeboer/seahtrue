@@ -21,6 +21,7 @@
 #'   \item{validation_output}{A list of all validation information, output, and rules that are used}
 #'   
 #' }
+#' @usage data(revive_output_donor_A)
 #' @source Janssen et al. 2021 Sci Rep 11:1162 <https://doi.org/10.1038/s41598-021-81217-4>
 "revive_output_donor_A"
 
