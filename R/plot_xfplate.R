@@ -93,7 +93,7 @@ sketch_plate <- function(xfplate, reorder_legend = FALSE) {
         scale_fill_manual(values = groupColors3) +
         scale_x_continuous(
             limits = c(0.5, 13),
-            breaks = c(1:12),
+            breaks = c(seq_len(12)),
             position = "top"
         ) +
         scale_y_discrete(

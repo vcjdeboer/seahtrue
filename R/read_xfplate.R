@@ -580,7 +580,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
                 command_name == "Measure"
             ) %>%
             dplyr::mutate(interval = command_index - 1) %>%
-            dplyr::mutate(measurement = 1:n()) %>%
+            dplyr::mutate(measurement = seq_len(n())) %>%
             dplyr::select(measurement,
                 interval,
                 injection = instruction_name
@@ -600,7 +600,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         # "PC - measure" command_index == 0
         # I use that to set the command_index
         interval <- 1
-        for (i in 1:nrow(measurement_info)) {
+        for (i in seq_len(nrow(measurement_info))) {
             if (measurement_info$command_index[i] == 0) {
                 measurement_info$command_index[i] <- interval
             } else {
@@ -611,7 +611,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         colnames(measurement_info)[3] <- "interval"
         measurement_info <- dplyr::filter(measurement_info, 
                                           command_name == "XF - PC_Measure")
-        measurement_info$measurement <- 1:nrow(measurement_info)
+        measurement_info$measurement <- seq_len(measurement_info)
         measurement_info <- measurement_info %>% dplyr::select(measurement, 
                                                                interval)
 
@@ -619,7 +619,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         # case mitostress
         injections <- c("basal", "OM", "FCCP", "AM/rot")
         injections_mitostress <- 
-          tibble::tibble(interval = 1:4, 
+          tibble::tibble(interval = seq_len(4), 
                         injection = c("basal", "OM", "FCCP", "AM/rot"))
         measurement_info <- 
           dplyr::left_join(measurement_info, 
@@ -627,7 +627,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
 
         ## case glycostress
         # injections <- c("basal", "glucose", "OM", "2DG")
-        # injections_glycostress <- tibble(interval = 1:4, 
+        # injections_glycostress <- tibble(interval = seq_len(4), 
         # injection=injections)
         # measurement_info <- left_join(measurement_info, 
         # injections_glycostress, by = c("interval"))

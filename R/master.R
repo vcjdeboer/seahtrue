@@ -18,7 +18,7 @@
 #'  # validation_output = Output of the data checks. including rules
 #'
 #' @export
-#' @import logger rlang cli glue readxl knitr sessioninfo
+#' @import logger rlang cli glue readxl knitr sessioninfo details
 #' @family {read functions}
 #' @examples
 #' revive_xfplate(
