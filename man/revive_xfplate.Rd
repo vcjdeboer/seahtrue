@@ -27,9 +27,11 @@ read, validate and preprocess
 }
 \examples{
 revive_xfplate(
-  system.file("extdata", 
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue"))
+    system.file("extdata",
+        "20191219_SciRep_PBMCs_donor_A.xlsx",
+        package = "seahtrue"
+    )
+)
 
 }
 \seealso{

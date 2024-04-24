@@ -9,7 +9,7 @@ rref <- c(
           person("Xiang", "Zhang", role = c("aut"))
           ),
       year      = 2024,
-      note      = "R package version 0.2.0",
+      note      = "R package version 0.3.0",
       key       = "seahtrue-package",
       url       = {"https://github.com/vcjdeboer/seahtrue"}
   )

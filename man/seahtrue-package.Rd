@@ -14,6 +14,7 @@ Seahtrue organizes data from experiments performed on an XF analyzer into struct
 Useful links:
 \itemize{
   \item \url{https://vcjdeboer.github.io/seahtrue/}
+  \item Report bugs at \url{https://vcjdeboer.github.io/seahtrue/issues}
 }
 
 }

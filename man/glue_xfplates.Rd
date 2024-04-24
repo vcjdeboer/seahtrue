@@ -21,16 +21,21 @@ This function takes a folder path and on the available .xlsx files
 the revive_xfplate() function is run and output in one nested tibble.
 }
 \examples{
-c(system.file("extdata",
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue"),
-  system.file("extdata",
-  "20200110_SciRep_PBMCs_donor_B.xlsx", 
-  package = "seahtrue"),
-  system.file("extdata",
-  "20200110_SciRep_PBMCs_donor_C.xlsx", 
-  package = "seahtrue")) |> 
-  glue_xfplates(arg_is_folder = FALSE)
+c(
+    system.file("extdata",
+        "20191219_SciRep_PBMCs_donor_A.xlsx",
+        package = "seahtrue"
+    ),
+    system.file("extdata",
+        "20200110_SciRep_PBMCs_donor_B.xlsx",
+        package = "seahtrue"
+    ),
+    system.file("extdata",
+        "20200110_SciRep_PBMCs_donor_C.xlsx",
+        package = "seahtrue"
+    )
+) |>
+    glue_xfplates(arg_is_folder = FALSE)
 }
 \seealso{
 Other {read functions}: 
