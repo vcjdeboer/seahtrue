@@ -280,6 +280,6 @@ revived_donors %>%
 sessioninfo::session_info() %>%
   details::details(
     summary = 'Current session info',
-    open    = TRUE
+    open    = FALSE
   )
 ```

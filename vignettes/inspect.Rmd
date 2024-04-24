@@ -163,6 +163,6 @@ The `validation_output` list will be described in a separate vignette.
 sessioninfo::session_info() %>%
   details::details(
     summary = 'Current session info',
-    open    = TRUE
+    open    = FALSE
   )
 ```
