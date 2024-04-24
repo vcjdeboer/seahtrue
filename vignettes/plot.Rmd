@@ -276,8 +276,8 @@ revived_donors %>%
 
 ```
 
-```{r}
-sessioninfo::session_info()%>%
+```{r echo=FALSE}
+sessioninfo::session_info() %>%
   details::details(
     summary = 'Current session info',
     open    = TRUE

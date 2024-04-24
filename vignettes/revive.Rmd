@@ -71,8 +71,8 @@ revive_output_donor_A <- my_file_path %>% revive_xfplate()
 
 The .xlsx file was read, and processed, now we can explore the output.
 
-```{r}
-sessioninfo::session_info()%>%
+```{r echo=FALSE}
+sessioninfo::session_info() %>%
   details::details(
     summary = 'Current session info',
     open    = TRUE
