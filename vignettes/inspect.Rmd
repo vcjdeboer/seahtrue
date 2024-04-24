@@ -147,3 +147,11 @@ Since every XF experiment uses pertubations with chemicals or nutrients the `inj
 #### Validation output
 
 The `validation_output` list will be described in a separate vignette.
+
+```{r}
+sessioninfo::session_info()%>%
+  details::details(
+    summary = 'Current session info',
+    open    = TRUE
+  )
+```

@@ -25,8 +25,8 @@ when normalize = TRUE}
 
 \item{take_group_mean}{Either TRUE or FALSE}
 
-\item{reorder_legend}{Either TRUE or FALSE. When `TRUE` the 
-groups are ordered based on the number in the character string of 
+\item{reorder_legend}{Either TRUE or FALSE. When `TRUE` the
+groups are ordered based on the number in the character string of
 the group. It also adds a "__00" after each character string
 to make the forcats::refactor(group, parse_number(group)) work.}
 }
@@ -34,7 +34,7 @@ to make the forcats::refactor(group, parse_number(group)) work.}
 a ggplot object
 }
 \description{
-The sketch_rate() function uses the rate_data 
+The sketch_rate() function uses the rate_data
 from the generated output from the revive_xfplate() function.
 The injection info is annotated in the plot, using the information
 form the injections provided in the original experiment. Several
@@ -46,40 +46,52 @@ can be plotted and whether the layout of the plot will not be
 ruined...
 }
 \examples{
-system.file("extdata", 
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue") |>
-  revive_xfplate() |>
-  purrr::pluck("rate_data", 1) |> 
-  sketch_rate(param = "OCR",
-              reorder_legend = TRUE)
- 
- system.file("extdata", 
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue") |>
-  revive_xfplate() |>
-  purrr::pluck("rate_data", 1) |> 
-  sketch_rate(param = "OCR",
-              take_group_mean = FALSE,
-              reorder_legend = TRUE)
+system.file("extdata",
+    "20191219_SciRep_PBMCs_donor_A.xlsx",
+    package = "seahtrue"
+) |>
+    revive_xfplate() |>
+    purrr::pluck("rate_data", 1) |>
+    sketch_rate(
+        param = "OCR",
+        reorder_legend = TRUE
+    )
 
-system.file("extdata", 
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue") |>
-  revive_xfplate() |>
-  purrr::pluck("rate_data", 1) |> 
-  sketch_rate(param = "ECAR",
-              normalize = TRUE,
-              take_group_mean = TRUE,
-              reorder_legend = TRUE)
-                           
-system.file("extdata", 
-  "20191219_SciRep_PBMCs_donor_A.xlsx", 
-  package = "seahtrue") |>
-  revive_xfplate() |>
-  purrr::pluck("rate_data", 1) |> 
-  sketch_rate(param = "ECAR",
-              normalize = TRUE,
-              take_group_mean = FALSE,
-              reorder_legend = TRUE)
+system.file("extdata",
+    "20191219_SciRep_PBMCs_donor_A.xlsx",
+    package = "seahtrue"
+) |>
+    revive_xfplate() |>
+    purrr::pluck("rate_data", 1) |>
+    sketch_rate(
+        param = "OCR",
+        take_group_mean = FALSE,
+        reorder_legend = TRUE
+    )
+
+system.file("extdata",
+    "20191219_SciRep_PBMCs_donor_A.xlsx",
+    package = "seahtrue"
+) |>
+    revive_xfplate() |>
+    purrr::pluck("rate_data", 1) |>
+    sketch_rate(
+        param = "ECAR",
+        normalize = TRUE,
+        take_group_mean = TRUE,
+        reorder_legend = TRUE
+    )
+
+system.file("extdata",
+    "20191219_SciRep_PBMCs_donor_A.xlsx",
+    package = "seahtrue"
+) |>
+    revive_xfplate() |>
+    purrr::pluck("rate_data", 1) |>
+    sketch_rate(
+        param = "ECAR",
+        normalize = TRUE,
+        take_group_mean = FALSE,
+        reorder_legend = TRUE
+    )
 }

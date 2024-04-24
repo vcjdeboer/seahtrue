@@ -275,3 +275,11 @@ revived_donors %>%
   sketch_assimilate_raw(param = "pH_em_corr")
 
 ```
+
+```{r}
+sessioninfo::session_info()%>%
+  details::details(
+    summary = 'Current session info',
+    open    = TRUE
+  )
+```
