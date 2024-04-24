@@ -133,7 +133,7 @@ instead of groups.</p>
 <span>        rev<span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        name <span class="op">=</span> <span class="st">"OCR (pmol/min)"</span><span class="op">)</span><span class="op">+</span></span>
 <span>      <span class="fu">scale_x_continuous</span><span class="op">(</span>limits<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">12.5</span><span class="op">)</span>,</span>
-<span>                        breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>,</span>
+<span>                        breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                        position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span><span class="op">+</span></span>
 <span>      <span class="fu">theme_bw</span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">15</span><span class="op">)</span> <span class="op">%+replace%</span> </span>
 <span>        <span class="fu">theme</span><span class="op">(</span>panel.grid <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
@@ -167,7 +167,7 @@ with the cell number:</p>
 <span>        rev<span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        name <span class="op">=</span> <span class="st">"OCR (pmol/min)"</span><span class="op">)</span><span class="op">+</span></span>
 <span>      <span class="fu">scale_x_continuous</span><span class="op">(</span>limits<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">12.5</span><span class="op">)</span>,</span>
-<span>                        breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>,</span>
+<span>                        breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                        position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span><span class="op">+</span></span>
 <span>      <span class="fu">theme_bw</span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">15</span><span class="op">)</span> <span class="op">%+replace%</span> </span>
 <span>        <span class="fu">theme</span><span class="op">(</span>panel.grid <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
@@ -300,9 +300,9 @@ vector it should be <code>FALSE</code>.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 9</span></span></span>
 <span><span class="co">#&gt;   plate_id     filepath_seahorse date_run         date_processed      assay_info</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> V0174416419V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  19-12-2019 17:25 2024-04-24 <span style="color: #949494;">07:29:04</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> V0194115019V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  10-1-2020 16:59  2024-04-24 <span style="color: #949494;">07:29:14</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> V0194715019V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  15-1-2020 17:26  2024-04-24 <span style="color: #949494;">07:29:25</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> V0174416419V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  19-12-2019 17:25 2024-04-24 <span style="color: #949494;">08:29:17</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> V0194115019V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  10-1-2020 16:59  2024-04-24 <span style="color: #949494;">08:29:28</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> V0194715019V <span style="color: #949494;">&lt;tibble [1 × 3]&gt;</span>  15-1-2020 17:26  2024-04-24 <span style="color: #949494;">08:29:39</span> <span style="color: #949494;">&lt;tibble&gt;</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: injection_info &lt;list&gt;, raw_data &lt;list&gt;, rate_data &lt;list&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   validation_output &lt;list&gt;</span></span></span></code></pre></div>
 <p>Next, we can unnest particular data tibbles, which combines the data
@@ -384,7 +384,7 @@ example.</p>
 <span>  <span class="fu"><a href="../reference/sketch_assimilate_raw.html">sketch_assimilate_raw</a></span><span class="op">(</span>param <span class="op">=</span> <span class="st">"pH_em_corr"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Picking joint bandwidth of 114</span></span></code></pre></div>
 <p><img src="plot_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
-<details open><summary><span title="Click to Expand"> Current session info </span>
+<details closed><summary><span title="Click to Expand"> Current session info </span>
 </summary><div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a> [<span class="dv">1</span>m [<span class="dv">36</span>m─ Session info ─────────────────────────────────────────────────────────────── [<span class="dv">39</span>m [<span class="dv">22</span>m</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  [<span class="dv">3</span>m [<span class="dv">90</span>msetting  [<span class="dv">39</span>m [<span class="dv">23</span>m  [<span class="dv">3</span>m [<span class="dv">90</span>mvalue [<span class="dv">39</span>m [<span class="dv">23</span>m</span>
