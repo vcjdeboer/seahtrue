@@ -1,3 +1,7 @@
+# seahtrue 0.99.0
+
+* bioconductor
+
 # seahtrue 0.3.0
 
 * Plotting functions are now written and included. These are the `sketch_plate()`, `sketch_rate()`, `sketch_assimilate_raw()` and `sketch_assimilate_rate()` functions

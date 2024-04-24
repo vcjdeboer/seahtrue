@@ -1,7 +1,7 @@
 Package: seahtrue
 Type: Package
 Title: Seahtrue revives XF data for structured data analysis
-Version: 0.3.0
+Version: 0.99.0
 Authors@R: c(
           person("Vincent", "de Boer", 
             email = "vincent.deboer@wur.nl", 
