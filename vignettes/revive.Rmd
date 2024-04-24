@@ -75,6 +75,6 @@ The .xlsx file was read, and processed, now we can explore the output.
 sessioninfo::session_info() %>%
   details::details(
     summary = 'Current session info',
-    open    = TRUE
+    open    = FALSE
   )
 ```

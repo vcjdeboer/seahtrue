@@ -44,7 +44,13 @@ Zhang, Xiang, Taolin Yuan, Jaap Keijer, and Vincent C. J. de Boer. “OCRbayes: 
 
 
 
-
+```{r echo=FALSE}
+sessioninfo::session_info() %>%
+  details::details(
+    summary = 'Current session info',
+    open    = FALSE
+  )
+```
 
 
 

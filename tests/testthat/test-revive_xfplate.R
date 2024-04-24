@@ -101,7 +101,7 @@ testthat::test_that("injections_are_correct", {
     xf_inj <- my_filepath %>%
         get_xf_inj()
 
-    testthat::expect_setequal(xf_inj %>% pull(measurement), 1:12)
+    testthat::expect_setequal(xf_inj %>% pull(measurement), seq_len(12))
     testthat::expect_setequal(
         xf_inj %>% pull(injection),
         c(
@@ -111,7 +111,7 @@ testthat::test_that("injections_are_correct", {
             rep("Monensin/Hoechst", 3)
         )
     )
-    testthat::expect_setequal(xf_inj %>% pull(interval) %>% unique(), 1:4)
+    testthat::expect_setequal(xf_inj %>% pull(interval) %>% unique(), seq_len(4))
 })
 
 testthat::test_that("rate_background_check", {
