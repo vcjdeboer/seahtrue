@@ -39,6 +39,7 @@ LazyData: false
 Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
+    BiocStyle
 Imports:
     dplyr (>= 1.1.2),
     readxl (>= 1.4.1),
