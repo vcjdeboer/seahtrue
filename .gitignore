@@ -9,4 +9,12 @@ untitled.R
 #man/
 #docs/
 #docs
+.DS_store
 inst/doc
+tests/.DS_Store
+tests/testthat/.DS_Store
+.git/.DS_Store
+.Rproj.user/.DS_Store
+.Rproj.user/73085A35/.DS_Store
+docs/.DS_Store
+seahtrue.Rproj
