@@ -192,11 +192,7 @@ Since every XF experiment uses pertubations with chemicals or nutrients the `inj
 
 
 ```{r echo=FALSE}
-sessioninfo::session_info() |>
-  details::details(
-    summary = 'Current session info',
-    open    = FALSE
-  )
+sessionInfo()
 ```
 
 
