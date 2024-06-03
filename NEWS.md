@@ -1,3 +1,7 @@
+# seahtrue 0.99.1
+
+* removed duplicated example xlsx files to lower package tarball size
+
 # seahtrue 0.99.0
 
 * bioconductor
