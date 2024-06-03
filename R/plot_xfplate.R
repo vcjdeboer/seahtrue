@@ -364,7 +364,7 @@ sketch_rate <- function(xf_rate,
 #'             package = "seahtrue"
 #'         ),
 #'         system.file("extdata",
-#'             "20200110_SciRep_PBMCs_donor_B.xlsx",
+#'             "20191219_SciRep_PBMCs_donor_A.xlsx",
 #'             package = "seahtrue"
 #'         )
 #'     ) |>
@@ -477,7 +477,7 @@ sketch_assimilate_raw <- function(my_df, param = "O2_mmHg") {
 #'             package = "seahtrue"
 #'         ),
 #'         system.file("extdata",
-#'             "20200110_SciRep_PBMCs_donor_B.xlsx",
+#'             "20191219_SciRep_PBMCs_donor_A.xlsx",
 #'             package = "seahtrue"
 #'         )
 #'     ) |>

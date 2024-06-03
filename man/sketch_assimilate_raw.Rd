@@ -29,7 +29,7 @@ suppressMessages(
             package = "seahtrue"
         ),
         system.file("extdata",
-            "20200110_SciRep_PBMCs_donor_B.xlsx",
+            "20191219_SciRep_PBMCs_donor_A.xlsx",
             package = "seahtrue"
         )
     ) |>

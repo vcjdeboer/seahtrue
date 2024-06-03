@@ -22,7 +22,6 @@
 #' @noRd
 #' @keywords internal
 #'
-#' @examples
 preprocess_xfplate <- function(xf) {
     xf_raw_pr <- preprocess_xf_raw(
         xf$raw,
@@ -108,7 +107,7 @@ preprocess_xfplate <- function(xf) {
 #' @noRd
 #' @keywords internal
 #'
-#' @examples
+
 
 preprocess_xf_raw <- function(xf_raw,
                               xf_pHcal,
@@ -192,7 +191,6 @@ preprocess_xf_raw <- function(xf_raw,
 #' @noRd
 #' @keywords internal
 #'
-#' @examples
 preprocess_xf_rate <- function(xf_rate,
                                xf_norm,
                                xf_inj,
