@@ -1,5 +1,8 @@
 my_filepath <-
-    testthat::test_path("20191219_SciRep_PBMCs_donor_A.xlsx")
+    #testthat::test_path("20191219_SciRep_PBMCs_donor_A.xlsx")
+    system.file("extdata",
+                "20191219_SciRep_PBMCs_donor_A.xlsx",
+                package = "seahtrue")
 
 my_req_cols_preprocessed_output <-
     c(
