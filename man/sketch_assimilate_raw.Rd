@@ -31,10 +31,6 @@ suppressMessages(
         system.file("extdata",
             "20200110_SciRep_PBMCs_donor_B.xlsx",
             package = "seahtrue"
-        ),
-        system.file("extdata",
-            "20200110_SciRep_PBMCs_donor_C.xlsx",
-            package = "seahtrue"
         )
     ) |>
         glue_xfplates(arg_is_folder = FALSE) |>
