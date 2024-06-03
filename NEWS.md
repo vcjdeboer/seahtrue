@@ -1,3 +1,8 @@
+# seahtrue 0.99.1
+
+* bioconductor - lower package size by removing example files.
+* bioconductor - removed citation because there is no DOI
+
 # seahtrue 0.99.0
 
 * bioconductor
