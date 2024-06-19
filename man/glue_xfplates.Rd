@@ -33,8 +33,3 @@ c(
 ) |>
     glue_xfplates(arg_is_folder = FALSE)
 }
-\seealso{
-Other {read functions}: 
-\code{\link{revive_xfplate}()}
-}
-\concept{{read functions}}

@@ -34,8 +34,3 @@ revive_xfplate(
 )
 
 }
-\seealso{
-Other {read functions}: 
-\code{\link{glue_xfplates}()}
-}
-\concept{{read functions}}
