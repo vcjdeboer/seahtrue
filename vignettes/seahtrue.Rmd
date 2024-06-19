@@ -189,9 +189,9 @@ Since every XF experiment uses pertubations with chemicals or nutrients the `inj
 
 ```
 
+### Session info
 
-
-```{r echo=FALSE}
+```{r}
 sessionInfo()
 ```
 
