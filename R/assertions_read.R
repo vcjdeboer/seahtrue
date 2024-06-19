@@ -142,38 +142,41 @@ validatie_tick_is_linear <- function(xf_raw_pr) {
     xf_raw_pr %>%
         dplyr::slice(1, .by = c(.data$measurement, .data$tick)) %>%
         dplyr::select(.data$well, .data$measurement, .data$tick, .data$group) %>%
-        dplyr::pull(tick) %>%
+        dplyr::pull(.data$tick) %>%
         validate::is_linear_sequence(begin = 0)
 }
 
 validate_for_NA <- function(xf_raw_pr, NA_rule) {
-    NA_df_summary <- validate::confront(xf_raw_pr, NA_rule) %>%
-        validate::summary() %>%
-        # pull(expression) %>%
-        dplyr::mutate(
-            param_NA =
-                purrr::map_chr(
-                    .x = .data$expression,
-                    .f = ~ stringr::str_extract_all(
-                        .x, "\\([^()]+\\)"
-                    ) %>%
-                        purrr::pluck(1) %>%
-                        stringr::str_sub(2, -2) %>%
-                        paste0("_NA")
-                )
-        ) %>%
-        dplyr::as_tibble()
-
+  
+    # NA_df_summary <- validate::confront(xf_raw_pr, NA_rule) %>%
+    #     validate::summary() %>%
+    #     # pull(expression) %>%
+    #     dplyr::mutate(
+    #         param_NA =
+    #             purrr::map_chr(
+    #                 .x = .data$expression,
+    #                 .f = ~ stringr::str_extract_all(
+    #                     .x, "\\([^()]+\\)"
+    #                 ) %>%
+    #                     purrr::pluck(1) %>%
+    #                     stringr::str_sub(2, -2) %>%
+    #                     paste0("_NA")
+    #             )
+    #     ) %>%
+    #     dplyr::as_tibble()
+    
     df_with_NAs_identified <- validate::confront(xf_raw_pr, NA_rule) %>%
         validate::values() %>%
         dplyr::as_tibble() %>%
-        dplyr::rename_with(~ NA_df_summary$param_NA, names(.)) %>%
-      #fix the dot
-        dplyr::select(where(~ any(. == FALSE))) %>%
-        dplyr::bind_cols(xf_raw_pr %>%
-                           #fix this dot? VB
-        dplyr::select(.data$well, .data$measurement, .data$tick, .data$group), .)
-
+        dplyr::rename_with(~ paste0(.x, "_NA")) %>% 
+        #dplyr::rename_with(~ NA_df_summary$param_NA, names(.)) %>%
+        dplyr::select(where(~ any(.x == FALSE))) %>%
+        dplyr::bind_cols(
+          xf_raw_pr %>%
+            dplyr::select(.data$well, .data$measurement, .data$tick, .data$group)) %>% 
+        dplyr::select(.data$well, .data$measurement, 
+                      .data$tick, .data$group, dplyr::everything())
+          
     return(df_with_NAs_identified)
 }
 
@@ -234,6 +237,31 @@ get_timing_info <- function(xf_raw_pr) {
     return(time_info)
 }
 
+
+#' The preprocessed data is validated against rules with the
+#' help of the validator package
+#' @description
+#' The input file that is read and preprocessed is validated
+#' for a number of rules. These rules are both physiologic, 
+#' in a sense that the parameters that are analyzed with the 
+#' Seahorse (O2 and pH) arae checked whether they are in 
+#' a physiolgical range (for example). Also there is a rule 
+#' for NAs and the timing info is organized.
+#' 
+#' @param preprocessed_xf_plate 
+#'
+#' @return  the input prepocessed xf plate data tibble
+#' with added extra column with a list of validation output
+#' @importFrom validate is_complete in_range
+#' @noRd
+#' @examples
+#' suppressMessages(
+#'  system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
+#'  package = "seahtrue") |> 
+#'    read_xfplate() |> 
+#'    preprocess_xf_plate() |> 
+#'    validate_preprocessed()
+#' )
 validate_preprocessed <- function(preprocessed_xf_plate) {
     xf_raw_pr <- preprocessed_xf_plate %>%
         purrr::pluck("raw_data", 1)
@@ -249,31 +277,37 @@ validate_preprocessed <- function(preprocessed_xf_plate) {
         in_range(.data$pH, min = 7.2, max = 7.6)
     )
     
+    NA_rule_names <- c("well", "measurement","tick","timescale","minutes",
+      "group","interval","injection","pH_em_corr","O2_em_corr",
+      "O2_mmHg","pH","pH_em_corr_corr","O2_em_corr_bkg",
+      "pH_em_corr_bkg","O2_mmHg_bkg","pH_bkgd","pH_em_corr_corr_bkg",
+      "bufferfactor","cell_n","flagged_well")
+    
     NA_rule <- validate::validator(
-        is_complete(well),
-        is_complete(measurement),
-        is_complete(tick),
-        is_complete(timescale),
-        is_complete(minutes),
-        is_complete(group),
-        is_complete(interval),
-        is_complete(injection),
-        is_complete(pH_em_corr),
-        is_complete(O2_em_corr),
-        is_complete(O2_mmHg),
-        is_complete(pH),
-        is_complete(pH_em_corr_corr),
-        is_complete(O2_em_corr_bkg),
-        is_complete(pH_em_corr_bkg),
-        is_complete(O2_mmHg_bkg),
-        is_complete(pH_bkgd),
-        is_complete(pH_em_corr_corr_bkg),
-        is_complete(bufferfactor),
-        is_complete(cell_n),
-        is_complete(flagged_well)
-    )
-
-
+      .data = data.frame(rule = c("is_complete(well)",
+                                  "is_complete(measurement)",
+                                  "is_complete(tick)",
+                                  "is_complete(timescale)",
+                                  "is_complete(minutes)",
+                                  "is_complete(group)",
+                                  "is_complete(interval)",
+                                  "is_complete(injection)",
+                                  "is_complete(pH_em_corr)",
+                                  "is_complete(O2_em_corr)",
+                                  "is_complete(O2_mmHg)",
+                                  "is_complete(pH)",
+                                  "is_complete(pH_em_corr_corr)",
+                                  "is_complete(O2_em_corr_bkg)",
+                                  "is_complete(pH_em_corr_bkg)",
+                                  "is_complete(O2_mmHg_bkg)",
+                                  "is_complete(pH_bkgd)",
+                                  "is_complete(pH_em_corr_corr_bkg)",
+                                  "is_complete(bufferfactor)",
+                                  "is_complete(cell_n)",
+                                  "is_complete(flagged_well)"),
+                         name = NA_rule_names,
+                         description = NA_rule_names))
+      
     # call validate functions
     df_with_NAs_identified <-
         validate_for_NA(xf_raw_pr, NA_rule)

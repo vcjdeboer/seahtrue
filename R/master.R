@@ -19,7 +19,6 @@
 #'
 #' @export
 #' @import logger rlang cli glue readxl 
-#' @family {read functions}
 #' @examples
 #' revive_xfplate(
 #'     system.file("extdata",
@@ -98,7 +97,6 @@ revive_xfplate <- function(filepath_seahorse) {
 #' @param arg_is_folder either TRUE or FALSE. When the input is a vector of path strings
 #' use FALSE, is it points to a folder use TRUE
 #' @return a nested tibble with all files organized in a row
-#' @family {read functions}
 #' @export
 #' @examples
 #' c(
@@ -130,7 +128,7 @@ glue_xfplates <- function(folderpath_seahorse, arg_is_folder) {
             pattern = "*.xlsx",
             full.names = TRUE
         ) %>%
-            stringr::str_subset(.,
+            stringr::str_subset(
                 fixed("~$"),
                 negate = TRUE
             )

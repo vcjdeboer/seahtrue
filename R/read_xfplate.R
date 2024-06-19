@@ -43,7 +43,7 @@ read_xfplate <- function(filepath_seahorse) {
 
     xf_rate <-
         get_xf_rate(filepath_seahorse) %>%
-        verify_xf_rate(., xf_flagged)
+        verify_xf_rate(xf_flagged)
 
     # make the output list
     xf <- list(
@@ -82,14 +82,12 @@ read_xfplate <- function(filepath_seahorse) {
 #' package = "seahtrue"))
 get_xf_raw <- function(filepath_seahorse) {
     xf_raw <- readxl::read_excel(filepath_seahorse,
-        sheet = "Raw"
-    ) %>%
+        sheet = "Raw") %>%
         dplyr::rename_all(toupper) %>%
         janitor::clean_names() %>%
-      #fix this . VB
-        dplyr::rename_with(~ stringr::str_replace(., "o2", "O2")) %>%
-        dplyr::rename_with(~ stringr::str_replace(., "ph", "pH")) %>%
-        dplyr::rename_with(~ stringr::str_replace(., "hg", "Hg")) %>%
+        dplyr::rename_with(~ gsub("o2", "O2", .x, fixed = TRUE)) %>%
+        dplyr::rename_with(~ gsub("ph", "pH", .x, fixed = TRUE)) %>%
+        dplyr::rename_with(~ gsub("hg", "Hg", .x, fixed = TRUE)) %>%
         dplyr::rename(
             pH_em_corr = .data$pH_corrected_em,
             O2_em_corr = .data$O2_corrected_em
@@ -302,7 +300,7 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
     # if background wells are flagged, this could go wrong
     # therefore they should be removed if flagged, first
     groups <- xf_rate %>%
-        select(well, group) %>%
+        select(.data$well, .data$group) %>%
         unique()
 
     xf_flagged <- xf_flagged %>%
@@ -310,25 +308,25 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
 
     if ("Background" %in% xf_flagged$group) {
         flagged_bkgd_wells <- xf_flagged %>%
-            filter(group == "Background") %>%
-            pull(well)
+            filter(.data$group == "Background") %>%
+            pull(.data$well)
 
         xf_rate <- xf_rate %>%
-            filter(!well %in% flagged_bkgd_wells)
+            filter(!.data$well %in% flagged_bkgd_wells)
     }
 
     # next do the check whether the data is bkgd corrected
     if (is.null(
         missing_strings(
             xf_rate %>%
-                pull(group) %>%
+                pull(.data$group) %>%
                 unique(),
             "Background"
         )
     )) {
         check_background <- xf_rate %>%
-            dplyr::filter(group == "Background") %>%
-            dplyr::pull(ocr) %>%
+            dplyr::filter(.data$group == "Background") %>%
+            dplyr::pull(.data$ocr) %>%
             mean()
 
         if (check_background == 0) {
@@ -353,9 +351,9 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
 
         xf_rate <- xf_rate %>%
             dplyr::select(
-                measurement, well, group,
-                time_wave, OCR_wave, OCR_wave_bc,
-                ECAR_wave, ECAR_wave_bc
+              .data$measurement, .data$well, .data$group,
+              .data$time_wave, .data$OCR_wave, .data$OCR_wave_bc,
+              .data$ECAR_wave, .data$ECAR_wave_bc
             )
 
         cli::cli_alert(
@@ -374,11 +372,11 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
             dplyr::mutate(OCR_wave_bc = 0, ECAR_wave_bc = 0)
 
         xf_rate <- xf_rate %>%
-            dplyr::select(
-                measurement, well, group,
-                time_wave, OCR_wave, OCR_wave_bc,
-                ECAR_wave, ECAR_wave_bc
-            )
+          dplyr::select(
+            .data$measurement, .data$well, .data$group,
+            .data$time_wave, .data$OCR_wave, .data$OCR_wave_bc,
+            .data$ECAR_wave, .data$ECAR_wave_bc
+          )
 
         cli::cli_alert(
             glue::glue("There was NO background group in the data")
@@ -395,11 +393,11 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
 
         # do background substraction for wave table
         background <- xf_rate %>%
-            dplyr::filter(group == "Background") %>%
+            dplyr::filter(.data$group == "Background") %>%
             dplyr::summarize(
-                bkg_OCR_wave = mean(OCR_wave),
-                bkg_ECAR_wave = mean(ECAR_wave),
-                .by = measurement
+                bkg_OCR_wave = mean(.data$OCR_wave),
+                bkg_ECAR_wave = mean(.data$ECAR_wave),
+                .by = .data$measurement
             )
 
         xf_rate <- dplyr::left_join(xf_rate,
@@ -411,11 +409,11 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
         xf_rate$ECAR_wave_bc <- xf_rate$ECAR_wave - xf_rate$bkg_ECAR_wave
 
         xf_rate <- xf_rate %>%
-            dplyr::select(
-                measurement, well, group,
-                time_wave, OCR_wave, OCR_wave_bc,
-                ECAR_wave, ECAR_wave_bc
-            )
+          dplyr::select(
+            .data$measurement, .data$well, .data$group,
+            .data$time_wave, .data$OCR_wave, .data$OCR_wave_bc,
+            .data$ECAR_wave, .data$ECAR_wave_bc
+          )
 
         cli::cli_alert(
             glue::glue("Rate was exported WITHOUT background correction,
@@ -818,17 +816,19 @@ get_xf_assayinfo <- function(filepath_seahorse,
     # time from start assay to start measuring
 
     minutes_to_start_measurement_one <- xf_raw %>%
-        dplyr:::arrange(.data$tick) %>%
+        dplyr::arrange(.data$tick) %>%
         dplyr::slice(1) %>%
         dplyr::pull(.data$timestamp) %>%
         as.character() %>%
         stringr::str_split(":") %>%
         unlist() %>%
-        as.numeric() %>%
-      # fix this dot VB 
-        {
-            first(.) * 60 + nth(., 2) + nth(., 3) / 60
-        }
+        as.numeric() 
+    
+    minutes_to_start_measurement_one <- 
+      minutes_to_start_measurement_one[[1]] * 60 +
+      minutes_to_start_measurement_one[[2]] +
+      minutes_to_start_measurement_one[[3]] / 60
+        
 
     # not used data_style conversion
     if (date_style == "US") {
@@ -999,7 +999,11 @@ missing_strings <- function(my_strings, strings_required) {
     
     #fix valid_codes and value VB
     rule <- validate::validator(
-        value %in% valid_codes
+        .data = data.frame(
+          rule = c("value %in% valid_codes"),
+          name = "missing strings",
+          description = "missing strings")
+        
     )
 
     strings_available <-
