@@ -84,14 +84,15 @@ get_xf_raw <- function(filepath_seahorse) {
     xf_raw <- readxl::read_excel(filepath_seahorse,
         sheet = "Raw"
     ) %>%
-        dplyr::rename_all(., toupper) %>%
+        dplyr::rename_all(toupper) %>%
         janitor::clean_names() %>%
+      #fix this . VB
         dplyr::rename_with(~ stringr::str_replace(., "o2", "O2")) %>%
         dplyr::rename_with(~ stringr::str_replace(., "ph", "pH")) %>%
         dplyr::rename_with(~ stringr::str_replace(., "hg", "Hg")) %>%
         dplyr::rename(
-            pH_em_corr = pH_corrected_em,
-            O2_em_corr = O2_corrected_em
+            pH_em_corr = .data$pH_corrected_em,
+            O2_em_corr = .data$O2_corrected_em
         )
 
 
@@ -224,7 +225,7 @@ get_xf_flagged <- function(filepath_seahorse) {
 
     # changed the cell address to well names
     new_col_names <- flagged_df %>%
-        dplyr::pull(address) %>%
+        dplyr::pull(.data$address) %>%
         substr(1, 1) %>%
         stringr::str_c(collapse = "---") %>%
         stringr::str_replace_all(c(
@@ -236,7 +237,7 @@ get_xf_flagged <- function(filepath_seahorse) {
     new_col_names_2 <- unlist(stringr::str_split(new_col_names, "---"))
 
     new_row_names <- flagged_df %>%
-        dplyr::pull(address) %>%
+        dplyr::pull(.data$address) %>%
         substr(2, 3) %>%
         stringr::str_c(collapse = "---") %>%
         stringr::str_replace_all(c(
@@ -577,13 +578,13 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         measurement_info <-
             dplyr::filter(
                 info_sh,
-                command_name == "Measure"
+                .data$command_name == "Measure"
             ) %>%
-            dplyr::mutate(interval = command_index - 1) %>%
+            dplyr::mutate(interval = .data$command_index - 1) %>%
             dplyr::mutate(measurement = seq_len(n())) %>%
-            dplyr::select(measurement,
-                interval,
-                injection = instruction_name
+            dplyr::select(.data$measurement,
+                          .data$interval,
+                injection = .data$instruction_name
             )
     }
 
@@ -594,7 +595,7 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         # in case there is no command index in "operation log"
         command_names <- c("XF - PC_Measure", "XF - PC_Inject")
         measurement_info <-
-            dplyr::filter(info_sh, command_name %in% command_names)
+            dplyr::filter(info_sh, .data$command_name %in% command_names)
 
         # "PC - inject" has a number as command_index
         # "PC - measure" command_index == 0
@@ -610,10 +611,10 @@ get_xf_inj <- function(filepath_seahorse, injscheme = "HAP") {
         }
         colnames(measurement_info)[3] <- "interval"
         measurement_info <- dplyr::filter(measurement_info, 
-                                          command_name == "XF - PC_Measure")
+                                          .data$command_name == "XF - PC_Measure")
         measurement_info$measurement <- seq_len(measurement_info)
-        measurement_info <- measurement_info %>% dplyr::select(measurement, 
-                                                               interval)
+        measurement_info <- measurement_info %>% dplyr::select(.data$measurement, 
+                                                               .data$interval)
 
         # gives name of the injection manually
         # case mitostress
@@ -686,7 +687,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
     #                 "TC", "TP", "Calibration pH")
 
     meta_df <- meta_df %>%
-        dplyr::filter(!is.na(parameter))
+        dplyr::filter(!is.na(.data$parameter))
 
     # read Assay Configuration sheet gain1
     gain1 <-
@@ -696,7 +697,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
             col_names = c("value"),
             range = gain1_cell
         ) %>%
-        dplyr::pull(value) %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     # read Assay Configuration sheet gain2
@@ -707,7 +708,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
             col_names = c("value"),
             range = gain2_cell
         ) %>%
-        dplyr::pull(value) %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     # read target emission cells
@@ -718,7 +719,7 @@ get_xf_assayinfo <- function(filepath_seahorse,
             col_names = c("value"),
             range = "B4"
         ) %>%
-        dplyr::pull(value) %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     # read pH target emission cells
@@ -729,86 +730,86 @@ get_xf_assayinfo <- function(filepath_seahorse,
             col_names = c("value"),
             range = "P4"
         ) %>%
-        dplyr::pull(value) %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     F0 <- meta_df %>%
-        dplyr::filter(parameter == "Calculated FO") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Calculated FO") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     V_C <- meta_df %>%
-        dplyr::filter(parameter == "Pseudo Volume") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Pseudo Volume") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     Tau_AC <- meta_df %>%
-        dplyr::filter(parameter == "TAC") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "TAC") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     Tau_W <- meta_df %>%
-        dplyr::filter(parameter == "TW") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "TW") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     Tau_C <- meta_df %>%
-        dplyr::filter(parameter == "TC") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "TC") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     Tau_P <- meta_df %>%
-        dplyr::filter(parameter == "TP") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "TP") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     KSV_original <- meta_df %>%
-        dplyr::filter(parameter == "ksv") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "ksv") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     KSV_corrected <- meta_df %>%
-        dplyr::filter(parameter == "Corrected Ksv") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Corrected Ksv") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     KSV_tempCorrection <- meta_df %>%
-        dplyr::filter(parameter == "Ksv Temp Correction") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Ksv Temp Correction") %>%
+        dplyr::pull(.data$value) %>%
         as.logical()
 
     KSV <- KSV_corrected
 
     pH_0 <- meta_df %>%
-        dplyr::filter(parameter == "Calibration pH") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Calibration pH") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     pH_plateVolume <- meta_df %>%
-        dplyr::filter(parameter == "Plate Volume") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "Plate Volume") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     pH_kVol <- meta_df %>%
-        dplyr::filter(parameter == "kVol") %>%
-        dplyr::pull(value) %>%
+        dplyr::filter(.data$parameter == "kVol") %>%
+        dplyr::pull(.data$value) %>%
         as.numeric()
 
     plate_id <- meta_df %>%
-        dplyr::filter(parameter == "Plate Barcode") %>%
-        dplyr::pull(value)
+        dplyr::filter(.data$parameter == "Plate Barcode") %>%
+        dplyr::pull(.data$value)
 
     cartridge_barcode <- meta_df %>%
-        dplyr::filter(parameter == "Cartridge Barcode") %>%
-        dplyr::pull(value)
+        dplyr::filter(.data$parameter == "Cartridge Barcode") %>%
+        dplyr::pull(.data$value)
 
     assay_name <- meta_df %>%
-        dplyr::filter(parameter == "Assay Name") %>%
-        dplyr::pull(value)
+        dplyr::filter(.data$parameter == "Assay Name") %>%
+        dplyr::pull(.data$value)
 
     instrument_serial <- meta_df %>%
-        dplyr::filter(parameter == "Instrument Serial") %>%
-        dplyr::pull(value)
+        dplyr::filter(.data$parameter == "Instrument Serial") %>%
+        dplyr::pull(.data$value)
 
     # other constants
     O2_0_mmHg <- 151.6900241
@@ -817,13 +818,14 @@ get_xf_assayinfo <- function(filepath_seahorse,
     # time from start assay to start measuring
 
     minutes_to_start_measurement_one <- xf_raw %>%
-        dplyr:::arrange(tick) %>%
+        dplyr:::arrange(.data$tick) %>%
         dplyr::slice(1) %>%
-        dplyr::pull(timestamp) %>%
+        dplyr::pull(.data$timestamp) %>%
         as.character() %>%
-        stringr::str_split(., ":") %>%
+        stringr::str_split(":") %>%
         unlist() %>%
         as.numeric() %>%
+      # fix this dot VB 
         {
             first(.) * 60 + nth(., 2) + nth(., 3) / 60
         }
@@ -984,8 +986,8 @@ get_platelayout_data <- function(filepath_seahorse,
             nchar(col) == 1 ~ paste0(row, "0", col),
             .default = paste0(row, col)
         )) %>%
-        dplyr::select(well, my_values) %>%
-        dplyr::rename(!!my_param := my_values) # OMG the := :)
+        dplyr::select(.data$well, .data$my_values) %>%
+        dplyr::rename(!!my_param := .data$my_values) # OMG the := :)
 
     return(df)
 }
@@ -994,7 +996,8 @@ get_platelayout_data <- function(filepath_seahorse,
 missing_strings <- function(my_strings, strings_required) {
     my_strings_df <- my_strings %>%
         dplyr::as_tibble()
-
+    
+    #fix valid_codes and value VB
     rule <- validate::validator(
         value %in% valid_codes
     )
@@ -1003,7 +1006,7 @@ missing_strings <- function(my_strings, strings_required) {
         validate::satisfying(my_strings_df, rule,
             ref = list(valid_codes = strings_required)
         ) %>%
-        pull(value)
+        pull(.data$value)
 
     my_missing_strings <-
         if (!identical(strings_available, strings_required)) {

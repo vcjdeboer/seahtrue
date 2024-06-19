@@ -57,8 +57,8 @@ sketch_plate <- function(xfplate, reorder_legend = FALSE) {
 
 
     xfplate_sep <- xfplate %>%
-        slice(1, .by = c(well)) %>%
-        tidyr::separate(well,
+        slice(1, .by = c(.data$well)) %>%
+        tidyr::separate(.data$well,
             into = c("row", "column"),
             sep = 1,
             convert = TRUE
@@ -86,8 +86,8 @@ sketch_plate <- function(xfplate, reorder_legend = FALSE) {
     }
 
     h <- xfplate_sep %>%
-        ggplot(aes(x = column, y = row)) +
-        geom_tile(aes(fill = group),
+        ggplot(aes(x = .data$column, y = .data$row)) +
+        geom_tile(aes(fill = .data$group),
             color = "grey50", show.legend = TRUE
         ) +
         scale_fill_manual(values = groupColors3) +
@@ -213,13 +213,13 @@ sketch_rate <- function(xf_rate,
 
     number_of_groups <-
         xf_rate %>%
-        pull(group) %>%
+        pull(.data$group) %>%
         unique() %>%
         length()
 
     largest_group_string_size <-
         xf_rate %>%
-        pull(group) %>%
+        pull(.data$group) %>%
         unique() %>%
         stringr::str_count() %>%
         max()
@@ -259,13 +259,13 @@ sketch_rate <- function(xf_rate,
     if ("Background" %in% xf_rate$group &&
         was_background_corrected && normalize == TRUE) {
         xf_rate <- xf_rate %>%
-            filter(group != "Background")
+            filter(.data$group != "Background")
     }
 
     if (any(xf_rate$cell_n == 0) && normalize) {
         wells_with_zero <- xf_rate %>%
-            filter(cell_n == 0) %>%
-            pull(well) %>%
+            filter(.data$cell_n == 0) %>%
+            pull(.data$well) %>%
             unique()
 
         if (length(wells_with_zero) > 15) {
@@ -303,7 +303,7 @@ sketch_rate <- function(xf_rate,
     if (normalize && param == "OCR") {
         xf_rate <- xf_rate %>%
             select(everything(), my_param = all_of(param_to_plot)) %>%
-            mutate(my_param = my_param / cell_n)
+            mutate(my_param = .data$my_param / .data$cell_n)
         y_label <- paste0(param, " (pmol/min/", normalize_unit, ")")
     }
     if (!normalize && param == "OCR") {
@@ -314,7 +314,7 @@ sketch_rate <- function(xf_rate,
     if (normalize && param == "ECAR") {
         xf_rate <- xf_rate %>%
             select(everything(), my_param = all_of(param_to_plot)) %>%
-            mutate(my_param = my_param / cell_n)
+            mutate(my_param = .data$my_param / .data$cell_n)
         y_label <- paste0(param, " (mpH/min/", normalize_unit, ")")
     }
     if (!normalize && param == "ECAR") {
@@ -326,12 +326,12 @@ sketch_rate <- function(xf_rate,
     # make plot
     if (!take_group_mean) {
         p <- xf_rate %>%
-            plot_line_per_well(., "my_param", y_label)
+            plot_line_per_well( "my_param", y_label)
     }
 
     if (take_group_mean) {
         p <- xf_rate %>%
-            plot_ribbon_per_meas_and_group(., "my_param", y_label)
+            plot_ribbon_per_meas_and_group( "my_param", y_label)
     }
 
     return(p)
@@ -426,17 +426,17 @@ sketch_assimilate_raw <- function(my_df, param = "O2_mmHg") {
 
 
     my_df %>%
-        dplyr::select(plate_id, raw_data) %>%
-        tidyr::unnest(raw_data) %>%
-        dplyr::select(plate_id, measurement, well, group, 
+        dplyr::select(.data$plate_id, .data$raw_data) %>%
+        tidyr::unnest(.data$raw_data) %>%
+        dplyr::select(.data$plate_id, .data$measurement, .data$well, .data$group, 
                       emission = all_of(param)) %>%
-        dplyr::slice(which.min(measurement), .by = c(plate_id, well)) %>%
+        dplyr::slice(which.min(.data$measurement), .by = c(.data$plate_id, .data$well)) %>%
         dplyr::mutate(group_id = case_when(
-          group == "Background" ~ "background",
+          .data$group == "Background" ~ "background",
           .default = "sample"
         )) %>%
-        ggplot(aes(x = emission, y = plate_id, group = plate_id)) +
-        ggridges::geom_density_ridges(aes(point_color = group_id),
+        ggplot(aes(x = .data$emission, y = .data$plate_id, group = .data$plate_id)) +
+        ggridges::geom_density_ridges(aes(point_color = .data$group_id),
             jittered_points = TRUE,
             position = ggridges::position_points_jitter(width = 0.05, 
                                                         height = 0),
@@ -529,25 +529,25 @@ sketch_assimilate_rate <- function(my_df,
 
 
     my_df %>%
-        dplyr::select(plate_id, rate_data) %>%
-        tidyr::unnest(rate_data) %>%
-        dplyr::select(plate_id, measurement, injection,
-            interval, well, group, cell_n,
-            flagged_well,
+        dplyr::select(.data$plate_id, .data$rate_data) %>%
+        tidyr::unnest(.data$rate_data) %>%
+        dplyr::select(.data$plate_id, .data$measurement, .data$injection,
+                      .data$interval, .data$well, .data$group, .data$cell_n,
+                      .data$flagged_well,
             rate = all_of(param)
         ) %>%
-        dplyr::filter(!flagged_well) %>%
-        dplyr::filter(group != "Background") %>%
-        dplyr::filter(measurement %in% my_measurements) %>%
+        dplyr::filter(!.data$flagged_well) %>%
+        dplyr::filter(.data$group != "Background") %>%
+        dplyr::filter(.data$measurement %in% my_measurements) %>%
         dplyr::mutate(
             group_id =
-                paste0(plate_id, "_", group)
+                paste0(.data$plate_id, "_", .data$group)
         ) %>%
         relevel_group_names() %>%
         ggplot(aes(
-            x = group,
-            y = rate,
-            color = as.factor(interval)
+            x = .data$group,
+            y = .data$rate,
+            color = as.factor(.data$interval)
         )) +
         scale_color_brewer(palette = "Set1") +
         geom_jitter() +
@@ -576,15 +576,15 @@ sketch_assimilate_rate <- function(my_df,
 relevel_group_names <- function(my_df) {
     my_df <- my_df %>%
         mutate(group = dplyr::case_when(
-            !stringr::str_detect(group, ".*[0-9].*") ~
-                paste0("00_", group),
-            .default = group
+            !stringr::str_detect(.data$group, ".*[0-9].*") ~
+                paste0("00_", .data$group),
+            .default = .data$group
         )) %>%
         mutate(
             group =
                 forcats::fct_reorder(
-                    group,
-                    readr::parse_number(group)
+                  .data$group,
+                    readr::parse_number(.data$group)
                 )
         )
 
@@ -592,7 +592,7 @@ relevel_group_names <- function(my_df) {
         my_df <- my_df %>%
             mutate(
                 group =
-                    forcats::fct_recode(group,
+                    forcats::fct_recode(.data$group,
                         "Background" = "00_Background"
                     )
             )
@@ -626,33 +626,33 @@ plot_ribbon_per_meas_and_group <- function(df, var, y_title) {
 
     max_y <- df %>%
         select(everything(), param = all_of(var)) %>%
-        pull(param) %>%
+        pull(.data$param) %>%
         max()
 
     interval_end <- df %>%
-        slice(1, .by = measurement) %>%
-        slice_tail(n = 1, by = interval) %>%
-        pull(time_wave) %>%
+        slice(1, .by = .data$measurement) %>%
+        slice_tail(n = 1, by = .data$interval) %>%
+        pull(.data$time_wave) %>%
         head(-1)
 
     interval_start <- df %>%
-        slice(1, .by = measurement) %>%
-        slice_head(n = 1, by = interval) %>%
-        pull(time_wave) %>%
+        slice(1, .by = .data$measurement) %>%
+        slice_head(n = 1, by = .data$interval) %>%
+        pull(.data$time_wave) %>%
         tail(-1)
 
     xintercept_inj <- (interval_start - interval_end) / 2 + interval_end
 
     label_inj <- df %>%
-        pull(injection) %>%
+        pull(.data$injection) %>%
         unique() %>%
         tail(-1)
 
     quantiles_df <- df %>%
         select(everything(), param = all_of(var)) %>%
         summarise(
-            q = list(quantile(param)),
-            .by = c(time_wave, group)
+            q = list(quantile(.data$param)),
+            .by = c(.data$time_wave, .data$group)
         ) %>%
         tidyr::unnest_wider(q)
 
@@ -661,14 +661,14 @@ plot_ribbon_per_meas_and_group <- function(df, var, y_title) {
 
     plot <- quantiles_df %>%
         mutate(
-            whisker_up = X100,
-            whisker_down = X0
+            whisker_up = .data$X100,
+            whisker_down = .data$X0
         ) %>%
-        ggplot(aes(x = time_wave, group = group)) +
-        geom_ribbon(aes(ymin = X50 - (X50 - X25), 
-                        ymax = X50 + (X75 - X50), 
-                        fill = group), alpha = 0.5) +
-        geom_line(aes(y = X50, color = group), 
+        ggplot(aes(x = .data$time_wave, group = .data$group)) +
+        geom_ribbon(aes(ymin = .data$X50 - (.data$X50 - .data$X25), 
+                        ymax = .data$X50 + (.data$X75 - .data$X50), 
+                        fill = .data$group), alpha = 0.5) +
+        geom_line(aes(y = .data$X50, color = .data$group), 
                   linewidth = 1.5, linetype = "solid") +
         geom_hline(yintercept = 0, linetype = "dashed", 
                    linewidth = 0.4, color = "#D16103") +
@@ -721,34 +721,34 @@ plot_line_per_well <- function(df, var, y_title) {
     }
     max_y <- df %>%
         select(everything(), param = all_of(var)) %>%
-        pull(param) %>%
+        pull(.data$param) %>%
         max()
 
     interval_end <- df %>%
-        slice(1, .by = measurement) %>%
-        slice_tail(n = 1, by = interval) %>%
-        pull(time_wave) %>%
+        slice(1, .by = .data$measurement) %>%
+        slice_tail(n = 1, by = .data$interval) %>%
+        pull(.data$time_wave) %>%
         head(-1)
 
     interval_start <- df %>%
-        slice(1, .by = measurement) %>%
-        slice_head(n = 1, by = interval) %>%
-        pull(time_wave) %>%
+        slice(1, .by = .data$measurement) %>%
+        slice_head(n = 1, by = .data$interval) %>%
+        pull(.data$time_wave) %>%
         tail(-1)
 
     xintercept_inj <- (interval_start - interval_end) / 2 + interval_end
 
     label_inj <- df %>%
-        pull(injection) %>%
+        pull(.data$injection) %>%
         unique() %>%
         tail(-1)
 
     plot <- df %>%
         select(everything(), param = all_of(var)) %>%
         ggplot(aes(
-            x = time_wave, y = param,
-            group = well,
-            color = group
+            x = .data$time_wave, y = .data$param,
+            group = .data$well,
+            color = .data$group
         )) +
         geom_line(linewidth = 0.5) +
         geom_vline(

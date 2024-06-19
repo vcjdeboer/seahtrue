@@ -42,7 +42,7 @@ preprocess_xfplate <- function(xf) {
     )
 
     xf_plate_pr <- xf_raw_pr %>%
-        tidyr::nest(.by = plate_id) %>%
+        tidyr::nest(.by = .data$plate_id) %>%
         dplyr::mutate(
             filepath_seahorse = list(tibble::tibble(
                 directory_path = dirname(xf$filepath_seahorse),
@@ -55,10 +55,10 @@ preprocess_xfplate <- function(xf) {
             rate_data = list(tibble::tibble(xf_rate_pr)),
             injection_info = list(tibble::tibble(xf$inj))
         ) %>%
-        dplyr::select(plate_id, filepath_seahorse,
-            date_run, date_processed, assay_info,
-            injection_info,
-            raw_data = data, rate_data
+        dplyr::select(.data$plate_id, .data$filepath_seahorse,
+                      .data$date_run, .data$date_processed, .data$assay_info,
+                      .data$injection_info,
+            raw_data = .data$data, .data$rate_data
         )
 
     cli::cli_alert_info("Finished preprocessing of the input data")
@@ -120,7 +120,7 @@ preprocess_xf_raw <- function(xf_raw,
     xf_raw_pr <- convert_timestamp(xf_raw)
 
     # add flag well columnn
-    xf_flagged <- xf_flagged %>% pull(well)
+    xf_flagged <- xf_flagged %>% pull(.data$well)
     xf_raw_pr$flagged_well <- FALSE
     xf_raw_pr$flagged_well[xf_raw_pr$well %in% xf_flagged] <- TRUE
 
@@ -158,11 +158,11 @@ preprocess_xf_raw <- function(xf_raw,
     # select columns that are needed
     xf_raw_pr <- xf_raw_pr %>%
         dplyr::select(
-            plate_id, well, measurement, tick,
-            timescale, minutes, group, interval, injection,
-            O2_em_corr, pH_em_corr, O2_mmHg, pH, pH_em_corr_corr,
-            O2_em_corr_bkg, pH_em_corr_bkg, O2_mmHg_bkg, pH_bkgd,
-            pH_em_corr_corr_bkg, bufferfactor, cell_n, flagged_well
+          .data$plate_id, .data$well, .data$measurement, .data$tick,
+          .data$timescale, .data$minutes, .data$group, .data$interval, .data$injection,
+          .data$O2_em_corr, .data$pH_em_corr, .data$O2_mmHg, .data$pH, .data$pH_em_corr_corr,
+          .data$O2_em_corr_bkg, .data$pH_em_corr_bkg, .data$O2_mmHg_bkg, .data$pH_bkgd,
+            .data$pH_em_corr_corr_bkg, .data$bufferfactor, .data$cell_n, .data$flagged_well
         )
 
     return(xf_raw_pr)
@@ -231,22 +231,22 @@ preprocess_xf_rate <- function(xf_rate,
 
 convert_timestamp <- function(xf_raw_pr) {
     xf_raw_pr %>%
-        mutate(timestamp = as.character(timestamp)) %>%
+        mutate(timestamp = as.character(.data$timestamp)) %>%
         mutate(
             times =
-                stringr::str_split(timestamp, ":")
+                stringr::str_split(.data$timestamp, ":")
         ) %>%
         mutate(
             totalMinutes =
-                purrr::map_dbl(times, ~ .x %>%
+                purrr::map_dbl(.data$times, ~ .x %>%
                     as.numeric() %>%
                     {
                         first(.) * 60 + nth(., 2) + nth(., 3) / 60
                     })
         ) %>%
-        mutate(minutes = totalMinutes - first(totalMinutes)) %>%
-        mutate(timescale = round(minutes * 60)) %>%
-        select(-times)
+        mutate(minutes = .data$totalMinutes - first(.data$totalMinutes)) %>%
+        mutate(timescale = round(.data$minutes * 60)) %>%
+        select(-.data$times)
 }
 
 
@@ -290,19 +290,19 @@ correct_pH_em_corr <- function(pH_em_corr, pH_cal_em, pH_targetEmission) {
 #'
 calc_background <- function(xf_raw_pr) {
     background <- xf_raw_pr %>%
-        filter(flagged_well == FALSE) %>%
+        filter(.data$flagged_well == FALSE) %>%
         dplyr::select(
-            group, well, tick, O2_em_corr,
-            pH_em_corr, O2_mmHg, pH, pH_em_corr_corr
+          .data$group, .data$well, .data$tick, .data$O2_em_corr,
+          .data$pH_em_corr, .data$O2_mmHg, .data$pH, .data$pH_em_corr_corr
         ) %>%
-        dplyr::filter(group == "Background") %>%
+        dplyr::filter(.data$group == "Background") %>%
         dplyr::summarize(
-            O2_em_corr_bkg = mean(O2_em_corr),
-            pH_em_corr_bkg = mean(pH_em_corr),
-            O2_mmHg_bkg = mean(O2_mmHg),
-            pH_bkgd = mean(pH),
-            pH_em_corr_corr_bkg = mean(pH_em_corr_corr),
-            .by = c(tick)
+            O2_em_corr_bkg = mean(.data$O2_em_corr),
+            pH_em_corr_bkg = mean(.data$pH_em_corr),
+            O2_mmHg_bkg = mean(.data$O2_mmHg),
+            pH_bkgd = mean(.data$pH),
+            pH_em_corr_corr_bkg = mean(.data$pH_em_corr_corr),
+            .by = c(.data$tick)
         )
 
     return(background)

@@ -7,7 +7,7 @@ validate_O2_pH_levels <- function(xf_raw_pr,
             dplyr::mutate(
                 validate =
                     purrr::map(
-                        .x = data,
+                        .x = .data$data,
                         .f = ~ .x %>%
                             validate::confront(., rule) %>%
                             validate::summary() %>%
@@ -15,83 +15,83 @@ validate_O2_pH_levels <- function(xf_raw_pr,
                             dplyr::filter(fails != 0)
                     )
             ) %>%
-            tidyr::unnest(validate) %>%
-            dplyr::select(-data) %>%
-            tidyr::nest(.by = c(well, expression)) %>% 
+            tidyr::unnest(.data$validate) %>%
+            dplyr::select(-.data$data) %>%
+            tidyr::nest(.by = c(.data$well, .data$expression)) %>% 
             dplyr::mutate(
                 failed =
                     purrr::map(
-                        .x = data,
+                        .x = .data$data,
                         .f = ~ .x %>%
-                            dplyr::select(measurement) %>%
-                            dplyr::pull(measurement)
+                            dplyr::select(.data$measurement) %>%
+                            dplyr::pull(.data$measurement)
                     )
             ) %>%
             dplyr::mutate(n_failed = purrr::map_dbl(
-                .x = data,
+                .x = .data$data,
                 .f = ~ .x %>% nrow()
             )) %>%
-            dplyr::select(-data)
+            dplyr::select(-.data$data)
     }
 
 
     get_failed_values <- function(failed_df, original_df, tick = "first") {
         if (tick == "first") {
             df <- failed_df %>%
-                tidyr::unnest(c(failed)) %>%
+                tidyr::unnest(c(.data$failed)) %>%
                 dplyr::mutate(
                     values =
                         purrr::map2(
-                            .x = failed,
-                            .y = well,
+                            .x = .data$failed,
+                            .y = .data$well,
                             .f = ~ original_df %>%
                                 dplyr::filter(well == .y) %>%
                                 dplyr::filter(measurement == .x) %>%
                                 dplyr::slice(1) %>%
-                                dplyr::select(O2_mmHg, pH)
+                                dplyr::select(.data$O2_mmHg, .data$pH)
                         )
                 ) %>%
-                tidyr::unnest(c(values)) %>%
-                dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>%
+                tidyr::unnest(c(.data$values)) %>%
+                dplyr::mutate(param = stringr::str_sub(.data$expression, 10, 11)) %>%
                 dplyr::mutate(label = "first_tick")
         }
 
         if (tick == "last") {
             df <- failed_df %>%
-                tidyr::unnest(c(failed)) %>%
+                tidyr::unnest(c(.data$failed)) %>%
                 dplyr::mutate(
                     values =
                         purrr::map2(
-                            .x = failed,
-                            .y = well,
+                            .x = .data$failed,
+                            .y = .data$well,
                             .f = ~ original_df %>%
                                 dplyr::filter(well == .y) %>%
                                 dplyr::filter(measurement == .x) %>%
                                 dplyr::slice_tail(n = 1) %>%
-                                dplyr::select(O2_mmHg, pH)
+                                dplyr::select(.data$O2_mmHg, .data$pH)
                         )
                 ) %>%
-                tidyr::unnest(c(values)) %>%
-                dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>%
+                tidyr::unnest(c(.data$values)) %>%
+                dplyr::mutate(param = stringr::str_sub(.data$expression, 10, 11)) %>%
                 dplyr::mutate(label = "last_tick")
         }
 
         if (tick == "start") {
             df <- failed_df %>%
-                tidyr::unnest(c(failed)) %>%
+                tidyr::unnest(c(.data$failed)) %>%
                 dplyr::mutate(
                     values =
                         purrr::map2(
-                            .x = failed,
-                            .y = well,
+                            .x = .data$failed,
+                            .y = .data$well,
                             .f = ~ original_df %>%
                                 dplyr::filter(well == .y) %>%
                                 dplyr::slice(1) %>%
-                                dplyr::select(O2_mmHg, pH)
+                                dplyr::select(.data$O2_mmHg, .data$pH)
                         )
                 ) %>%
-                tidyr::unnest(c(values)) %>%
-                dplyr::mutate(param = stringr::str_sub(expression, 10, 11)) %>%
+                tidyr::unnest(c(.data$values)) %>%
+                dplyr::mutate(param = stringr::str_sub(.data$expression, 10, 11)) %>%
                 dplyr::mutate(label = "start_tick")
         }
 
@@ -102,37 +102,37 @@ validate_O2_pH_levels <- function(xf_raw_pr,
     failed_df_first_tick <- xf_raw_pr %>%
         dplyr::slice_head(
             n = 1,
-            by = c(well, measurement)
+            by = c(.data$well, .data$measurement)
         ) %>%
-        tidyr::nest(.by = c(well, measurement)) %>%
-        validate_ticks(., tick_range_rule) %>%
-        get_failed_values(., xf_raw_pr, tick = "first")
+        tidyr::nest(.by = c(.data$well, .data$measurement)) %>%
+        validate_ticks( tick_range_rule) %>%
+        get_failed_values( xf_raw_pr, tick = "first")
 
     failed_df_last_tick <- xf_raw_pr %>%
         dplyr::slice_tail(
             n = 1,
-            by = c(well, measurement)
+            by = c(.data$well, .data$measurement)
         ) %>%
-        tidyr::nest(.by = c(well, measurement)) %>%
-        validate_ticks(., tick_range_rule) %>%
-        get_failed_values(., xf_raw_pr, tick = "last")
+        tidyr::nest(.by = c(.data$well, .data$measurement)) %>%
+        validate_ticks(tick_range_rule) %>%
+        get_failed_values(xf_raw_pr, tick = "last")
 
     failed_df_start_tick <- xf_raw_pr %>%
         dplyr::slice_head(
             n = 1,
-            by = c(well)
+            by = c(.data$well)
         ) %>%
-        tidyr::nest(.by = c(well, measurement)) %>%
-        validate_ticks(., start_tick_range_rule) %>%
-        get_failed_values(., xf_raw_pr, tick = "start")
+        tidyr::nest(.by = c(.data$well, .data$measurement)) %>%
+        validate_ticks(start_tick_range_rule) %>%
+        get_failed_values(xf_raw_pr, tick = "start")
 
     failed_ticks_combined <- dplyr::bind_rows(
         failed_df_last_tick,
         failed_df_first_tick,
         failed_df_start_tick
     ) %>%
-        tidyr::nest(.by = c(well, n_failed, param, label)) %>%
-        dplyr::arrange(well, label)
+        tidyr::nest(.by = c(.data$well, .data$n_failed, .data$param, .data$label)) %>%
+        dplyr::arrange(.data$well, .data$label)
 
     return(failed_ticks_combined)
 }
@@ -140,8 +140,8 @@ validate_O2_pH_levels <- function(xf_raw_pr,
 validatie_tick_is_linear <- function(xf_raw_pr) {
     # is linear for tick
     xf_raw_pr %>%
-        dplyr::slice(1, .by = c(measurement, tick)) %>%
-        dplyr::select(well, measurement, tick, group) %>%
+        dplyr::slice(1, .by = c(.data$measurement, .data$tick)) %>%
+        dplyr::select(.data$well, .data$measurement, .data$tick, .data$group) %>%
         dplyr::pull(tick) %>%
         validate::is_linear_sequence(begin = 0)
 }
@@ -153,13 +153,13 @@ validate_for_NA <- function(xf_raw_pr, NA_rule) {
         dplyr::mutate(
             param_NA =
                 purrr::map_chr(
-                    .x = expression,
+                    .x = .data$expression,
                     .f = ~ stringr::str_extract_all(
                         .x, "\\([^()]+\\)"
                     ) %>%
                         purrr::pluck(1) %>%
                         stringr::str_sub(2, -2) %>%
-                        paste0(., "_NA")
+                        paste0("_NA")
                 )
         ) %>%
         dplyr::as_tibble()
@@ -168,9 +168,11 @@ validate_for_NA <- function(xf_raw_pr, NA_rule) {
         validate::values() %>%
         dplyr::as_tibble() %>%
         dplyr::rename_with(~ NA_df_summary$param_NA, names(.)) %>%
+      #fix the dot
         dplyr::select(where(~ any(. == FALSE))) %>%
         dplyr::bind_cols(xf_raw_pr %>%
-            dplyr::select(well, measurement, tick, group), .)
+                           #fix this dot? VB
+        dplyr::select(.data$well, .data$measurement, .data$tick, .data$group), .)
 
     return(df_with_NAs_identified)
 }
@@ -178,7 +180,7 @@ validate_for_NA <- function(xf_raw_pr, NA_rule) {
 validate_well_number <- function(xf_raw_pr) {
     number_of_wells_per_plate <-
         xf_raw_pr %>%
-        dplyr::pull(well) %>%
+        dplyr::pull(.data$well) %>%
         unique() %>%
         length()
 
@@ -190,43 +192,43 @@ validate_well_number <- function(xf_raw_pr) {
 get_timing_info <- function(xf_raw_pr) {
     number_of_ticks_per_measurement <-
         xf_raw_pr %>%
-        dplyr::slice(1, .by = c(measurement, tick)) %>%
-        count(measurement) %>%
-        dplyr::rename(number_of_ticks = n)
+        dplyr::slice(1, .by = c(.data$measurement, .data$tick)) %>%
+        count(.data$measurement) %>%
+        dplyr::rename(number_of_ticks = .data$n)
 
     time_info <- xf_raw_pr %>%
-        dplyr::slice(1, .by = c(measurement, tick)) %>%
+        dplyr::slice(1, .by = c(.data$measurement, .data$tick)) %>%
         dplyr::mutate(
-            st = first(timescale),
-            end = last(timescale),
-            .by = measurement
+            st = first(.data$timescale),
+            end = last(.data$timescale),
+            .by = .data$measurement
         ) %>%
-        dplyr::select(st, end) %>%
-        dplyr::mutate(per_meas = end - st) %>%
+        dplyr::select(.data$st, .data$end) %>%
+        dplyr::mutate(per_meas = .data$end - .data$st) %>%
         unique() %>%
-        dplyr::mutate(lagged = lag(end)) %>%
-        dplyr::mutate(lagged = case_when(is.na(lagged) ~ 0,
-            .default = lagged
+        dplyr::mutate(lagged = lag(.data$end)) %>%
+        dplyr::mutate(lagged = case_when(is.na(.data$lagged) ~ 0,
+            .default = .data$lagged
         )) %>%
-        dplyr::mutate(wait_mix = st - lagged) %>%
-        dplyr::select(-lagged) %>%
+        dplyr::mutate(wait_mix = .data$st - .data$lagged) %>%
+        dplyr::select(-.data$lagged) %>%
         dplyr::bind_cols(number_of_ticks_per_measurement) %>%
         dplyr::select(
-            measurement,
-            number_of_ticks,
-            st, end, per_meas, wait_mix
+          .data$measurement,
+          .data$number_of_ticks,
+          .data$st, .data$end, .data$per_meas, .data$wait_mix
         ) %>%
         dplyr::mutate(
-            st_min = st / 60,
-            end_min = end / 60,
-            per_meas_min = per_meas / 60,
-            wait_mix_min = wait_mix / 60
+            st_min = .data$st / 60,
+            end_min = .data$end / 60,
+            per_meas_min = .data$per_meas / 60,
+            wait_mix_min = .data$wait_mix / 60
         ) %>%
         dplyr::rename(
-            st_sec = st,
-            end_sec = end,
-            per_meas_sec = per_meas,
-            wait_mix_sec = wait_mix
+            st_sec = .data$st,
+            end_sec = .data$end,
+            per_meas_sec = .data$per_meas,
+            wait_mix_sec = .data$wait_mix
         )
 
     return(time_info)
@@ -238,15 +240,15 @@ validate_preprocessed <- function(preprocessed_xf_plate) {
 
     # rules
     tick_range_rule <- validate::validator(
-        in_range(O2_mmHg, min = 10, max = 200),
-        in_range(pH, min = 7, max = 7.5)
+        in_range(.data$O2_mmHg, min = 10, max = 200),
+        in_range(.data$pH, min = 7, max = 7.5)
     )
 
     start_tick_range_rule <- validate::validator(
-        in_range(O2_mmHg, min = 140, max = 170),
-        in_range(pH, min = 7.2, max = 7.6)
+        in_range(.data$O2_mmHg, min = 140, max = 170),
+        in_range(.data$pH, min = 7.2, max = 7.6)
     )
-
+    
     NA_rule <- validate::validator(
         is_complete(well),
         is_complete(measurement),
