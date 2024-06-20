@@ -1,3 +1,10 @@
+# seahtrue 0.99.2
+
+* bioconductor - refactor the code that gives the no visible binding for tibble calls, and validator ruls
+* bioconductor - include importsFrom in validate_preprocess function for (head, tail, quantile functions)
+* bioconductor - remove family tag in master functions in roxygen comments
+* biocondcutor - updated the vignette layout for the sessionInfo call
+
 # seahtrue 0.99.1
 
 * bioconductor - lower package size by removing example files.
