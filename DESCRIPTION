@@ -67,6 +67,5 @@ RoxygenNote: 7.3.1
 Depends:
     R (>= 4.2.0) 
 VignetteBuilder: knitr
-StagedInstall: no
 URL: https://vcjdeboer.github.io/seahtrue/
 BugReports: https://vcjdeboer.github.io/seahtrue/issues
