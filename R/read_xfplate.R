@@ -188,18 +188,38 @@ verify_xf_norm <- function(xf_norm) {
 #' Get unselected (flagged) wells from the Assay Configuration sheet.
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
-#' This Excel file is converted from the assay result file (.asyr) downloaded 
-#' from
-#' the Agilent Seahorse XF Wave software.
+#'   This Excel file is converted from the assay result file (.asyr) downloaded
+#'   from the Agilent Seahorse XF Wave software.
 #'
-#' @return Vector that contains wells that were "unselected" (flagged).
+#' @return A tibble with columns `well` and `flag`, indicating which wells were
+#'   "unselected" (flagged). If the `tidyxl` package is not installed, an empty
+#'   tibble is returned with zero flagged wells.
+#'
+#' @details
+#' This function requires the \pkg{tidyxl} package to extract formatting
+#' information from the Excel file. If \pkg{tidyxl} is not installed, the
+#' function will return an empty tibble and issue a warning. 
+#'
 #' @noRd
 #' @keywords internal
-#' @import tidyxl readxl dplyr stringr tibble
+#' @importFrom tibble tibble
+#' @importFrom dplyr filter pull
+#' @importFrom stringr str_c str_split str_replace_all
+#' @importFrom cli cli_warn
 #' @examples
-#' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
-#' package = "seahtrue"))
+#' # This example works whether or not tidyxl is installed.
+#' # If tidyxl is unavailable, a warning is shown and an empty tibble is returned.
+#' flagged <- get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
+#'   package = "seahtrue"))
+#' print(flagged)
 get_xf_flagged <- function(filepath_seahorse) {
+    
+  # Check if tidyxl is installed
+  if (!requireNamespace("tidyxl", quietly = TRUE)) {
+    cli::cli_warn("Package {.pkg tidyxl} not available. Returning tibble with no flagged wells.")    
+    return(tibble::tibble(well = character(0), flag = logical(0)))
+  }
+    
     x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
