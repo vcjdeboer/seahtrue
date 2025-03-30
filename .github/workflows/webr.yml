@@ -1,28 +1,10 @@
-name: Build seahtrue for WebR
+name: Build and deploy seahtrue from GitHub for WebR
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-webr:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🧾 Checkout your package
-        uses: actions/checkout@v3
-
-      - name: 🐳 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 🔨 Run WebR build container from Docker Hub
-        run: |
-          docker run --rm --platform=linux/amd64 \
-            -v "${{ github.workspace }}:/pkg" \
-            rwasm/webr-build:latest \
-            webr-build /pkg
-
-      - name: 📦 Upload compiled WebR package
-        uses: actions/upload-artifact@v4
-        with:
-          name: seahtrue-webr
-          path: ./seahtrue_*.tgz
+  build:
+    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
+    with:
+      packages: vcjdeboer/seahtrue  
