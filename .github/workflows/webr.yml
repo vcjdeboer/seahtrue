@@ -1,7 +1,7 @@
 name: Build seahtrue for WebR
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # manual trigger from GitHub UI
 
 jobs:
   build-webr:
@@ -11,15 +11,18 @@ jobs:
       - name: 🧾 Checkout your package
         uses: actions/checkout@v3
 
-      - name: 🐳 Build package with WebR toolchain
+      - name: 🐳 Set up Docker Buildx (needed for --platform flag)
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔨 Run WebR build container
         run: |
-          docker run --platform=linux/amd64 --rm \
-            -v "$PWD:/pkg" \
+          docker run --rm --platform=linux/amd64 \
+            -v "${{ github.workspace }}:/pkg" \
             ghcr.io/r-wasm/webr-build:latest \
             webr-build /pkg
 
-      - name: 📦 Upload compiled .tgz
+      - name: 📦 Upload compiled WebR package
         uses: actions/upload-artifact@v4
         with:
-          name: seahtrue-webr-package
+          name: seahtrue-webr
           path: ./seahtrue_*.tgz
