@@ -1,22 +1,25 @@
 name: Build seahtrue for WebR
 
 on:
-  workflow_dispatch:  # manual trigger
+  workflow_dispatch:
 
 jobs:
   build-webr:
     runs-on: ubuntu-latest
+
     steps:
       - name: 🧾 Checkout your package
         uses: actions/checkout@v3
 
-      - name: 🔧 Compile for WebR using r-wasm/actions
-        uses: r-wasm/webr-build@v1
-        with:
-          path: .  # path to your package (repo root)
+      - name: 🐳 Build package with WebR toolchain
+        run: |
+          docker run --platform=linux/amd64 --rm \
+            -v "$PWD:/pkg" \
+            ghcr.io/r-wasm/webr-build:latest \
+            webr-build /pkg
 
       - name: 📦 Upload compiled .tgz
         uses: actions/upload-artifact@v4
         with:
           name: seahtrue-webr-package
-          path: seahtrue_*.tgz
+          path: ./seahtrue_*.tgz
