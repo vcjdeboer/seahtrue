@@ -251,7 +251,7 @@ sketch_rate <- function(xf_rate,
 
     if (!validate::all_complete(xf_rate$cell_n)) {
         cli::cli_abort(
-            glue::glue("There are NAs in the n_cell column"),
+            glue::glue("There are NAs in the cell_n column"),
             wrap = TRUE
         )
     }
