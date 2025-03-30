@@ -1,4 +1,4 @@
-name: Build and deploy seahtrue for WebR
+name: Build and deploy seahtrue from GitHub
 
 on:
   workflow_dispatch:
@@ -7,9 +7,10 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  repository-projects: read  
 
 jobs:
   build:
     uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
     with:
-      packages: vcjdeboer/seahtrue
+      packages: vcjdeboer/seahtrue  
