@@ -32,11 +32,9 @@ read_xfplate <- function(filepath_seahorse,
                          instrument = my_instrument) %>%
         verify_xf_assayinfo()
 
-    xf_norm <-
-        get_xf_norm(filepath_seahorse) %>%
-        verify_xf_norm()
-
-
+    xf_norm <- get_xf_norm(filepath_seahorse) %>%
+      verify_xf_norm() %>%
+      set_xf_norm()
 
     xf_buffer <- get_xf_buffer(filepath_seahorse)
     xf_inj <- get_xf_inj(filepath_seahorse)
@@ -169,21 +167,33 @@ get_xf_norm <- function(filepath_seahorse) {
 
 # new function
 verify_xf_norm <- function(xf_norm) {
-    # typically a full plate is copied, thus a high number
-    # of NAs is typically a sign that norm is not available
+  # Count NAs in cell_n
+  na_count <- sum(is.na(xf_norm$cell_n), na.rm = TRUE)
+  
+  # Determine if normalization is available
+  norm_available <- na_count <= 90
+  
+  # Attach attributes
+  xf_norm <- xf_norm %>%
+    structure(
+      norm_available = norm_available,
+      na_count = na_count
+    )
+  
+  return(xf_norm)
+}
 
-    # get the attribute using:
-    # attributes(xf_norm) %>%  pluck("norm_available")
-
-    if (sum(is.na(xf_norm$cell_n)) > 90) {
-        xf_norm <- xf_norm %>%
-            structure(norm_available = FALSE)
-    } else {
-        xf_norm <- xf_norm %>%
-            structure(norm_available = TRUE)
-    }
-
-    return(xf_norm)
+set_xf_norm <- function(xf_norm) {
+  na_count <- sum(is.na(xf_norm$cell_n), na.rm = TRUE)
+  
+  if (na_count > 0) {
+    cli::cli_alert_info("Replaced {na_count} missing {.field cell_n} values with 1 (no normalization).")
+    
+    xf_norm <- xf_norm %>%
+      dplyr::mutate(cell_n = ifelse(is.na(.data$cell_n), 1, .data$cell_n))
+  }
+  
+  return(xf_norm)
 }
 
 # get_xf_flagged() -----------------------------------------------------
