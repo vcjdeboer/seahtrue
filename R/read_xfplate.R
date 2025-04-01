@@ -1027,32 +1027,13 @@ get_platelayout_data <- function(filepath_seahorse,
 
 # new util function
 missing_strings <- function(my_strings, strings_required) {
-    my_strings_df <- my_strings %>%
-        dplyr::as_tibble()
-    
-    #fix valid_codes and value VB
-    rule <- validate::validator(
-        .data = data.frame(
-          rule = c("value %in% valid_codes"),
-          name = "missing strings",
-          description = "missing strings")
-        
-    )
-
-    strings_available <-
-        validate::satisfying(my_strings_df, rule,
-            ref = list(valid_codes = strings_required)
-        ) %>%
-        pull(.data$value)
-
-    my_missing_strings <-
-        if (!identical(strings_available, strings_required)) {
-            dplyr::setdiff(
-                strings_required,
-                strings_available
-            )
-        }
-
-
+  strings_available <- intersect(my_strings, strings_required)
+  
+  my_missing_strings <- setdiff(strings_required, strings_available)
+  
+  if (length(my_missing_strings) > 0) {
     return(my_missing_strings)
+  } else {
+    return(NULL)
+  }
 }
