@@ -2,35 +2,60 @@
 % Please edit documentation in R/master.R
 \name{revive_xfplate}
 \alias{revive_xfplate}
-\title{Running the read, preprocess and validate}
+\title{Read, Preprocess, and Validate Seahorse XF Excel File}
 \usage{
-revive_xfplate(filepath_seahorse)
+revive_xfplate(
+  filepath_seahorse,
+  my_instrument = "XFe96",
+  use_default_qc_ranges = TRUE,
+  qc_ranges = list()
+)
 }
 \arguments{
-\item{filepath_seahorse}{Absolute path to the Seahorse Excel file.}
+\item{filepath_seahorse}{Character. Absolute path to the Seahorse Excel file.
+This file should be exported from Agilent Wave and include the expected sheets.}
+
+\item{my_instrument}{Character. The type of Seahorse instrument used.
+Default is `"XFe96"`.}
+
+\item{use_default_qc_ranges}{Logical. If `TRUE` (default), built-in QC ranges are used:
+O2 = [50-180] mmHg, pH = [6.8-7.6].}
+
+\item{qc_ranges}{Optional list of custom QC ranges, created with [define_qc_ranges()].
+This is only used if `use_default_qc_ranges = FALSE`.}
 }
 \value{
-A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
- * plate_id = Barcode plate id of the well plate containing the samples \cr
- * filepath_seahorse = Path, and basename to .xlsx input file \cr
- * date_run = Date and time when the plate was run \cr
- * date_processed = Date and time this output from revive_xfplate() was generated \cr
- * assay_info = Meta information from 'Assay Configuration' sheet and 'Calibration' sheet \cr
- * injection_info = Dataframe with information from the 'Operation log' sheet \cr
- * raw_data = Preprocessed raw dataframe from 'Raw' sheet \cr
- * rate_data = Preprocessed rate data from 'Rate' sheet \cr
- # validation_output = Output of the data checks. including rules
+A nested tibble with the processed Seahorse plate data, including:
+\describe{
+  \item{plate_id}{Barcode of the plate (if available)}
+  \item{filepath_seahorse}{Path to the `.xlsx` file}
+  \item{date_run}{Timestamp when the plate was run}
+  \item{date_processed}{Timestamp when this object was created}
+  \item{assay_info}{Metadata from the assay configuration and calibration sheets}
+  \item{injection_info}{Data frame with injection (operation log) info}
+  \item{raw_data}{Preprocessed raw data from the Raw sheet}
+  \item{rate_data}{Preprocessed OCR/ECAR data from the Rate sheet}
+  \item{validation_output}{List-column with validation outputs and QC flags}
+}
 }
 \description{
-This function takes the Seahorse Wave .xlsx file and computes it through
-read, validate and preprocess
+This function reads a Seahorse XF assay result `.xlsx` file (exported from Wave),
+and processes it through reading, preprocessing, and validation steps.
+It performs QC validation using either default or user-defined quality control ranges.
+}
+\details{
+This is the main entry point for working with Seahorse `.xlsx` files. It wraps
+around lower-level functions like [read_xfplate()], [preprocess_xfplate()],
+and [validate_preprocessed()]. It also performs basic file and sheet existence checks.
 }
 \examples{
+# Example using internal test file:
 revive_xfplate(
-    system.file("extdata",
-        "20191219_SciRep_PBMCs_donor_A.xlsx",
-        package = "seahtrue"
-    )
+  system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx",
+    package = "seahtrue"
+  )
 )
-
+}
+\seealso{
+[define_qc_ranges()], [validate_preprocessed()]
 }

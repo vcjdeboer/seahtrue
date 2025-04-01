@@ -1,33 +1,54 @@
-#' Running the read, preprocess and validate
+#' Read, Preprocess, and Validate Seahorse XF Excel File
 #'
 #' @description
-#' This function takes the Seahorse Wave .xlsx file and computes it through
-#' read, validate and preprocess
+#' This function reads a Seahorse XF assay result `.xlsx` file (exported from Wave),
+#' and processes it through reading, preprocessing, and validation steps.
+#' It performs QC validation using either default or user-defined quality control ranges.
 #'
-#' @param filepath_seahorse Absolute path to the Seahorse Excel file.
+#' @param filepath_seahorse Character. Absolute path to the Seahorse Excel file.
+#'   This file should be exported from Agilent Wave and include the expected sheets.
+#' @param my_instrument Character. The type of Seahorse instrument used.
+#'   Default is `"XFe96"`.
+#' @param use_default_qc_ranges Logical. If `TRUE` (default), built-in QC ranges are used:
+#'   O2 = [50-180] mmHg, pH = [6.8-7.6].
+#' @param qc_ranges Optional list of custom QC ranges, created with [define_qc_ranges()].
+#'   This is only used if `use_default_qc_ranges = FALSE`.
 #'
-#' @return A preprocessed seahorse dataset is returned as an output. This is a nested tibble with the following 7 columns: \cr
-#'  * plate_id = Barcode plate id of the well plate containing the samples \cr
-#'  * filepath_seahorse = Path, and basename to .xlsx input file \cr
-#'  * date_run = Date and time when the plate was run \cr
-#'  * date_processed = Date and time this output from revive_xfplate() was generated \cr
-#'  * assay_info = Meta information from 'Assay Configuration' sheet and 'Calibration' sheet \cr
-#'  * injection_info = Dataframe with information from the 'Operation log' sheet \cr
-#'  * raw_data = Preprocessed raw dataframe from 'Raw' sheet \cr
-#'  * rate_data = Preprocessed rate data from 'Rate' sheet \cr
-#'  # validation_output = Output of the data checks. including rules
+#' @return A nested tibble with the processed Seahorse plate data, including:
+#' \describe{
+#'   \item{plate_id}{Barcode of the plate (if available)}
+#'   \item{filepath_seahorse}{Path to the `.xlsx` file}
+#'   \item{date_run}{Timestamp when the plate was run}
+#'   \item{date_processed}{Timestamp when this object was created}
+#'   \item{assay_info}{Metadata from the assay configuration and calibration sheets}
+#'   \item{injection_info}{Data frame with injection (operation log) info}
+#'   \item{raw_data}{Preprocessed raw data from the Raw sheet}
+#'   \item{rate_data}{Preprocessed OCR/ECAR data from the Rate sheet}
+#'   \item{validation_output}{List-column with validation outputs and QC flags}
+#' }
+#'
+#' @details
+#' This is the main entry point for working with Seahorse `.xlsx` files. It wraps
+#' around lower-level functions like [read_xfplate()], [preprocess_xfplate()],
+#' and [validate_preprocessed()]. It also performs basic file and sheet existence checks.
+#'
+#' @seealso [define_qc_ranges()], [validate_preprocessed()]
 #'
 #' @export
-#' @import logger rlang cli glue readxl 
-#' @examples
-#' revive_xfplate(
-#'     system.file("extdata",
-#'         "20191219_SciRep_PBMCs_donor_A.xlsx",
-#'         package = "seahtrue"
-#'     )
-#' )
 #'
-revive_xfplate <- function(filepath_seahorse) {
+#' @import logger rlang cli glue readxl
+#'
+#' @examples
+#' # Example using internal test file:
+#' revive_xfplate(
+#'   system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx",
+#'     package = "seahtrue"
+#'   )
+#' )
+revive_xfplate <- function(filepath_seahorse,
+                           my_instrument = "XFe96",
+                           use_default_qc_ranges = TRUE,
+                           qc_ranges = list()) {
     logger::log_info("Start reviving")
 
     # Check if argument is present
@@ -74,11 +95,47 @@ revive_xfplate <- function(filepath_seahorse) {
         }
     }
 
+    #check the qc arguments
+    if (use_default_qc_ranges) {
+      cli::cli_alert("Using default QC ranges: O2 = [50-180] mmHg, pH = [6.8-7.6].")
+      qc_ranges <- define_qc_ranges(O2_min = 50,
+                                    O2_max = 180,
+                                    pH_min = 6.8,
+                                    pH_max = 7.6)
+      
+    }
+    
+    if (!use_default_qc_ranges && inherits(qc_ranges, "qc_ranges")){
+      O2_min <- qc_ranges$O2$min
+      O2_max <- qc_ranges$O2$max
+      pH_min <- qc_ranges$pH$min
+      pH_max <- qc_ranges$pH$max
+      unit   <- qc_ranges$O2$unit
+      cli::cli_inform(
+        "Using the {.strong qc_ranges} provided: O2 = [{O2_min}-{O2_max}] {unit}, pH = [{pH_min}-{pH_max}]",
+        O2_min = O2_min,
+        O2_max = O2_max,
+        pH_min = pH_min,
+        pH_max = pH_max,
+        unit   = unit
+      )
+      cat("\n")
+      qc_ranges <- qc_ranges
+    }
+    
+    if (!use_default_qc_ranges && !inherits(qc_ranges, "qc_ranges")){
+      cli::cli_alert("Falling back to default QC ranges: O2 = [50-180] mmHg, pH = [6.8-7.6]. Because the qc_ranges was not generated using the define_qc_ranges function")
+      
+      qc_ranges <- define_qc_ranges(O2_min = 50,
+                                    O2_max = 180,
+                                    pH_min = 6.8,
+                                    pH_max = 7.6)
+    }
     # run the read/preprocess/validate function
     preprocessed_xf_plate <- filepath_seahorse %>%
-        read_xfplate() %>%
+        read_xfplate(my_instrument = my_instrument) %>%
         preprocess_xfplate() %>%
-        validate_preprocessed()
+        validate_preprocessed(qc_ranges)
 
     logger::log_info("Finished reviving")
 
@@ -129,8 +186,8 @@ glue_xfplates <- function(folderpath_seahorse, arg_is_folder) {
             full.names = TRUE
         ) %>%
             stringr::str_subset(
-                fixed("~$"),
-                negate = TRUE
+              pattern = stringr::fixed("~$"),
+              negate = TRUE
             )
     } else {
         file_list <- folderpath_seahorse
@@ -151,4 +208,15 @@ glue_xfplates <- function(folderpath_seahorse, arg_is_folder) {
     logger::log_info("Finished glueing")
 
     return(df)
+}
+
+
+define_qc_ranges <- function(O2_min, O2_max, pH_min, pH_max) {
+  structure(
+    list(
+      O2 = list(min = O2_min, max = O2_max, unit = "mmHg"),
+      pH = list(min = pH_min, max = pH_max)
+    ),
+    class = "qc_ranges"
+  )
 }
