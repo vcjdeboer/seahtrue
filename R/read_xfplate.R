@@ -14,7 +14,8 @@
 #' @examples
 #' read_xfplate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
 #' package = "seahtrue"))
-read_xfplate <- function(filepath_seahorse) {
+read_xfplate <- function(filepath_seahorse,
+                         my_instrument = "XFe96") {
     cli::cli_alert(
         glue::glue("Start function to read seahorse plate data from 
                  Excel file: {basename(filepath_seahorse)}"),
@@ -26,7 +27,9 @@ read_xfplate <- function(filepath_seahorse) {
         verify_xf_raw()
 
     xf_assayinfo <-
-        get_xf_assayinfo(filepath_seahorse, xf_raw) %>%
+        get_xf_assayinfo(filepath_seahorse, 
+                         xf_raw,
+                         instrument = my_instrument) %>%
         verify_xf_assayinfo()
 
     xf_norm <-
