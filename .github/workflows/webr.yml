@@ -1,6 +1,9 @@
 name: Build and deploy seahtrue from GitHub
 
 on:
+  push:
+    branches:
+      - devel
   workflow_dispatch:
 
 permissions:
@@ -13,4 +16,5 @@ jobs:
   build:
     uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
     with:
-      packages: vcjdeboer/seahtrue  
+      packages: vcjdeboer/seahtrue@devel
+      repo-path: _site/devel
