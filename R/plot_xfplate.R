@@ -1099,14 +1099,15 @@ plot_bioenergetic_trajectory <- function(df,
       names_pattern = "(.*)_(ocr|ecar)"
     ) %>%
     dplyr::mutate(
-      state = dplyr::recode(state,
-                            "basal" = "Baseline",
-                            "fccp" = "FCCP",
-                            "amrot" = "AM/Rot",
-                            "mon" = "Monensin"
-      ),
-      state = factor(state, levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")),
-      #group = forcats::fct_rev(factor(group))
+      state = factor(
+        dplyr::recode(as.character(.data$state),
+                      "basal" = "Baseline",
+                      "fccp" = "FCCP",
+                      "amrot" = "AM/Rot",
+                      "mon" = "Monensin"
+        ),
+        levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")
+      )
     )
   
   # Optional state label replacements
