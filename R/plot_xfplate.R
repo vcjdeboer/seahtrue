@@ -1095,24 +1095,24 @@ plot_bioenergetic_trajectory <- function(df,
     dplyr::select(group, dplyr::all_of(required_cols[-1])) %>%
     tidyr::pivot_longer(
       cols = -group,
-      names_to = c("state", ".value"),
+      names_to = c("phase", ".value"),
       names_pattern = "(.*)_(ocr|ecar)"
     ) %>%
-    dplyr::mutate(
-      state = factor(
-        dplyr::recode(as.character(.data$state),
-                      "basal" = "Baseline",
-                      "fccp" = "FCCP",
-                      "amrot" = "AM/Rot",
-                      "mon" = "Monensin"
-        ),
-        levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")
-      )
+    mutate(
+      phase = dplyr::recode(
+        as.character(.data$phase),
+        "basal" = "Baseline",
+        "fccp" = "FCCP",
+        "amrot" = "AM/Rot",
+        "mon" = "Monensin"
+      ),
+      phase = factor(.data$phase, levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")),
+      phase_label = .data$phase
     )
   
   # Optional state label replacements
   df_long <- df_long %>%
-    dplyr::mutate(label = dplyr::recode(as.character(state), !!!label_map))
+    dplyr::mutate(phase_label = dplyr::recode(as.character(.data$phase), !!!label_map))
   
   # Set plot ranges
   x_max <- max(df_long$ecar, na.rm = TRUE) * 1.1
@@ -1123,7 +1123,7 @@ plot_bioenergetic_trajectory <- function(df,
               linewidth = 1.2,
               arrow = arrow(type = "closed", length = unit(0.15, "inches"))) +
     geom_point(shape = 21, size = 4, color = "black") +
-    ggrepel::geom_label_repel(aes(label = label),
+    ggrepel::geom_label_repel(aes(label = phase_label),
                               size = 3,
                               max.overlaps = 10,
                               box.padding = 0.4,
