@@ -799,10 +799,14 @@ plot_line_per_well <- function(df, var, y_title) {
 #' @export
 #'
 #' @examples
+#'  data <- revive_xfplate(
+#'   system.file("extdata", 
+#'   "20191219_SciRep_PBMCs_donor_A.xlsx", package = "seahtrue")
+#'  ) 
 #' calculate_space(
-#'   rate = my_rate_data,
-#'   param_set_ocr = c(init_ocr = "m3", om_ocr = "m6", fccp_ocr = "m9", amrot_ocr = "m12"),
-#'   param_set_ecar = c(init_ecar = "m3", om_ecar = "m6"),
+#'   rate = purrr::pluck(data, "rate_data", 1),
+#'   param_set_ocr = c(init_ocr = "m3", fccp_ocr = "m4", amrot_ocr = "m9", mon_ocr = "m12"),
+#'   param_set_ecar = c(init_ecar = "m3", fccp_ecar = "m4", amrot_ecar = "m9", mon_ecar = "m12"),
 #'   conversion_model = "mookerjee")
 #' 
 calculate_space <- function(rate,
@@ -943,10 +947,22 @@ calculate_space <- function(rate,
 #' @param ocr_title Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/µg)"`.
 #' @param palette Optional named vector of fill colors (e.g., group names as names).
 #' @param title Optional plot title (default `NULL`).
+#' @param legend_title Optional title for the legend. Default: "Group".
 #'
 #' @return A `ggplot` object
 #' @export
-#'
+#' @importFrom dplyr mutate select summarize rename if_any filter all_of
+#' @importFrom dplyr left_join ungroup matches
+#' @importFrom tidyr pivot_wider pivot_longer
+#' @importFrom purrr pmap_dbl
+#' @importFrom ggplot2 ggplot aes geom_rect geom_point geom_path geom_segment
+#' @importFrom ggplot2 scale_colour_manual scale_color_manual scale_fill_manual labs theme_classic
+#' @importFrom ggplot2 geom_hline geom_vline coord_cartesian
+#' @importFrom grid arrow unit
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom stats setNames
+#' @importFrom rlang .data
+#' @importFrom scales alpha
 #' @examples
 #' # Simulate output from calculate_space()
 #' df_space <- tibble::tibble(
@@ -1039,7 +1055,18 @@ plot_bioenergetic_space <- function(df,
 #'
 #' @return A `ggplot` object showing OCR vs ECAR trajectories with labeled points and arrows.
 #' @export
-#'
+#' @importFrom dplyr mutate select summarize rename if_any filter all_of
+#' @importFrom dplyr left_join ungroup matches
+#' @importFrom tidyr pivot_wider pivot_longer
+#' @importFrom purrr pmap_dbl
+#' @importFrom ggplot2 ggplot aes geom_rect geom_point geom_path geom_segment
+#' @importFrom ggplot2 scale_colour_manual scale_color_manual scale_fill_manual labs theme_classic
+#' @importFrom ggplot2 geom_hline geom_vline coord_cartesian
+#' @importFrom grid arrow unit
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom stats setNames
+#' @importFrom rlang .data
+#' @importFrom scales alpha
 #' @examples
 #' df_space <- tibble::tibble(
 #'   group = c("control", "treated"),
