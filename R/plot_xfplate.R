@@ -777,3 +777,355 @@ plot_line_per_well <- function(df, var, y_title) {
 
     return(plot)
 }
+
+
+# new functions ---------------------------------------
+
+#' Calculate Bioenergetic Indices from OCR and ECAR Data
+#'
+#' @description
+#' Computes bioenergetic parameters (OCR/ECAR) including spare capacity, glycolytic index,
+#' and supply flexibility index. Compatible with both oligomycin- and monensin-based protocols.
+#'
+#' @param rate A tibble from the `rate_data` list of `revive_xfplate()`.
+#' @param param_set_ocr Named character vector defining OCR injections (e.g. `init_ocr = "m3"`).
+#' @param param_set_ecar Named character vector defining ECAR injections (e.g. `om_ecar = "m6"`).
+#' @param conversion_model Either `"mookerjee"` (default) or `"agilent"`.
+#' @param ug_protein_scaling_factor Protein content per well (in µg, default = 20).
+#' @param OCR_var Name of column containing OCR values (default = `"J_oxphos"`).
+#' @param ECAR_var Name of column containing ECAR values (default = `"J_glyco"`).
+#'
+#' @return A tibble with one row per group and multiple bioenergetic indices.
+#' @export
+#'
+#' @examples
+#' calculate_space(
+#'   rate = my_rate_data,
+#'   param_set_ocr = c(init_ocr = "m3", om_ocr = "m6", fccp_ocr = "m9", amrot_ocr = "m12"),
+#'   param_set_ecar = c(init_ecar = "m3", om_ecar = "m6"),
+#'   conversion_model = "mookerjee")
+#' 
+calculate_space <- function(rate,
+                            param_set_ocr,
+                            param_set_ecar,
+                            conversion_model = "mookerjee",
+                            ug_protein_scaling_factor = 20,
+                            OCR_var = "J_oxphos",
+                            ECAR_var = "J_glyco") {
+  # Validate model
+  if (!conversion_model %in% c("mookerjee", "agilent")) {
+    stop("conversion_model must be either 'mookerjee' or 'agilent'")
+  }
+  
+  # Built-in ATP conversion factors
+  atp_factors <- if (conversion_model == "mookerjee") {
+    list(
+      Jglyco_ecar_factor = 7.23,
+      Jglyco_ocr_factor = 0.469,
+      Joxphos_ocr_factor = 4.6988
+    )
+  } else {
+    list(
+      Jglyco_ecar_factor = 8.7552,
+      Jglyco_ocr_factor = 0.8,
+      Joxphos_ocr_factor = 5.5
+    )
+  }
+  
+  # Supply Flexibility Index (SFI)
+  SFI <- function(x, y, max_ecar, max_ocr) {
+    x_0 <- max(x + y - max_ocr, 0)
+    y_0 <- max(x + y - max_ecar, 0)
+    angle_ocr <- atan(max_ocr / x_0) * (180 / pi)
+    angle_ecar <- atan(y_0 / max_ecar) * (180 / pi)
+    ((angle_ocr - angle_ecar) / 90) * 100
+  }
+  
+  # ATP-normalized OCR + ECAR rates
+  rate_J <- rate %>%
+    dplyr::mutate(
+      J_glyco = (ECAR_wave_bc * atp_factors$Jglyco_ecar_factor -
+                   OCR_wave_bc * atp_factors$Jglyco_ocr_factor) / ug_protein_scaling_factor,
+      J_oxphos = (OCR_wave_bc * atp_factors$Joxphos_ocr_factor) / ug_protein_scaling_factor
+    )
+  
+  df_ocr <- rate_J %>%
+    dplyr::select(group, measurement, my_OCR = all_of(OCR_var)) %>%
+    dplyr::summarize(OCR = mean(my_OCR, na.rm = TRUE), .by = c(group, measurement)) %>%
+    tidyr::pivot_wider(names_from = measurement, names_prefix = "m", values_from = OCR) %>%
+    dplyr::rename(!!!param_set_ocr)
+  
+  # Assign non_mito_ocr if present
+  if ("amrot_ocr" %in% names(df_ocr)) {
+    df_ocr <- dplyr::mutate(df_ocr, non_mito_ocr = amrot_ocr)
+  } else {
+    df_ocr <- dplyr::mutate(df_ocr, non_mito_ocr = NA_real_)
+  }
+  
+  # Continue with dependent metrics
+  df_ocr <- df_ocr %>%
+    dplyr::mutate(
+      basal_ocr = if ("init_ocr" %in% names(.)) init_ocr - non_mito_ocr else NA_real_,
+      max_ocr = if ("fccp_ocr" %in% names(.)) fccp_ocr - non_mito_ocr else NA_real_,
+      spare_ocr = max_ocr - basal_ocr,
+      spare_ocr_index = spare_ocr / max_ocr,
+      max_ocr_index = max_ocr / basal_ocr,
+      atp_linked = if (all(c("init_ocr", "om_ocr") %in% names(.))) init_ocr - om_ocr else NA_real_,
+      proton_leak = if ("om_ocr" %in% names(.)) om_ocr - non_mito_ocr else NA_real_,
+      leak_index = proton_leak / basal_ocr,
+      coupling_index = atp_linked / basal_ocr
+    ) %>%
+    dplyr::select(-dplyr::matches("^m\\d+$"))
+  
+  #conditionals
+  df_ecar <- rate_J %>%
+    dplyr::select(group, measurement, my_ECAR = all_of(ECAR_var)) %>%
+    dplyr::summarize(ECAR = mean(my_ECAR, na.rm = TRUE), .by = c(group, measurement)) %>%
+    tidyr::pivot_wider(names_from = measurement, names_prefix = "m", values_from = ECAR) %>%
+    dplyr::rename(!!!param_set_ecar)
+  
+  # Dynamically assign basal_ecar and max_ecar
+  if ("init_ecar" %in% names(df_ecar)) {
+    df_ecar <- dplyr::mutate(df_ecar, basal_ecar = .data[["init_ecar"]])
+  } else {
+    df_ecar <- dplyr::mutate(df_ecar, basal_ecar = NA_real_)
+  }
+  
+  if ("mon_ecar" %in% names(df_ecar)) {
+    df_ecar <- dplyr::mutate(df_ecar, max_ecar = .data[["mon_ecar"]])
+  } else if ("om_ecar" %in% names(df_ecar)) {
+    df_ecar <- dplyr::mutate(df_ecar, max_ecar = .data[["om_ecar"]])
+  } else {
+    df_ecar <- dplyr::mutate(df_ecar, max_ecar = NA_real_)
+  }
+  
+  # Now compute derived ECAR metrics
+  df_ecar <- df_ecar %>%
+    dplyr::mutate(
+      spare_ecar = max_ecar - basal_ecar,
+      spare_ecar_index = spare_ecar / max_ecar,
+      max_ecar_index = max_ecar / basal_ecar
+    ) %>%
+    dplyr::select(-dplyr::matches("^m\\d+$"))
+  
+  # Merge and derive global indices
+  df_space <- df_ocr %>%
+    dplyr::left_join(df_ecar, by = "group") %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      bioenergetic_scope = max_ecar + max_ocr,
+      glyco_index = (basal_ecar / bioenergetic_scope) * 100,
+      bio_index = ((basal_ecar + basal_ocr) / bioenergetic_scope) * 100,
+      glyco_index_max = (max_ecar / bioenergetic_scope) * 100,
+      supply_index = purrr::pmap_dbl(
+        list(basal_ecar, basal_ocr, max_ecar, max_ocr),
+        function(b_ecar, b_ocr, m_ecar, m_ocr) {
+          if (any(is.na(c(b_ecar, b_ocr, m_ecar, m_ocr)))) NA_real_
+          else SFI(b_ecar, b_ocr, m_ecar, m_ocr)
+        }
+      )
+    )
+  
+  return(df_space)
+}
+
+
+#' Plot Bioenergetic Space for Each Group
+#'
+#' @description
+#' Visualizes the metabolic space for each group using rectangles, basal points,
+#' and maximal capacity for both ECAR and OCR axes.
+#' This function expects output from `calculate_space()`.
+#'
+#' @param df A tibble returned by `calculate_space()`. Must include columns:
+#'   `group`, `basal_ocr`, `fccp_ocr`, `basal_ecar`, `amrot_ecar`.
+#' @param ecar_title Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/µg)"`.
+#' @param ocr_title Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/µg)"`.
+#' @param palette Optional named vector of fill colors (e.g., group names as names).
+#' @param title Optional plot title (default `NULL`).
+#'
+#' @return A `ggplot` object
+#' @export
+#'
+#' @examples
+#' # Simulate output from calculate_space()
+#' df_space <- tibble::tibble(
+#'   group = c("control", "treated"),
+#'   basal_ocr = c(25, 30),
+#'   fccp_ocr = c(50, 60),
+#'   basal_ecar = c(20, 28),
+#'   amrot_ecar = c(40, 42)
+#' )
+#'
+#' # Define group colors
+#' palette <- c("control" = "#1b9e77", "treated" = "#d95f02")
+#'
+#' # Plot bioenergetic space
+#' plot_bioenergetic_space(
+#'   df = df_space,
+#'   ecar_title = "J ATP glycolysis (pmol/min/ug)",
+#'   ocr_title = "J ATP oxphos (pmol/min/ug)",
+#'   palette = palette,
+#'   title = "Example Bioenergetic Profiles"
+#')
+plot_bioenergetic_space <- function(df,
+  ecar_title = "J ATP glycolysis (pmol/min/ug)",
+  ocr_title = "J ATP oxphos (pmol/min/ug)",
+  legend_title = "Group",
+  palette = NULL,
+  title = NULL) {
+  
+  required_cols <- c("group", "basal_ocr", "fccp_ocr", "basal_ecar", "amrot_ecar")
+  missing_cols <- setdiff(required_cols, names(df))
+  if (length(missing_cols) > 0) {
+    stop("Missing required columns in input data: ", paste(missing_cols, collapse = ", "))
+  }
+  
+  df <- df %>%
+    dplyr::filter(!if_any(all_of(required_cols), is.na))
+  
+  x_max <- max(df$amrot_ecar, df$basal_ecar, na.rm = TRUE) * 1.1
+  y_max <- max(df$fccp_ocr, df$basal_ocr, na.rm = TRUE) * 1.1
+  
+  p <- ggplot(df, aes(
+    xmin = 0, ymin = 0,
+    xmax = amrot_ecar, ymax = fccp_ocr,
+    fill = group
+  )) +
+    geom_rect(alpha = 0.5, color = "black") +
+    geom_segment(aes(x = 0, xend = amrot_ecar, y = 0, yend = fccp_ocr),
+                 color = "grey10", linetype = "dashed") +
+    geom_point(aes(x = basal_ecar, y = basal_ocr, fill = group),
+               shape = 21, color = "black", size = 4) +
+    labs(
+      x = ecar_title,
+      y = ocr_title,
+      fill = legend_title,
+      title = title
+    ) +
+    coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE) +
+    theme_classic(base_size = 13) +
+    theme(
+      panel.grid.major = element_line(color = "grey90", size = 0.3),
+      panel.grid.minor = element_blank(),
+      axis.line = element_line(color = "black"),
+      plot.title = element_text(hjust = 0)
+    ) +
+    geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
+    geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    facet_wrap(vars(group))
+  
+  if (!is.null(palette)) {
+    p <- p +
+      scale_fill_manual(values = colorspace::lighten(palette, 0.2)) +
+      scale_colour_manual(values = palette)
+  }
+  
+  return(p)
+}
+
+#' Plot Metabolic Trajectories in J-space
+#'
+#' @description
+#' Converts the wide-format `df_space` tibble into a trajectory plot showing the progression
+#' of metabolic states (e.g., Baseline → FCCP → AM/Rot) for each group in OCR/ECAR space.
+#' Arrows indicate direction of metabolic shifts across conditions.
+#'
+#' @param df A tibble as returned by `calculate_space()`. Must contain columns:
+#'   `group`, `basal_ocr`, `fccp_ocr`, `amrot_ocr`, `basal_ecar`, `fccp_ecar`, `amrot_ecar`.
+#' @param palette Optional named vector of fill colors (names = groups).
+#' @param title Optional title for the plot. Default: `"Metabolic J-space"`.
+#' @param label_map Optional named vector to rename default state labels (e.g., `c("Baseline" = "Basal")`).
+#'
+#' @return A `ggplot` object showing OCR vs ECAR trajectories with labeled points and arrows.
+#' @export
+#'
+#' @examples
+#' df_space <- tibble::tibble(
+#'   group = c("control", "treated"),
+#'   basal_ocr = c(25, 30), fccp_ocr = c(50, 60), amrot_ocr = c(15, 18),
+#'   basal_ecar = c(20, 28), fccp_ecar = c(22, 32), amrot_ecar = c(18, 21)
+#' )
+#' palette <- c("control" = "#1f78b4", "treated" = "#33a02c")
+#' plot_bioenergetic_trajectory(df_space, palette = palette)
+plot_bioenergetic_trajectory <- function(df,
+                                         palette = NULL,
+                                         title = "Metabolic J-space",
+                                         label_map = c("Baseline" = "Basal", "FCCP" = "FCCP", "AM/Rot" = "AM/Rot")) {
+  # Validate required columns
+  required_cols <- c(
+    "group",
+    "basal_ocr", "fccp_ocr", "amrot_ocr",
+    "basal_ecar", "fccp_ecar", "amrot_ecar"
+  )
+  missing_cols <- setdiff(required_cols, names(df))
+  if (length(missing_cols) > 0) {
+    stop("Missing required columns in input data: ", paste(missing_cols, collapse = ", "))
+  }
+  
+  # Convert to long format with .value = ocr/ecar and .name = state
+  df_long <- df %>%
+    dplyr::select(group, dplyr::all_of(required_cols[-1])) %>%
+    tidyr::pivot_longer(
+      cols = -group,
+      names_to = c("state", ".value"),
+      names_pattern = "(.*)_(ocr|ecar)"
+    ) %>%
+    dplyr::mutate(
+      state = dplyr::recode(state,
+                            "basal" = "Baseline",
+                            "fccp" = "FCCP",
+                            "amrot" = "AM/Rot",
+                            "mon" = "Monensin"
+      ),
+      state = factor(state, levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")),
+      #group = forcats::fct_rev(factor(group))
+    )
+  
+  # Optional state label replacements
+  df_long <- df_long %>%
+    dplyr::mutate(label = dplyr::recode(as.character(state), !!!label_map))
+  
+  # Set plot ranges
+  x_max <- max(df_long$ecar, na.rm = TRUE) * 1.1
+  y_max <- max(df_long$ocr, na.rm = TRUE) * 1.1
+  
+  p <- ggplot(df_long, aes(x = ecar, y = ocr, group = group, fill = group)) +
+    geom_path(aes(color = group),
+              linewidth = 1.2,
+              arrow = arrow(type = "closed", length = unit(0.15, "inches"))) +
+    geom_point(shape = 21, size = 4, color = "black") +
+    ggrepel::geom_label_repel(aes(label = label),
+                              size = 3,
+                              max.overlaps = 10,
+                              box.padding = 0.4,
+                              point.padding = 0.3,
+                              label.size = NA,
+                              fill = alpha("white", 0.8),
+                              segment.color = "grey60") +
+    labs(
+      title = title,
+      x = expression(J[glyco]~"(ECAR-derived)"),
+      y = expression(J[oxphos]~"(OCR-derived)"),
+      fill = "Group",
+      color = "Group"
+    ) +
+    theme_classic(base_size = 13) +
+    theme(
+      panel.grid.major = element_line(color = "grey90", size = 0.3),
+      panel.grid.minor = element_blank(),
+      axis.line = element_line(color = "black"),
+      plot.title = element_text(hjust = 0)
+    ) +
+    geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
+    geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE)
+  
+  if (!is.null(palette)) {
+    p <- p +
+      scale_color_manual(values = palette) +
+      scale_fill_manual(values = colorspace::lighten(palette, 0.2))
+  }
+  
+  return(p)
+}

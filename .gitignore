@@ -18,3 +18,5 @@ tests/testthat/.DS_Store
 .Rproj.user/73085A35/.DS_Store
 docs/.DS_Store
 seahtrue.Rproj
+new_trajectory_test.qmd
+new_trajectory.qmd
