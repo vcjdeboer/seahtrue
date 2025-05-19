@@ -985,11 +985,11 @@ calculate_space <- function(rate,
 #'   title = "Example Bioenergetic Profiles"
 #')
 plot_bioenergetic_space <- function(df,
-  ecar_title = "J ATP glycolysis (pmol/min/ug)",
-  ocr_title = "J ATP oxphos (pmol/min/ug)",
-  legend_title = "Group",
-  palette = NULL,
-  title = NULL) {
+                                    ecar_title = "J ATP glycolysis (pmol/min/ug)",
+                                    ocr_title = "J ATP oxphos (pmol/min/ug)",
+                                    legend_title = "Group",
+                                    palette = NULL,
+                                    title = NULL) {
   
   required_cols <- c("group", "basal_ocr", "fccp_ocr", "basal_ecar", "amrot_ecar")
   missing_cols <- setdiff(required_cols, names(df))
@@ -998,43 +998,43 @@ plot_bioenergetic_space <- function(df,
   }
   
   df <- df %>%
-    dplyr::filter(!if_any(all_of(required_cols), is.na))
+    dplyr::filter(!dplyr::if_any(dplyr::all_of(required_cols), is.na))
   
   x_max <- max(df$amrot_ecar, df$basal_ecar, na.rm = TRUE) * 1.1
   y_max <- max(df$fccp_ocr, df$basal_ocr, na.rm = TRUE) * 1.1
   
-  p <- ggplot(df, aes(
+  p <- ggplot2::ggplot(df, ggplot2::aes(
     xmin = 0, ymin = 0,
-    xmax = amrot_ecar, ymax = fccp_ocr,
-    fill = group
+    xmax = .data$amrot_ecar, ymax = .data$fccp_ocr,
+    fill = .data$group
   )) +
-    geom_rect(alpha = 0.5, color = "black") +
-    geom_segment(aes(x = 0, xend = amrot_ecar, y = 0, yend = fccp_ocr),
-                 color = "grey10", linetype = "dashed") +
-    geom_point(aes(x = basal_ecar, y = basal_ocr, fill = group),
-               shape = 21, color = "black", size = 4) +
-    labs(
+    ggplot2::geom_rect(alpha = 0.5, color = "black") +
+    ggplot2::geom_segment(ggplot2::aes(x = 0, xend = .data$amrot_ecar, y = 0, yend = .data$fccp_ocr),
+                          color = "grey10", linetype = "dashed") +
+    ggplot2::geom_point(ggplot2::aes(x = .data$basal_ecar, y = .data$basal_ocr, fill = .data$group),
+                        shape = 21, color = "black", size = 4) +
+    ggplot2::labs(
       x = ecar_title,
       y = ocr_title,
       fill = legend_title,
       title = title
     ) +
-    coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE) +
-    theme_classic(base_size = 13) +
-    theme(
-      panel.grid.major = element_line(color = "grey90", size = 0.3),
-      panel.grid.minor = element_blank(),
-      axis.line = element_line(color = "black"),
-      plot.title = element_text(hjust = 0)
+    ggplot2::coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE) +
+    ggplot2::theme_classic(base_size = 13) +
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(color = "grey90", size = 0.3),
+      panel.grid.minor = ggplot2::element_blank(),
+      axis.line = ggplot2::element_line(color = "black"),
+      plot.title = ggplot2::element_text(hjust = 0)
     ) +
-    geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
-    geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
-    facet_wrap(vars(group))
+    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::facet_wrap(ggplot2::vars(.data$group))
   
   if (!is.null(palette)) {
     p <- p +
-      scale_fill_manual(values = colorspace::lighten(palette, 0.2)) +
-      scale_colour_manual(values = palette)
+      ggplot2::scale_fill_manual(values = colorspace::lighten(palette, 0.2)) +
+      ggplot2::scale_colour_manual(values = palette)
   }
   
   return(p)
@@ -1079,7 +1079,6 @@ plot_bioenergetic_trajectory <- function(df,
                                          palette = NULL,
                                          title = "Metabolic J-space",
                                          label_map = c("Baseline" = "Basal", "FCCP" = "FCCP", "AM/Rot" = "AM/Rot")) {
-  # Validate required columns
   required_cols <- c(
     "group",
     "basal_ocr", "fccp_ocr", "amrot_ocr",
@@ -1090,15 +1089,14 @@ plot_bioenergetic_trajectory <- function(df,
     stop("Missing required columns in input data: ", paste(missing_cols, collapse = ", "))
   }
   
-  # Convert to long format with .value = ocr/ecar and .name = state
   df_long <- df %>%
-    dplyr::select(group, dplyr::all_of(required_cols[-1])) %>%
+    dplyr::select(.data$group, dplyr::all_of(required_cols[-1])) %>%
     tidyr::pivot_longer(
-      cols = -group,
+      cols = !dplyr::all_of("group"),
       names_to = c("phase", ".value"),
       names_pattern = "(.*)_(ocr|ecar)"
     ) %>%
-    mutate(
+    dplyr::mutate(
       phase = dplyr::recode(
         as.character(.data$phase),
         "basal" = "Baseline",
@@ -1107,52 +1105,47 @@ plot_bioenergetic_trajectory <- function(df,
         "mon" = "Monensin"
       ),
       phase = factor(.data$phase, levels = c("Baseline", "FCCP", "AM/Rot", "Monensin")),
-      phase_label = .data$phase
+      phase_label = dplyr::recode(as.character(.data$phase), !!!label_map)
     )
   
-  # Optional state label replacements
-  df_long <- df_long %>%
-    dplyr::mutate(phase_label = dplyr::recode(as.character(.data$phase), !!!label_map))
-  
-  # Set plot ranges
   x_max <- max(df_long$ecar, na.rm = TRUE) * 1.1
   y_max <- max(df_long$ocr, na.rm = TRUE) * 1.1
   
-  p <- ggplot(df_long, aes(x = ecar, y = ocr, group = group, fill = group)) +
-    geom_path(aes(color = group),
-              linewidth = 1.2,
-              arrow = arrow(type = "closed", length = unit(0.15, "inches"))) +
-    geom_point(shape = 21, size = 4, color = "black") +
-    ggrepel::geom_label_repel(aes(label = phase_label),
+  p <- ggplot(df_long, ggplot2::aes(x = .data$ecar, y = .data$ocr, group = .data$group, fill = .data$group)) +
+    ggplot2::geom_path(ggplot2::aes(color = .data$group),
+                       linewidth = 1.2,
+                       arrow = grid::arrow(type = "closed", length = grid::unit(0.15, "inches"))) +
+    ggplot2::geom_point(shape = 21, size = 4, color = "black") +
+    ggrepel::geom_label_repel(ggplot2::aes(label = .data$phase_label),
                               size = 3,
                               max.overlaps = 10,
                               box.padding = 0.4,
                               point.padding = 0.3,
                               label.size = NA,
-                              fill = alpha("white", 0.8),
+                              fill = scales::alpha("white", 0.8),
                               segment.color = "grey60") +
-    labs(
+    ggplot2::labs(
       title = title,
-      x = expression(J[glyco]~"(ECAR-derived)"),
-      y = expression(J[oxphos]~"(OCR-derived)"),
+      x = expression(J[glyco] ~ "(ECAR-derived)"),
+      y = expression(J[oxphos] ~ "(OCR-derived)"),
       fill = "Group",
       color = "Group"
     ) +
-    theme_classic(base_size = 13) +
-    theme(
-      panel.grid.major = element_line(color = "grey90", size = 0.3),
-      panel.grid.minor = element_blank(),
-      axis.line = element_line(color = "black"),
-      plot.title = element_text(hjust = 0)
+    ggplot2::theme_classic(base_size = 13) +
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(color = "grey90", size = 0.3),
+      panel.grid.minor = ggplot2::element_blank(),
+      axis.line = ggplot2::element_line(color = "black"),
+      plot.title = ggplot2::element_text(hjust = 0)
     ) +
-    geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
-    geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
-    coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE)
+    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE)
   
   if (!is.null(palette)) {
     p <- p +
-      scale_color_manual(values = palette) +
-      scale_fill_manual(values = colorspace::lighten(palette, 0.2))
+      ggplot2::scale_color_manual(values = palette) +
+      ggplot2::scale_fill_manual(values = colorspace::lighten(palette, 0.2))
   }
   
   return(p)
