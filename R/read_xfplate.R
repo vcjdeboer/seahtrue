@@ -332,12 +332,9 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
 
     # if background wells are flagged, this could go wrong
     # therefore they should be removed if flagged, first
-    groups <- xf_rate %>%
-        select(.data$well, .data$group) %>%
-        unique()
-
-    xf_flagged <- xf_flagged %>%
-        left_join(groups, by = c("well"))
+    groups_tbl <- xf_rate_test %>% dplyr::distinct(well, group)
+    xf_flagged_test <- xf_flagged_test %>%
+      dplyr::left_join(groups_tbl, by = "well")
 
     if ("Background" %in% xf_flagged$group) {
         flagged_bkgd_wells <- xf_flagged %>%
