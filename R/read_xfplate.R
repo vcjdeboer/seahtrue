@@ -134,6 +134,12 @@ verify_xf_raw <- function(xf_raw) {
     }
     
     # Check for missing values in O2_mmHg and pH and replace with zeros
+    xf_raw <- xf_raw %>%
+      dplyr::mutate(
+        O2_mmHg = suppressWarnings(as.numeric(ifelse(O2_mmHg %in% c("N/A", "NaN", ""), NA, O2_mmHg))),
+        pH      = suppressWarnings(as.numeric(ifelse(pH %in% c("N/A", "NaN", ""), NA, pH)))
+      )
+    
     na_O2 <- sum(is.na(xf_raw$O2_mmHg))
     na_pH <- sum(is.na(xf_raw$pH))
     
