@@ -345,28 +345,24 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
             filter(!.data$well %in% flagged_bkgd_wells)
     }
 
-    # next do the check whether the data is bkgd corrected
-    if (is.null(
-        missing_strings(
-            xf_rate %>%
-                pull(.data$group) %>%
-                unique(),
-            "Background"
-        )
-    )) {
+    # next do the check whether the data is background-corrected
+    has_background <- "Background" %in% unique(xf_rate$group)
+    
+    if (has_background) {
+      if (!"ocr" %in% names(xf_rate)) {
+        warning("Column 'ocr' not found in xf_rate; cannot determine background correction.")
+        corrected_allready <- NA
+      } else {
         check_background <- xf_rate %>%
-            dplyr::filter(.data$group == "Background") %>%
-            dplyr::pull(.data$ocr) %>%
-            mean()
-
-        if (check_background == 0) {
-            corrected_allready <- TRUE
-        } else {
-            corrected_allready <- FALSE
-        }
+          dplyr::filter(group == "Background") %>%
+          dplyr::mutate(ocr = suppressWarnings(as.numeric(ocr))) %>%
+          dplyr::summarise(mean_ocr = mean(ocr, na.rm = TRUE)) %>%
+          dplyr::pull(mean_ocr)
+        
+        corrected_allready <- if (is.finite(check_background)) (check_background == 0) else NA
+      }
     } else {
-        # if Background  group is not present then:
-        corrected_allready <- "no_background"
+      corrected_allready <- "no_background"
     }
 
     if (corrected_allready == TRUE) {
