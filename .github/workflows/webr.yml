@@ -11,4 +11,3 @@ jobs:
     uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
     with:
       packages: vcjdeboer/seahtrue
-      webr-image: "ghcr.io/r-wasm/webr:v0.4.4" 
