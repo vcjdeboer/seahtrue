@@ -8,6 +8,6 @@ permissions:
   repository-projects: read  
 jobs:
   build:
-    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
+    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v3
     with:
       packages: vcjdeboer/seahtrue@devel
