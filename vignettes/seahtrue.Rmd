@@ -3,7 +3,7 @@ title: Introduction to Seahtrue
 author: "Vincent C. J. de Boer, Gerwin Smits, Xiang Zhang"
 date: "`r format(Sys.Date(), '%b %d, %Y')`"
 output:
-    BiocStyle::html_document:
+    rmarkdown::html_document:
         toc: true
         number_sections: true
         toc_depth: 3

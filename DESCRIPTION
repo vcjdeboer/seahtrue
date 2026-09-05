@@ -40,8 +40,7 @@ Suggests:
     rmarkdown,
     knitr,
     testthat (>= 3.0.0),
-    tidyxl (>= 1.0.8),
-    BiocStyle
+    tidyxl (>= 1.0.8)
 Imports:
     dplyr (>= 1.1.2),
     readxl (>= 1.4.1),
