@@ -167,7 +167,7 @@ get_timing_info <- function(xf_raw_pr) {
 #' @description
 #' Validates preprocessed Seahorse XF plate data using a set of rules,
 #' including:
-#' - Physiological ranges for oxygen consumption (O₂) and pH
+#' - Physiological ranges for oxygen consumption (O2) and pH
 #' - Presence of all 96 wells
 #' - Proper timing structure
 #'

@@ -1,3 +1,14 @@
+# seahtrue (development version)
+
+* Added input validation with clear error messages for `calculate_space()`.
+* Documented the canonical injection-name contract; `calculate_space()` now warns when the plot-required columns can't be produced.
+* `calculate_space()` arguments `OCR_var`/`ECAR_var` renamed to `ocr_var`/`ecar_var` for naming consistency (no change in behavior or defaults).
+* `calculate_space()` gains an optional `atp_factors` argument to supply custom ATP conversion factors.
+* Space/trajectory functions moved to their own source file.
+* Added test coverage for `revive_xfplate()`, `calculate_space()`, and the space plots.
+* Package hygiene: converted source files to ASCII-only, cleared R CMD check NOTEs, and switched internal messaging to `cli`.
+* Regenerated the `revive_output_donor_A` example dataset with current code, removing a stale dependency on the `validate`/`settings` packages that broke `R CMD check` in environments without them.
+
 # seahtrue 0.99.2
 
 * bioconductor - refactor the code that gives the no visible binding for tibble calls, and validator ruls

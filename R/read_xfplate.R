@@ -146,13 +146,13 @@ verify_xf_raw <- function(xf_raw) {
     if (na_O2 > 0 || na_pH > 0) {
       if (na_O2 > 0) {
         cli::cli_inform(
-          glue::glue("Detected {na_O2} NA values in O2_mmHg — replaced with 0.")
+          glue::glue("Detected {na_O2} NA values in O2_mmHg \u2014 replaced with 0.")
         )
         xf_raw$O2_mmHg[is.na(xf_raw$O2_mmHg)] <- 0
       }
       if (na_pH > 0) {
         cli::cli_inform(
-          glue::glue("Detected {na_pH} NA values in pH — replaced with 0.")
+          glue::glue("Detected {na_pH} NA values in pH \u2014 replaced with 0.")
         )
         xf_raw$pH[is.na(xf_raw$pH)] <- 0
       }

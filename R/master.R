@@ -119,7 +119,7 @@ revive_xfplate <- function(filepath_seahorse,
         pH_max = pH_max,
         unit   = unit
       )
-      cat("\n")
+      cli::cli_inform("")
       qc_ranges <- qc_ranges
     }
     
