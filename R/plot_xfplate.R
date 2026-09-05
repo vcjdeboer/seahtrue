@@ -820,7 +820,29 @@ calculate_space <- function(rate,
   if (!conversion_model %in% c("mookerjee", "agilent")) {
     stop("conversion_model must be either 'mookerjee' or 'agilent'")
   }
-  
+
+  # --- input validation ---
+  if (!is.data.frame(rate)) {
+    cli::cli_abort("{.arg rate} must be a data frame/tibble, not {.cls {class(rate)}}.")
+  }
+  required_rate_cols <- c("group", "measurement", "OCR_wave_bc", "ECAR_wave_bc")
+  missing_rate <- setdiff(required_rate_cols, names(rate))
+  if (length(missing_rate) > 0) {
+    cli::cli_abort(c(
+      "{.arg rate} is missing required column{?s}: {.val {missing_rate}}.",
+      "i" = "Pass the tibble from {.code purrr::pluck(revive_xfplate(file), \"rate_data\", 1)}."
+    ))
+  }
+  for (arg_name in c("param_set_ocr", "param_set_ecar")) {
+    val <- get(arg_name)
+    if (is.null(val) || is.null(names(val)) || any(names(val) == "")) {
+      cli::cli_abort(c(
+        "{.arg {arg_name}} must be a *named* character vector.",
+        "i" = "e.g. {.code c(init_ocr = \"m3\", fccp_ocr = \"m4\", amrot_ocr = \"m9\")}"
+      ))
+    }
+  }
+
   # Built-in ATP conversion factors
   atp_factors <- if (conversion_model == "mookerjee") {
     list(
