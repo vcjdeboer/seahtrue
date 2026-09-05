@@ -2,6 +2,19 @@ name: Build and deploy seahtrue from GitHub
 
 on:
   workflow_dispatch:
+    inputs:
+      webr_image:
+        description: >-
+          webR container image used to build the wasm binary. MUST match the
+          R version of the webR runtime that "the book of seahtrue" loads via
+          quarto-live, otherwise the book cannot install seahtrue (it fetches
+          from bin/emscripten/contrib/<Rminor>/, which is version-specific).
+          The book (_extensions/r-wasm/live) currently bundles webR v0.5.2 =
+          R 4.5.1 -> contrib/4.5. Do NOT use `:main`: that is unreleased R 4.6,
+          which no released webR / quarto-live runtime can load.
+        default: "ghcr.io/r-wasm/webr:v0.5.2"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -16,8 +29,13 @@ jobs:
   # directly from this repo URL (its _quarto.yml `webr: repos:`), so the VFS
   # image is unnecessary. The upstream reusable workflow
   # (r-wasm/actions .../deploy-cran-repo.yml@v3) always runs make_vfs_library,
-  # which currently fails in the latest webR image (file_packager: Nothing to
-  # do!), so we replicate only the repo-building half of its build-rwasm step.
+  # which fails in the webR image (file_packager: Nothing to do!), so we
+  # replicate only the repo-building half of its build-rwasm step.
+  #
+  # IMPORTANT: the wasm binary is built for the R version of `webr_image` and
+  # lands in bin/emscripten/contrib/<Rminor>/. The book's webR runtime requests
+  # its own R version's contrib dir, so `webr_image` must track the webR version
+  # bundled by the book's quarto-live extension (see the input description).
   build:
     runs-on: ubuntu-24.04
 
@@ -34,10 +52,11 @@ jobs:
       - name: Build wasm package repository (rwasm::add_pkg, no VFS image)
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          WEBR_IMAGE: ${{ inputs.webr_image }}
           # rwasm builds seahtrue's wasm binary by first installing its R deps
           # into host R via pak (R/build.R: pak::pkg_install("deps::<tarball>")).
-          # In the latest webR container pak's "Installing system requirements"
-          # step runs `sh -c apt-get -y update`, which fails and aborts the pak
+          # In the webR container pak's "Installing system requirements" step
+          # runs `sh -c apt-get -y update`, which can fail and abort the pak
           # subprocess, leaving the deps uninstalled so the wasm build reports
           # "dependencies ... not available" and produces no binary. Host apt
           # system requirements are irrelevant to a wasm cross-build (deps are
@@ -45,13 +64,14 @@ jobs:
           # sysreqs handling entirely.
           PKG_SYSREQS: "false"
         run: |
+          echo "Building with webR image: ${WEBR_IMAGE}"
           docker run --rm \
             -v "${{ github.workspace }}:/github/workspace" \
             --workdir /github/workspace \
             -e GITHUB_PAT \
             -e PKG_SYSREQS \
             --entrypoint Rscript \
-            ghcr.io/r-wasm/webr:main \
+            "${WEBR_IMAGE}" \
             -e 'rwasm::add_pkg("vcjdeboer/seahtrue@devel", repo_dir = "_site", compress = TRUE)'
 
       - name: Verify seahtrue wasm binary was built
@@ -71,7 +91,7 @@ jobs:
             grep -rH '^Package:' $pkgs || true
             exit 1
           fi
-          echo "OK: seahtrue wasm binary is present in the repo."
+          echo "OK: seahtrue wasm binary is present in the repo:"
           grep -rH -A1 '^Package: seahtrue$' $pkgs || true
 
       - name: Upload Pages artifact
