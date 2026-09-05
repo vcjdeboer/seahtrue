@@ -35,6 +35,16 @@ Visualizes the metabolic space for each group using rectangles, basal points,
 and maximal capacity for both ECAR and OCR axes.
 This function expects output from `calculate_space()`.
 }
+\details{
+The horizontal extent of the metabolic-space rectangle is drawn from
+`amrot_ecar` (the antimycin A / rotenone ECAR), which represents the
+glycolytic capacity reached after mitochondrial inhibition. This is by
+design and differs from the `max_ecar` value used inside
+[calculate_space()] for the `supply_index` and `glyco_index_max`
+metrics, where `max_ecar` is taken from `mon_ecar` (or `om_ecar`).
+The plot width and those metrics therefore intentionally reflect
+different injection points.
+}
 \examples{
 # Simulate output from calculate_space()
 df_space <- tibble::tibble(

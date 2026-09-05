@@ -29,6 +29,15 @@ Converts the wide-format `df_space` tibble into a trajectory plot showing the pr
 of metabolic states (e.g., Baseline -> FCCP -> AM/Rot) for each group in OCR/ECAR space.
 Arrows indicate direction of metabolic shifts across conditions.
 }
+\details{
+The final (AM/Rot) point of each trajectory is plotted at `amrot_ecar`
+(the antimycin A / rotenone ECAR), which represents the glycolytic
+capacity reached after mitochondrial inhibition. This is by design and
+differs from the `max_ecar` value used inside [calculate_space()] for
+the `supply_index` and `glyco_index_max` metrics, where `max_ecar` is
+taken from `mon_ecar` (or `om_ecar`). The plotted trajectory and those
+metrics therefore intentionally reflect different injection points.
+}
 \examples{
 df_space <- tibble::tibble(
   group = c("control", "treated"),

@@ -206,6 +206,16 @@ calculate_space <- function(rate,
 #' and maximal capacity for both ECAR and OCR axes.
 #' This function expects output from `calculate_space()`.
 #'
+#' @details
+#' The horizontal extent of the metabolic-space rectangle is drawn from
+#' `amrot_ecar` (the antimycin A / rotenone ECAR), which represents the
+#' glycolytic capacity reached after mitochondrial inhibition. This is by
+#' design and differs from the `max_ecar` value used inside
+#' [calculate_space()] for the `supply_index` and `glyco_index_max`
+#' metrics, where `max_ecar` is taken from `mon_ecar` (or `om_ecar`).
+#' The plot width and those metrics therefore intentionally reflect
+#' different injection points.
+#'
 #' @param df A tibble returned by `calculate_space()`. Must include columns:
 #'   `group`, `basal_ocr`, `fccp_ocr`, `basal_ecar`, `amrot_ecar`.
 #' @param ecar_title Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/ug)"`.
@@ -311,6 +321,15 @@ plot_bioenergetic_space <- function(df,
 #' Converts the wide-format `df_space` tibble into a trajectory plot showing the progression
 #' of metabolic states (e.g., Baseline -> FCCP -> AM/Rot) for each group in OCR/ECAR space.
 #' Arrows indicate direction of metabolic shifts across conditions.
+#'
+#' @details
+#' The final (AM/Rot) point of each trajectory is plotted at `amrot_ecar`
+#' (the antimycin A / rotenone ECAR), which represents the glycolytic
+#' capacity reached after mitochondrial inhibition. This is by design and
+#' differs from the `max_ecar` value used inside [calculate_space()] for
+#' the `supply_index` and `glyco_index_max` metrics, where `max_ecar` is
+#' taken from `mon_ecar` (or `om_ecar`). The plotted trajectory and those
+#' metrics therefore intentionally reflect different injection points.
 #'
 #' @param df A tibble as returned by `calculate_space()`. Must contain columns:
 #'   `group`, `basal_ocr`, `fccp_ocr`, `amrot_ocr`, `basal_ecar`, `fccp_ecar`, `amrot_ecar`.
