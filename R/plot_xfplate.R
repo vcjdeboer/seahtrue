@@ -791,7 +791,7 @@ plot_line_per_well <- function(df, var, y_title) {
 #' @param param_set_ocr Named character vector defining OCR injections (e.g. `init_ocr = "m3"`).
 #' @param param_set_ecar Named character vector defining ECAR injections (e.g. `om_ecar = "m6"`).
 #' @param conversion_model Either `"mookerjee"` (default) or `"agilent"`.
-#' @param ug_protein_scaling_factor Protein content per well (in µg, default = 20).
+#' @param ug_protein_scaling_factor Protein content per well (in ug, default = 20).
 #' @param OCR_var Name of column containing OCR values (default = `"J_oxphos"`).
 #' @param ECAR_var Name of column containing ECAR values (default = `"J_glyco"`).
 #'
@@ -943,8 +943,8 @@ calculate_space <- function(rate,
 #'
 #' @param df A tibble returned by `calculate_space()`. Must include columns:
 #'   `group`, `basal_ocr`, `fccp_ocr`, `basal_ecar`, `amrot_ecar`.
-#' @param ecar_title Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/µg)"`.
-#' @param ocr_title Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/µg)"`.
+#' @param ecar_title Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/ug)"`.
+#' @param ocr_title Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/ug)"`.
 #' @param palette Optional named vector of fill colors (e.g., group names as names).
 #' @param title Optional plot title (default `NULL`).
 #' @param legend_title Optional title for the legend. Default: "Group".
@@ -1044,7 +1044,7 @@ plot_bioenergetic_space <- function(df,
 #'
 #' @description
 #' Converts the wide-format `df_space` tibble into a trajectory plot showing the progression
-#' of metabolic states (e.g., Baseline → FCCP → AM/Rot) for each group in OCR/ECAR space.
+#' of metabolic states (e.g., Baseline -> FCCP -> AM/Rot) for each group in OCR/ECAR space.
 #' Arrows indicate direction of metabolic shifts across conditions.
 #'
 #' @param df A tibble as returned by `calculate_space()`. Must contain columns:

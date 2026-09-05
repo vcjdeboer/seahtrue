@@ -17,9 +17,9 @@ plot_bioenergetic_space(
 \item{df}{A tibble returned by `calculate_space()`. Must include columns:
 `group`, `basal_ocr`, `fccp_ocr`, `basal_ecar`, `amrot_ecar`.}
 
-\item{ecar_title}{Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/µg)"`.}
+\item{ecar_title}{Label for the x-axis (ECAR). Default: `"ECAR (pmol ATP/min/ug)"`.}
 
-\item{ocr_title}{Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/µg)"`.}
+\item{ocr_title}{Label for the y-axis (OCR). Default: `"OCR (pmol ATP/min/ug)"`.}
 
 \item{legend_title}{Optional title for the legend. Default: "Group".}
 

@@ -23,7 +23,7 @@ calculate_space(
 
 \item{conversion_model}{Either `"mookerjee"` (default) or `"agilent"`.}
 
-\item{ug_protein_scaling_factor}{Protein content per well (in µg, default = 20).}
+\item{ug_protein_scaling_factor}{Protein content per well (in ug, default = 20).}
 
 \item{OCR_var}{Name of column containing OCR values (default = `"J_oxphos"`).}
 

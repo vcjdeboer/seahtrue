@@ -9,7 +9,7 @@ untitled.R
 #man/
 #docs/
 #docs
-.DS_store
+.DS_Store
 inst/doc
 tests/.DS_Store
 tests/testthat/.DS_Store

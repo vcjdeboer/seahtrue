@@ -26,7 +26,7 @@ A `ggplot` object showing OCR vs ECAR trajectories with labeled points and arrow
 }
 \description{
 Converts the wide-format `df_space` tibble into a trajectory plot showing the progression
-of metabolic states (e.g., Baseline → FCCP → AM/Rot) for each group in OCR/ECAR space.
+of metabolic states (e.g., Baseline -> FCCP -> AM/Rot) for each group in OCR/ECAR space.
 Arrows indicate direction of metabolic shifts across conditions.
 }
 \examples{
