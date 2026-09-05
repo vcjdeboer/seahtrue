@@ -9,6 +9,7 @@ calculate_space(
   param_set_ocr,
   param_set_ecar,
   conversion_model = "mookerjee",
+  atp_factors = NULL,
   ug_protein_scaling_factor = 20,
   ocr_var = "J_oxphos",
   ecar_var = "J_glyco"
@@ -22,6 +23,11 @@ calculate_space(
 \item{param_set_ecar}{Named character vector defining ECAR injections (e.g. `om_ecar = "m6"`).}
 
 \item{conversion_model}{Either `"mookerjee"` (default) or `"agilent"`.}
+
+\item{atp_factors}{Optional named list with numeric elements
+`Jglyco_ecar_factor`, `Jglyco_ocr_factor`, and `Joxphos_ocr_factor`. When
+supplied, these custom ATP conversion factors override the
+`conversion_model` preset.}
 
 \item{ug_protein_scaling_factor}{Protein content per well (in ug, default = 20).}
 

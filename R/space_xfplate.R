@@ -12,6 +12,10 @@
 #' @param param_set_ocr Named character vector defining OCR injections (e.g. `init_ocr = "m3"`).
 #' @param param_set_ecar Named character vector defining ECAR injections (e.g. `om_ecar = "m6"`).
 #' @param conversion_model Either `"mookerjee"` (default) or `"agilent"`.
+#' @param atp_factors Optional named list with numeric elements
+#'   `Jglyco_ecar_factor`, `Jglyco_ocr_factor`, and `Joxphos_ocr_factor`. When
+#'   supplied, these custom ATP conversion factors override the
+#'   `conversion_model` preset.
 #' @param ug_protein_scaling_factor Protein content per well (in ug, default = 20).
 #' @param ocr_var Name of column containing OCR values (default = `"J_oxphos"`).
 #' @param ecar_var Name of column containing ECAR values (default = `"J_glyco"`).
@@ -45,6 +49,7 @@ calculate_space <- function(rate,
                             param_set_ocr,
                             param_set_ecar,
                             conversion_model = "mookerjee",
+                            atp_factors = NULL,
                             ug_protein_scaling_factor = 20,
                             ocr_var = "J_oxphos",
                             ecar_var = "J_glyco") {
@@ -75,8 +80,19 @@ calculate_space <- function(rate,
     }
   }
 
-  # Built-in ATP conversion factors
-  atp_factors <- if (conversion_model == "mookerjee") {
+  # Built-in ATP conversion factors, unless the user supplies their own
+  atp_factors <- if (!is.null(atp_factors)) {
+    required_factor_names <- c("Jglyco_ecar_factor", "Jglyco_ocr_factor", "Joxphos_ocr_factor")
+    if (!is.list(atp_factors) ||
+        !all(required_factor_names %in% names(atp_factors)) ||
+        !all(vapply(atp_factors[required_factor_names], is.numeric, logical(1)))) {
+      cli::cli_abort(c(
+        "{.arg atp_factors} must be a named list with numeric elements {.val {required_factor_names}}.",
+        "i" = "Or omit it to use the {.val {conversion_model}} preset."
+      ))
+    }
+    atp_factors
+  } else if (conversion_model == "mookerjee") {
     list(
       Jglyco_ecar_factor = 7.23,
       Jglyco_ocr_factor = 0.469,
@@ -89,7 +105,7 @@ calculate_space <- function(rate,
       Joxphos_ocr_factor = 5.5
     )
   }
-  
+
   # Supply Flexibility Index (SFI)
   SFI <- function(x, y, max_ecar, max_ocr) {
     x_0 <- max(x + y - max_ocr, 0)
