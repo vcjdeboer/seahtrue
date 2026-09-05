@@ -42,3 +42,28 @@ test_that("calculate_space warns when plot-required canonical names are missing"
     regexp = "amrot_ecar|canonical|downstream"
   )
 })
+
+test_that("calculate_space returns one row per group with expected columns", {
+  rate <- purrr::pluck(example_plate(), "rate_data", 1)
+  out <- calculate_space(
+    rate = rate,
+    param_set_ocr  = c(init_ocr = "m3", fccp_ocr = "m4", amrot_ocr = "m9", mon_ocr = "m12"),
+    param_set_ecar = c(init_ecar = "m3", fccp_ecar = "m4", amrot_ecar = "m9", mon_ecar = "m12"),
+    conversion_model = "mookerjee"
+  )
+  expect_s3_class(out, "tbl_df")
+  expect_equal(nrow(out), dplyr::n_distinct(rate$group))
+  expect_true(all(c("group", "basal_ocr", "fccp_ocr", "amrot_ocr",
+                    "basal_ecar", "fccp_ecar", "amrot_ecar",
+                    "supply_index", "glyco_index") %in% names(out)))
+  expect_type(out$supply_index, "double")
+})
+
+test_that("conversion_model presets produce different J values", {
+  rate <- purrr::pluck(example_plate(), "rate_data", 1)
+  ps_ocr  <- c(init_ocr = "m3", fccp_ocr = "m4", amrot_ocr = "m9", mon_ocr = "m12")
+  ps_ecar <- c(init_ecar = "m3", fccp_ecar = "m4", amrot_ecar = "m9", mon_ecar = "m12")
+  m <- calculate_space(rate, ps_ocr, ps_ecar, conversion_model = "mookerjee")
+  a <- calculate_space(rate, ps_ocr, ps_ecar, conversion_model = "agilent")
+  expect_false(isTRUE(all.equal(m$basal_ocr, a$basal_ocr)))
+})
