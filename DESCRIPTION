@@ -63,9 +63,9 @@ Imports:
     scales (>= 1.3.0),
     ggrepel,
     grid
-RoxygenNote: 7.3.2
 Depends:
     R (>= 4.2.0) 
 VignetteBuilder: knitr
 URL: https://vcjdeboer.github.io/seahtrue/
 BugReports: https://vcjdeboer.github.io/seahtrue/issues
+Config/roxygen2/version: 8.0.0
