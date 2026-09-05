@@ -7,6 +7,7 @@
 * Space/trajectory functions moved to their own source file.
 * Added test coverage for `revive_xfplate()`, `calculate_space()`, and the space plots.
 * Package hygiene: converted source files to ASCII-only, cleared R CMD check NOTEs, and switched internal messaging to `cli`.
+* Regenerated the `revive_output_donor_A` example dataset with current code, removing a stale dependency on the `validate`/`settings` packages that broke `R CMD check` in environments without them.
 
 # seahtrue 0.99.2
 
