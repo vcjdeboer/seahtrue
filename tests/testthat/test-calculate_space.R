@@ -27,3 +27,18 @@ test_that("calculate_space errors on unnamed param_set", {
     regexp = "param_set_ocr"
   )
 })
+
+test_that("calculate_space warns when plot-required canonical names are missing", {
+  file <- system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx",
+                      package = "seahtrue")
+  skip_if(file == "", "example data not installed")
+  rate <- purrr::pluck(revive_xfplate(file), "rate_data", 1)
+  expect_warning(
+    calculate_space(
+      rate = rate,
+      param_set_ocr  = c(init_ocr = "m3", fccp_ocr = "m4", amrot_ocr = "m9", mon_ocr = "m12"),
+      param_set_ecar = c(init_ecar = "m3", fccp_ecar = "m4", weird_ecar = "m9", mon_ecar = "m12")
+    ),
+    regexp = "amrot_ecar|canonical|downstream"
+  )
+})

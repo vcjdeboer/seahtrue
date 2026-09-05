@@ -795,6 +795,17 @@ plot_line_per_well <- function(df, var, y_title) {
 #' @param OCR_var Name of column containing OCR values (default = `"J_oxphos"`).
 #' @param ECAR_var Name of column containing ECAR values (default = `"J_glyco"`).
 #'
+#' @section Canonical injection names:
+#' `param_set_ocr` and `param_set_ecar` map measurement columns (e.g. `"m3"`)
+#' to *canonical* injection names. Downstream metrics and the plotting
+#' functions rely on these names. Use one of `init`, `fccp`, `amrot`, `om`,
+#' `mon` suffixed with `_ocr` or `_ecar` (e.g. `init_ocr`, `amrot_ecar`).
+#' Derived columns (`basal_*`, `max_*`, `spare_*`, `supply_index`,
+#' `glyco_index`) are computed from these. `plot_bioenergetic_space()` and
+#' `plot_bioenergetic_trajectory()` require `basal_ocr`, `fccp_ocr`,
+#' `amrot_ocr`, `basal_ecar`, `fccp_ecar`, `amrot_ecar`; a warning is issued
+#' if `calculate_space()` cannot produce them.
+#'
 #' @return A tibble with one row per group and multiple bioenergetic indices.
 #' @export
 #'
@@ -951,7 +962,18 @@ calculate_space <- function(rate,
         }
       )
     )
-  
+
+  # Names required by the plotting functions downstream.
+  plot_required <- c("basal_ocr", "fccp_ocr", "amrot_ocr",
+                     "basal_ecar", "fccp_ecar", "amrot_ecar")
+  missing_for_plots <- setdiff(plot_required, names(df_space))
+  if (length(missing_for_plots) > 0) {
+    cli::cli_warn(c(
+      "Output lacks column{?s} {.val {missing_for_plots}} needed by {.fn plot_bioenergetic_space}/{.fn plot_bioenergetic_trajectory}.",
+      "i" = "Use the canonical injection names in {.arg param_set_ocr}/{.arg param_set_ecar}: one of {.val {c('init','fccp','amrot','om','mon')}} suffixed with {.val _ocr} or {.val _ecar}."
+    ))
+  }
+
   return(df_space)
 }
 

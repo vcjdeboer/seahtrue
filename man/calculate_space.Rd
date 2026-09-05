@@ -36,6 +36,19 @@ A tibble with one row per group and multiple bioenergetic indices.
 Computes bioenergetic parameters (OCR/ECAR) including spare capacity, glycolytic index,
 and supply flexibility index. Compatible with both oligomycin- and monensin-based protocols.
 }
+\section{Canonical injection names}{
+
+`param_set_ocr` and `param_set_ecar` map measurement columns (e.g. `"m3"`)
+to *canonical* injection names. Downstream metrics and the plotting
+functions rely on these names. Use one of `init`, `fccp`, `amrot`, `om`,
+`mon` suffixed with `_ocr` or `_ecar` (e.g. `init_ocr`, `amrot_ecar`).
+Derived columns (`basal_*`, `max_*`, `spare_*`, `supply_index`,
+`glyco_index`) are computed from these. `plot_bioenergetic_space()` and
+`plot_bioenergetic_trajectory()` require `basal_ocr`, `fccp_ocr`,
+`amrot_ocr`, `basal_ecar`, `fccp_ecar`, `amrot_ecar`; a warning is issued
+if `calculate_space()` cannot produce them.
+}
+
 \examples{
  data <- revive_xfplate(
   system.file("extdata", 
