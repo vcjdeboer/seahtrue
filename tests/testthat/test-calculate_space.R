@@ -13,7 +13,7 @@ test_that("calculate_space errors when rate lacks required columns", {
     calculate_space(rate = bad,
                     param_set_ocr = c(init_ocr = "m3"),
                     param_set_ecar = c(init_ecar = "m3")),
-    regexp = "OCR_wave_bc|ECAR_wave_bc|column"
+    regexp = "is missing required column"
   )
 })
 
