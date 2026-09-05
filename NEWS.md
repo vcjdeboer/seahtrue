@@ -1,5 +1,7 @@
 # seahtrue (development version)
 
+* `calculate_space()` arguments `OCR_var`/`ECAR_var` renamed to `ocr_var`/`ecar_var` for naming consistency (no change in behavior or defaults).
+
 ## BiocCheck working checklist (remove before release)
 
 - Baseline after Phase 1 hygiene (2026-09-05): ERROR 3, WARNING 1, NOTE 6.

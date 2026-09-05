@@ -10,8 +10,8 @@ calculate_space(
   param_set_ecar,
   conversion_model = "mookerjee",
   ug_protein_scaling_factor = 20,
-  OCR_var = "J_oxphos",
-  ECAR_var = "J_glyco"
+  ocr_var = "J_oxphos",
+  ecar_var = "J_glyco"
 )
 }
 \arguments{
@@ -25,9 +25,9 @@ calculate_space(
 
 \item{ug_protein_scaling_factor}{Protein content per well (in ug, default = 20).}
 
-\item{OCR_var}{Name of column containing OCR values (default = `"J_oxphos"`).}
+\item{ocr_var}{Name of column containing OCR values (default = `"J_oxphos"`).}
 
-\item{ECAR_var}{Name of column containing ECAR values (default = `"J_glyco"`).}
+\item{ecar_var}{Name of column containing ECAR values (default = `"J_glyco"`).}
 }
 \value{
 A tibble with one row per group and multiple bioenergetic indices.

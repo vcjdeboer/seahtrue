@@ -13,8 +13,8 @@
 #' @param param_set_ecar Named character vector defining ECAR injections (e.g. `om_ecar = "m6"`).
 #' @param conversion_model Either `"mookerjee"` (default) or `"agilent"`.
 #' @param ug_protein_scaling_factor Protein content per well (in ug, default = 20).
-#' @param OCR_var Name of column containing OCR values (default = `"J_oxphos"`).
-#' @param ECAR_var Name of column containing ECAR values (default = `"J_glyco"`).
+#' @param ocr_var Name of column containing OCR values (default = `"J_oxphos"`).
+#' @param ecar_var Name of column containing ECAR values (default = `"J_glyco"`).
 #'
 #' @section Canonical injection names:
 #' `param_set_ocr` and `param_set_ecar` map measurement columns (e.g. `"m3"`)
@@ -46,8 +46,8 @@ calculate_space <- function(rate,
                             param_set_ecar,
                             conversion_model = "mookerjee",
                             ug_protein_scaling_factor = 20,
-                            OCR_var = "J_oxphos",
-                            ECAR_var = "J_glyco") {
+                            ocr_var = "J_oxphos",
+                            ecar_var = "J_glyco") {
   # Validate model
   if (!conversion_model %in% c("mookerjee", "agilent")) {
     stop("conversion_model must be either 'mookerjee' or 'agilent'")
@@ -108,7 +108,7 @@ calculate_space <- function(rate,
     )
   
   df_ocr <- rate_J %>%
-    dplyr::select(group, measurement, my_OCR = all_of(OCR_var)) %>%
+    dplyr::select(group, measurement, my_OCR = all_of(ocr_var)) %>%
     dplyr::summarize(OCR = mean(my_OCR, na.rm = TRUE), .by = c(group, measurement)) %>%
     tidyr::pivot_wider(names_from = measurement, names_prefix = "m", values_from = OCR) %>%
     dplyr::rename(!!!param_set_ocr)
@@ -137,7 +137,7 @@ calculate_space <- function(rate,
   
   #conditionals
   df_ecar <- rate_J %>%
-    dplyr::select(group, measurement, my_ECAR = all_of(ECAR_var)) %>%
+    dplyr::select(group, measurement, my_ECAR = all_of(ecar_var)) %>%
     dplyr::summarize(ECAR = mean(my_ECAR, na.rm = TRUE), .by = c(group, measurement)) %>%
     tidyr::pivot_wider(names_from = measurement, names_prefix = "m", values_from = ECAR) %>%
     dplyr::rename(!!!param_set_ecar)
