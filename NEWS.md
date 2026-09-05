@@ -8,6 +8,7 @@
 * Added test coverage for `revive_xfplate()`, `calculate_space()`, and the space plots.
 * Package hygiene: converted source files to ASCII-only, cleared R CMD check NOTEs, and switched internal messaging to `cli`.
 * Regenerated the `revive_output_donor_A` example dataset with current code, removing a stale dependency on the `validate`/`settings` packages that broke `R CMD check` in environments without them.
+* Switched the vignette output from `BiocStyle::html_document` to `rmarkdown::html_document` and dropped `BiocStyle` from Suggests, so the webR build (which cannot resolve Bioconductor-only packages) builds without it.
 
 # seahtrue 0.99.2
 
