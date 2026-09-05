@@ -14,7 +14,8 @@
 #' @examples
 #' read_xfplate(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
 #' package = "seahtrue"))
-read_xfplate <- function(filepath_seahorse) {
+read_xfplate <- function(filepath_seahorse,
+                         my_instrument = "XFe96") {
     cli::cli_alert(
         glue::glue("Start function to read seahorse plate data from 
                  Excel file: {basename(filepath_seahorse)}"),
@@ -26,14 +27,14 @@ read_xfplate <- function(filepath_seahorse) {
         verify_xf_raw()
 
     xf_assayinfo <-
-        get_xf_assayinfo(filepath_seahorse, xf_raw) %>%
+        get_xf_assayinfo(filepath_seahorse, 
+                         xf_raw,
+                         instrument = my_instrument) %>%
         verify_xf_assayinfo()
 
-    xf_norm <-
-        get_xf_norm(filepath_seahorse) %>%
-        verify_xf_norm()
-
-
+    xf_norm <- get_xf_norm(filepath_seahorse) %>%
+      verify_xf_norm() %>%
+      set_xf_norm()
 
     xf_buffer <- get_xf_buffer(filepath_seahorse)
     xf_inj <- get_xf_inj(filepath_seahorse)
@@ -131,6 +132,31 @@ verify_xf_raw <- function(xf_raw) {
             )
         }
     }
+    
+    # Check for missing values in O2_mmHg and pH and replace with zeros
+    xf_raw <- xf_raw %>%
+      dplyr::mutate(
+        O2_mmHg = suppressWarnings(as.numeric(ifelse(O2_mmHg %in% c("N/A", "NaN", ""), NA, O2_mmHg))),
+        pH      = suppressWarnings(as.numeric(ifelse(pH %in% c("N/A", "NaN", ""), NA, pH)))
+      )
+    
+    na_O2 <- sum(is.na(xf_raw$O2_mmHg))
+    na_pH <- sum(is.na(xf_raw$pH))
+    
+    if (na_O2 > 0 || na_pH > 0) {
+      if (na_O2 > 0) {
+        cli::cli_inform(
+          glue::glue("Detected {na_O2} NA values in O2_mmHg \u2014 replaced with 0.")
+        )
+        xf_raw$O2_mmHg[is.na(xf_raw$O2_mmHg)] <- 0
+      }
+      if (na_pH > 0) {
+        cli::cli_inform(
+          glue::glue("Detected {na_pH} NA values in pH \u2014 replaced with 0.")
+        )
+        xf_raw$pH[is.na(xf_raw$pH)] <- 0
+      }
+    }
 
     return(xf_raw)
 }
@@ -166,21 +192,33 @@ get_xf_norm <- function(filepath_seahorse) {
 
 # new function
 verify_xf_norm <- function(xf_norm) {
-    # typically a full plate is copied, thus a high number
-    # of NAs is typically a sign that norm is not available
+  # Count NAs in cell_n
+  na_count <- sum(is.na(xf_norm$cell_n), na.rm = TRUE)
+  
+  # Determine if normalization is available
+  norm_available <- na_count <= 90
+  
+  # Attach attributes
+  xf_norm <- xf_norm %>%
+    structure(
+      norm_available = norm_available,
+      na_count = na_count
+    )
+  
+  return(xf_norm)
+}
 
-    # get the attribute using:
-    # attributes(xf_norm) %>%  pluck("norm_available")
-
-    if (sum(is.na(xf_norm$cell_n)) > 90) {
-        xf_norm <- xf_norm %>%
-            structure(norm_available = FALSE)
-    } else {
-        xf_norm <- xf_norm %>%
-            structure(norm_available = TRUE)
-    }
-
-    return(xf_norm)
+set_xf_norm <- function(xf_norm) {
+  na_count <- sum(is.na(xf_norm$cell_n), na.rm = TRUE)
+  
+  if (na_count > 0) {
+    cli::cli_alert_info("Replaced {na_count} missing {.field cell_n} values with 1 (no normalization).")
+    
+    xf_norm <- xf_norm %>%
+      dplyr::mutate(cell_n = ifelse(is.na(.data$cell_n), 1, .data$cell_n))
+  }
+  
+  return(xf_norm)
 }
 
 # get_xf_flagged() -----------------------------------------------------
@@ -188,18 +226,38 @@ verify_xf_norm <- function(xf_norm) {
 #' Get unselected (flagged) wells from the Assay Configuration sheet.
 #'
 #' @param filepath_seahorse Absolute path to the Seahorse Excel file.
-#' This Excel file is converted from the assay result file (.asyr) downloaded 
-#' from
-#' the Agilent Seahorse XF Wave software.
+#'   This Excel file is converted from the assay result file (.asyr) downloaded
+#'   from the Agilent Seahorse XF Wave software.
 #'
-#' @return Vector that contains wells that were "unselected" (flagged).
+#' @return A tibble with columns `well` and `flag`, indicating which wells were
+#'   "unselected" (flagged). If the `tidyxl` package is not installed, an empty
+#'   tibble is returned with zero flagged wells.
+#'
+#' @details
+#' This function requires the \pkg{tidyxl} package to extract formatting
+#' information from the Excel file. If \pkg{tidyxl} is not installed, the
+#' function will return an empty tibble and issue a warning. 
+#'
 #' @noRd
 #' @keywords internal
-#' @import tidyxl readxl dplyr stringr tibble
+#' @importFrom tibble tibble
+#' @importFrom dplyr filter pull
+#' @importFrom stringr str_c str_split str_replace_all
+#' @importFrom cli cli_warn
 #' @examples
-#' get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
-#' package = "seahtrue"))
+#' # This example works whether or not tidyxl is installed.
+#' # If tidyxl is unavailable, a warning is shown and an empty tibble is returned.
+#' flagged <- get_xf_flagged(system.file("extdata", "20191219_SciRep_PBMCs_donor_A.xlsx", 
+#'   package = "seahtrue"))
+#' print(flagged)
 get_xf_flagged <- function(filepath_seahorse) {
+    
+  # Check if tidyxl is installed
+  if (!requireNamespace("tidyxl", quietly = TRUE)) {
+    cli::cli_warn("Package {.pkg tidyxl} not available. Returning tibble with no flagged wells.")    
+    return(tibble::tibble(well = character(0), flag = logical(0)))
+  }
+    
     x <- tidyxl::xlsx_cells(filepath_seahorse, "Assay Configuration")
     formats <- tidyxl::xlsx_formats(filepath_seahorse, "Assay Configuration")
 
@@ -299,12 +357,9 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
 
     # if background wells are flagged, this could go wrong
     # therefore they should be removed if flagged, first
-    groups <- xf_rate %>%
-        select(.data$well, .data$group) %>%
-        unique()
-
+    groups_tbl <- xf_rate %>% dplyr::distinct(well, group)
     xf_flagged <- xf_flagged %>%
-        left_join(groups, by = c("well"))
+      dplyr::left_join(groups_tbl, by = "well")
 
     if ("Background" %in% xf_flagged$group) {
         flagged_bkgd_wells <- xf_flagged %>%
@@ -315,28 +370,24 @@ verify_xf_rate <- function(xf_rate, xf_flagged) {
             filter(!.data$well %in% flagged_bkgd_wells)
     }
 
-    # next do the check whether the data is bkgd corrected
-    if (is.null(
-        missing_strings(
-            xf_rate %>%
-                pull(.data$group) %>%
-                unique(),
-            "Background"
-        )
-    )) {
+    # next do the check whether the data is background-corrected
+    has_background <- "Background" %in% unique(xf_rate$group)
+    
+    if (has_background) {
+      if (!"ocr" %in% names(xf_rate)) {
+        warning("Column 'ocr' not found in xf_rate; cannot determine background correction.")
+        corrected_allready <- NA
+      } else {
         check_background <- xf_rate %>%
-            dplyr::filter(.data$group == "Background") %>%
-            dplyr::pull(.data$ocr) %>%
-            mean()
-
-        if (check_background == 0) {
-            corrected_allready <- TRUE
-        } else {
-            corrected_allready <- FALSE
-        }
+          dplyr::filter(group == "Background") %>%
+          dplyr::mutate(ocr = suppressWarnings(as.numeric(ocr))) %>%
+          dplyr::summarise(mean_ocr = mean(ocr, na.rm = TRUE)) %>%
+          dplyr::pull(mean_ocr)
+        
+        corrected_allready <- if (is.finite(check_background)) (check_background == 0) else NA
+      }
     } else {
-        # if Background  group is not present then:
-        corrected_allready <- "no_background"
+      corrected_allready <- "no_background"
     }
 
     if (corrected_allready == TRUE) {
@@ -994,32 +1045,13 @@ get_platelayout_data <- function(filepath_seahorse,
 
 # new util function
 missing_strings <- function(my_strings, strings_required) {
-    my_strings_df <- my_strings %>%
-        dplyr::as_tibble()
-    
-    #fix valid_codes and value VB
-    rule <- validate::validator(
-        .data = data.frame(
-          rule = c("value %in% valid_codes"),
-          name = "missing strings",
-          description = "missing strings")
-        
-    )
-
-    strings_available <-
-        validate::satisfying(my_strings_df, rule,
-            ref = list(valid_codes = strings_required)
-        ) %>%
-        pull(.data$value)
-
-    my_missing_strings <-
-        if (!identical(strings_available, strings_required)) {
-            dplyr::setdiff(
-                strings_required,
-                strings_available
-            )
-        }
-
-
+  strings_available <- intersect(my_strings, strings_required)
+  
+  my_missing_strings <- setdiff(strings_required, strings_available)
+  
+  if (length(my_missing_strings) > 0) {
     return(my_missing_strings)
+  } else {
+    return(NULL)
+  }
 }

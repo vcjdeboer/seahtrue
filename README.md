@@ -14,6 +14,24 @@ command:
 
 ``` r
 devtools::install_github("vcjdeboer/seahtrue", ref = "main")
+
+```
+### Installation developer version
+
+If you want to install the developer version you can download it from the devel branch like this:
+
+``` r
+install.packages(c("remotes"))
+
+remotes::install_github("vcjdeboer/seahtrue@devel")
+
+packageVersion("seahtrue")
+
+# ‘1.1.0.9001’
+
+help(package = "seahtrue")
+
+
 ```
 
 ### Getting Help

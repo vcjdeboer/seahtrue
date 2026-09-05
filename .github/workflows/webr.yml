@@ -1,13 +1,103 @@
 name: Build and deploy seahtrue from GitHub
 on:
   workflow_dispatch:
+    inputs:
+      webr_image:
+        description: >-
+          webR container image used to build the wasm binary. MUST match the
+          R version of the webR runtime that "the book of seahtrue" loads via
+          quarto-live, otherwise the book cannot install seahtrue (it fetches
+          from bin/emscripten/contrib/<Rminor>/, which is version-specific).
+          The book (_extensions/r-wasm/live) currently bundles webR v0.5.2 =
+          R 4.5.1 -> contrib/4.5. Do NOT use `:main`: that is unreleased R 4.6,
+          which no released webR / quarto-live runtime can load.
+        default: "ghcr.io/r-wasm/webr:v0.5.2"
+        required: false
+        type: string
+
 permissions:
   contents: read
   pages: write
   id-token: write
-  repository-projects: read  
+  repository-projects: read
+
 jobs:
+  # Build the wasm CRAN-like package repository into `_site` and deploy it to
+  # GitHub Pages. We intentionally do NOT build a VFS library image
+  # (rwasm::make_vfs_library): "the book of seahtrue" loads packages via webR
+  # directly from this repo URL (its _quarto.yml `webr: repos:`), so the VFS
+  # image is unnecessary. The upstream reusable workflow
+  # (r-wasm/actions .../deploy-cran-repo.yml@v3) always runs make_vfs_library,
+  # which fails in the webR image (file_packager: Nothing to do!), so we
+  # replicate only the repo-building half of its build-rwasm step.
+  #
+  # IMPORTANT: the wasm binary is built for the R version of `webr_image` and
+  # lands in bin/emscripten/contrib/<Rminor>/. The book's webR runtime requests
+  # its own R version's contrib dir, so `webr_image` must track the webR version
+  # bundled by the book's quarto-live extension (see the input description).
   build:
-    uses: r-wasm/actions/.github/workflows/deploy-cran-repo.yml@v2
-    with:
-      packages: vcjdeboer/seahtrue@devel
+    runs-on: ubuntu-24.04
+
+    # Match the upstream reusable workflow so runs serialize on the Pages group.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: true
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Build wasm package repository (rwasm::add_pkg, no VFS image)
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          WEBR_IMAGE: ${{ inputs.webr_image }}
+          # rwasm builds seahtrue's wasm binary by first installing its R deps
+          # into host R via pak (R/build.R: pak::pkg_install("deps::<tarball>")).
+          # In the webR container pak's "Installing system requirements" step
+          # runs `sh -c apt-get -y update`, which can fail and abort the pak
+          # subprocess, leaving the deps uninstalled so the wasm build reports
+          # "dependencies ... not available" and produces no binary. Host apt
+          # system requirements are irrelevant to a wasm cross-build (deps are
+          # PPM binaries; seahtrue is NeedsCompilation: no), so disable pak's
+          # sysreqs handling entirely.
+          PKG_SYSREQS: "false"
+        run: |
+          echo "Building with webR image: ${WEBR_IMAGE}"
+          docker run --rm \
+            -v "${{ github.workspace }}:/github/workspace" \
+            --workdir /github/workspace \
+            -e GITHUB_PAT \
+            -e PKG_SYSREQS \
+            --entrypoint Rscript \
+            "${WEBR_IMAGE}" \
+            -e 'rwasm::add_pkg("vcjdeboer/seahtrue@devel", repo_dir = "_site", compress = TRUE)'
+
+      - name: Verify seahtrue wasm binary was built
+        # rwasm swallows a failed wasm build as a warning and exits 0, so assert
+        # the binary actually landed in the repo before deploying it.
+        run: |
+          set -euo pipefail
+          echo "Repo tree under _site/bin:"
+          find _site/bin -maxdepth 4 -type d -print || true
+          pkgs="$(find _site/bin/emscripten/contrib -maxdepth 2 -name PACKAGES -print 2>/dev/null || true)"
+          if [ -z "$pkgs" ]; then
+            echo "::error::No emscripten PACKAGES index found; add_pkg did not build any wasm binary."
+            exit 1
+          fi
+          if ! grep -rqE '^Package: seahtrue$' $pkgs; then
+            echo "::error::seahtrue not present in emscripten PACKAGES; wasm build failed."
+            grep -rH '^Package:' $pkgs || true
+            exit 1
+          fi
+          echo "OK: seahtrue wasm binary is present in the repo:"
+          grep -rH -A1 '^Package: seahtrue$' $pkgs || true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

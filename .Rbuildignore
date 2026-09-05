@@ -5,3 +5,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^new_trajectory\.qmd$
+^new_trajectory_test\.qmd$
+^docs/superpowers$
+^\.claude$
+^\.superpowers$
+^.*\.DS_Store$
+^\.git$

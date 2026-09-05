@@ -249,12 +249,12 @@ sketch_rate <- function(xf_rate,
         )
     }
 
-    if (!validate::all_complete(xf_rate$cell_n)) {
-        cli::cli_abort(
-            glue::glue("There are NAs in the n_cell column"),
-            wrap = TRUE
-        )
-    }
+    # if (!validate::all_complete(xf_rate$cell_n)) {
+    #     cli::cli_abort(
+    #         glue::glue("There are NAs in the cell_n column"),
+    #         wrap = TRUE
+    #     )
+    # }
 
     if ("Background" %in% xf_rate$group &&
         was_background_corrected && normalize == TRUE) {
@@ -612,13 +612,13 @@ plot_ribbon_per_meas_and_group <- function(df, var, y_title) {
                 panel.grid.minor.x = element_blank(),
                 panel.grid.major.x = element_blank(),
                 panel.grid.minor.y = element_blank(),
-                panel.grid.major.y = element_line(size = 0.5, 
+                panel.grid.major.y = element_line(linewidth = 0.5,
                                                   linetype = "dashed"),
                 panel.border = element_blank(),
                 # axis.ticks.x = element_blank(),
                 axis.ticks.y = element_blank(),
-                axis.line = element_line(size = 0.6),
-                plot.title = element_text(hjust = 0, color = "black", 
+                axis.line = element_line(linewidth = 0.6),
+                plot.title = element_text(hjust = 0, color = "black",
                                           size = rel(1)),
                 legend.text = element_text(size = rel(0.6)),
                 legend.title.align = 0,
@@ -708,13 +708,13 @@ plot_line_per_well <- function(df, var, y_title) {
                 panel.grid.minor.x = element_blank(),
                 panel.grid.major.x = element_blank(),
                 panel.grid.minor.y = element_blank(),
-                panel.grid.major.y = element_line(size = 0.5, 
+                panel.grid.major.y = element_line(linewidth = 0.5,
                                                   linetype = "dashed"),
                 panel.border = element_blank(),
                 # axis.ticks.x = element_blank(),
                 axis.ticks.y = element_blank(),
-                axis.line = element_line(size = 0.6),
-                plot.title = element_text(hjust = 0, 
+                axis.line = element_line(linewidth = 0.6),
+                plot.title = element_text(hjust = 0,
                                           color = "black", size = rel(1)),
                 legend.text = element_text(size = rel(0.6)),
                 legend.title.align = 0,

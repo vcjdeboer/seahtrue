@@ -23,6 +23,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Vincent de Boer \email{vincent.deboer@wur.nl} (\href{https://orcid.org/0000-0001-9928-1698}{ORCID})
   \item Gerwin Smits
   \item Xiang Zhang
 }

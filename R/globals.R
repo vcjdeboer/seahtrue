@@ -1,0 +1,32 @@
+# Column names used in non-standard evaluation (dplyr/tidyr) across the package.
+# Registered here so R CMD check does not report "no visible binding".
+utils::globalVariables(c(
+  ".",
+  "amrot_ocr",
+  "atp_linked",
+  "basal_ecar",
+  "basal_ocr",
+  "bioenergetic_scope",
+  "ECAR",
+  "ECAR_wave_bc",
+  "fccp_ocr",
+  "group",
+  "init_ocr",
+  "max_ecar",
+  "max_ocr",
+  "mean_ocr",
+  "measurement",
+  "my_ECAR",
+  "my_OCR",
+  "non_mito_ocr",
+  "O2_mmHg",
+  "OCR",
+  "OCR_wave_bc",
+  "ocr",
+  "om_ocr",
+  "pH",
+  "proton_leak",
+  "spare_ecar",
+  "spare_ocr",
+  "well"
+))
