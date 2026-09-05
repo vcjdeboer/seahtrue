@@ -1,106 +1,72 @@
 validate_O2_pH_levels <- function(xf_raw_pr, qc_ranges) {
-  
-  check_tick_ranges_for_well <- function(df, ranges) {
-    # Extract QC thresholds
-    O2_min <- ranges %>% purrr::pluck("O2", "min")
-    O2_max <- ranges %>% purrr::pluck("O2", "max")
-    pH_min <- ranges %>% purrr::pluck("pH", "min")
-    pH_max <- ranges %>% purrr::pluck("pH", "max")
-    
-    # Safety check
-    required_cols <- c("well", "group", "tick", "measurement", "O2_mmHg", "pH")
-    if (!all(required_cols %in% names(df))) {
-      cli::cli_alert_danger("Missing columns in input:")
-      cli::cli_alert_info(paste(setdiff(required_cols, names(df)), collapse = ", "))
-      stop("Aborting check_tick_ranges()")
-    }
-    
-    if (nrow(df) == 0) {
-      return(list(
-        flags = tibble::tibble(
-          well = NA_character_,
-          group = NA_character_,
-          start_O2 = NA, first_O2 = NA, last_O2 = NA,
-          start_pH = NA, first_pH = NA, last_pH = NA
-        ),
-        debug = tibble::tibble()
-      ))
-    }
-    
-    start_tick <- min(df$tick, na.rm = TRUE)
-    
-    tick_bounds <- df %>%
-      dplyr::group_by(.data$measurement) %>%
-      dplyr::summarise(
-        min_tick = min(.data$tick, na.rm = TRUE),
-        max_tick = max(.data$tick, na.rm = TRUE),
-        .groups = "drop"
-      )
-    
-    tick_first <- tick_bounds %>% purrr::pluck("min_tick")
-    tick_last  <- tick_bounds %>% purrr::pluck("max_tick")
-    
-    ticks_to_check <- unique(c(start_tick, tick_first, tick_last))
-    
-    tick_subset <- df %>%
-      dplyr::filter(.data$tick %in% ticks_to_check) %>%
-      dplyr::mutate(
-        position = dplyr::case_when(
-          tick == start_tick      ~ "start",
-          tick %in% tick_first    ~ "first",
-          tick %in% tick_last     ~ "last",
-          TRUE                    ~ NA_character_
-        ),
-        out_O2 = !(.data$O2_mmHg >= O2_min & .data$O2_mmHg <= O2_max),
-        out_pH = !(.data$pH >= pH_min & .data$pH <= pH_max)
-      )
-    
-    flags <- tick_subset %>%
-      dplyr::summarise(
-        start_O2 = any(.data$out_O2[.data$position == "start"], na.rm = TRUE),
-        first_O2 = any(.data$out_O2[.data$position == "first"], na.rm = TRUE),
-        last_O2  = any(.data$out_O2[.data$position == "last"],  na.rm = TRUE),
-        start_pH = any(.data$out_pH[.data$position == "start"], na.rm = TRUE),
-        first_pH = any(.data$out_pH[.data$position == "first"], na.rm = TRUE),
-        last_pH  = any(.data$out_pH[.data$position == "last"],  na.rm = TRUE),
-        .groups = "drop"
-      ) %>%
-      dplyr::mutate(
-        well = unique(df$well),
-        group = unique(df$group)
-      ) %>%
-      dplyr::relocate(.data$well, .data$group)
-    
-    debug_out <- tick_subset %>%
-      dplyr::filter(.data$out_O2 | .data$out_pH) %>%
-      dplyr::mutate(
-        well = unique(df$well),
-        group = unique(df$group)
-      ) %>%
-      dplyr::select(.data$well, .data$group, 
-                    .data$measurement, .data$tick, 
-                    .data$position, .data$O2_mmHg, 
-                    .data$out_O2, .data$pH, .data$out_pH)
-    
-    return(list(flags = flags, debug = debug_out))
+
+  # Extract QC thresholds
+  O2_min <- qc_ranges %>% purrr::pluck("O2", "min")
+  O2_max <- qc_ranges %>% purrr::pluck("O2", "max")
+  pH_min <- qc_ranges %>% purrr::pluck("pH", "min")
+  pH_max <- qc_ranges %>% purrr::pluck("pH", "max")
+
+  # Safety check
+  required_cols <- c("well", "group", "tick", "measurement", "O2_mmHg", "pH")
+  if (!all(required_cols %in% names(xf_raw_pr))) {
+    cli::cli_alert_danger("Missing columns in input:")
+    cli::cli_alert_info(paste(setdiff(required_cols, names(xf_raw_pr)), collapse = ", "))
+    stop("Aborting validate_O2_pH_levels()")
   }
-  
-  nested <- xf_raw_pr %>%
+
+  # Whole-plate vectorised QC. The previous implementation nested the data per
+  # well and ran the tick-range check well-by-well via purrr::map(); with ~96
+  # wells that is hundreds of small dplyr calls, whose per-call overhead is
+  # negligible in native R but crippling under webR/wasm (the book timed out at
+  # quarto-live's 30s elapsed limit). Grouping by well+group and computing the
+  # flags in a handful of grouped operations produces identical output at a
+  # fraction of the cost. Note: a tick is unique to one measurement, so a row's
+  # tick equalling its own measurement's min/max is equivalent to the previous
+  # `tick %in% <all measurements' min/max ticks>` membership test.
+  tagged <- xf_raw_pr %>%
     dplyr::group_by(.data$well, .data$group) %>%
-    tidyr::nest() %>%
+    dplyr::mutate(start_tick = min(.data$tick, na.rm = TRUE)) %>%
+    dplyr::group_by(.data$well, .data$group, .data$measurement) %>%
     dplyr::mutate(
-      data = purrr::map(.data$data, ~ dplyr::mutate(.x, well = well, group = group)),
-      qc_result = purrr::map(.data$data, ~ check_tick_ranges_for_well(.x, ranges = qc_ranges))
+      meas_min_tick = min(.data$tick, na.rm = TRUE),
+      meas_max_tick = max(.data$tick, na.rm = TRUE)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(
+      .data$tick == .data$start_tick |
+        .data$tick == .data$meas_min_tick |
+        .data$tick == .data$meas_max_tick
+    ) %>%
+    dplyr::mutate(
+      position = dplyr::case_when(
+        .data$tick == .data$start_tick    ~ "start",
+        .data$tick == .data$meas_min_tick ~ "first",
+        .data$tick == .data$meas_max_tick ~ "last",
+        TRUE                              ~ NA_character_
+      ),
+      out_O2 = !(.data$O2_mmHg >= O2_min & .data$O2_mmHg <= O2_max),
+      out_pH = !(.data$pH >= pH_min & .data$pH <= pH_max)
     )
-  
-  flags_df <- nested %>%
-    dplyr::pull(.data$qc_result) %>%
-    purrr::map_dfr(purrr::pluck, "flags")
-  
-  debug_df <- nested %>%
-    dplyr::pull(.data$qc_result) %>%
-    purrr::map_dfr(purrr::pluck, "debug")
-  
+
+  flags_df <- tagged %>%
+    dplyr::group_by(.data$well, .data$group) %>%
+    dplyr::summarise(
+      start_O2 = any(.data$out_O2[.data$position == "start"], na.rm = TRUE),
+      first_O2 = any(.data$out_O2[.data$position == "first"], na.rm = TRUE),
+      last_O2  = any(.data$out_O2[.data$position == "last"],  na.rm = TRUE),
+      start_pH = any(.data$out_pH[.data$position == "start"], na.rm = TRUE),
+      first_pH = any(.data$out_pH[.data$position == "first"], na.rm = TRUE),
+      last_pH  = any(.data$out_pH[.data$position == "last"],  na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  debug_df <- tagged %>%
+    dplyr::filter(.data$out_O2 | .data$out_pH) %>%
+    dplyr::select(.data$well, .data$group,
+                  .data$measurement, .data$tick,
+                  .data$position, .data$O2_mmHg,
+                  .data$out_O2, .data$pH, .data$out_pH)
+
   return(list(flag = flags_df, debug = debug_df))
 }
 
