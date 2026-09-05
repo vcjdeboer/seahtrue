@@ -1,20 +1,11 @@
 # seahtrue (development version)
 
+* Added input validation with clear error messages for `calculate_space()`.
+* Documented the canonical injection-name contract; `calculate_space()` now warns when the plot-required columns can't be produced.
 * `calculate_space()` arguments `OCR_var`/`ECAR_var` renamed to `ocr_var`/`ecar_var` for naming consistency (no change in behavior or defaults).
-
-## BiocCheck working checklist (remove before release)
-
-- Baseline after Phase 1 hygiene (2026-09-05): ERROR 3, WARNING 1, NOTE 6.
-- Remaining items to address in Phase 2/3:
-  - ERROR: `Remotes: bioc::BiocStyle` in DESCRIPTION must be removed before release (Bioc requires deps from CRAN/Bioconductor only).
-  - ERROR: package `Version:` (1.1.0.9001) is not a valid Bioconductor version number (needs x.y.z form).
-  - ERROR: package directory name must match the `Package:` field — not applicable to the real checkout (this run was from a worktree directory named `bioc-space-improvements`, not `seahtrue`); re-verify from a `seahtrue`-named checkout before release.
-  - WARNING: no Bioconductor dependencies detected in DESCRIPTION.
-  - NOTE: `suppressWarnings()` used 3 times (R/read_xfplate.R lines 139, 140, 383) — avoid if possible.
-  - NOTE: 18 functions exceed the recommended 50-line length; longest include `get_xf_assayinfo()` (R/read_xfplate.R, 258 lines) and `validate_O2_pH_levels()` (R/assertions_read.R, 105 lines).
-  - NOTE: R version dependency should be updated from 4.2.0 to 4.4.0.
-  - NOTE: 120 lines (4%) exceed 80 characters; 418 lines (13%) are not indented in multiples of 4 spaces — consider running `styler`.
-  - NOTE: cannot verify Bioc-devel mailing list subscription (requires admin credentials) — confirm manually before release.
+* Space/trajectory functions moved to their own source file.
+* Added test coverage for `revive_xfplate()`, `calculate_space()`, and the space plots.
+* Package hygiene: converted source files to ASCII-only, cleared R CMD check NOTEs, and switched internal messaging to `cli`.
 
 # seahtrue 0.99.2
 
