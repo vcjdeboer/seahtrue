@@ -34,14 +34,45 @@ jobs:
       - name: Build wasm package repository (rwasm::add_pkg, no VFS image)
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          # rwasm builds seahtrue's wasm binary by first installing its R deps
+          # into host R via pak (R/build.R: pak::pkg_install("deps::<tarball>")).
+          # In the latest webR container pak's "Installing system requirements"
+          # step runs `sh -c apt-get -y update`, which fails and aborts the pak
+          # subprocess, leaving the deps uninstalled so the wasm build reports
+          # "dependencies ... not available" and produces no binary. Host apt
+          # system requirements are irrelevant to a wasm cross-build (deps are
+          # PPM binaries; seahtrue is NeedsCompilation: no), so disable pak's
+          # sysreqs handling entirely.
+          PKG_SYSREQS: "false"
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/github/workspace" \
             --workdir /github/workspace \
             -e GITHUB_PAT \
+            -e PKG_SYSREQS \
             --entrypoint Rscript \
             ghcr.io/r-wasm/webr:main \
             -e 'rwasm::add_pkg("vcjdeboer/seahtrue@devel", repo_dir = "_site", compress = TRUE)'
+
+      - name: Verify seahtrue wasm binary was built
+        # rwasm swallows a failed wasm build as a warning and exits 0, so assert
+        # the binary actually landed in the repo before deploying it.
+        run: |
+          set -euo pipefail
+          echo "Repo tree under _site/bin:"
+          find _site/bin -maxdepth 4 -type d -print || true
+          pkgs="$(find _site/bin/emscripten/contrib -maxdepth 2 -name PACKAGES -print 2>/dev/null || true)"
+          if [ -z "$pkgs" ]; then
+            echo "::error::No emscripten PACKAGES index found; add_pkg did not build any wasm binary."
+            exit 1
+          fi
+          if ! grep -rqE '^Package: seahtrue$' $pkgs; then
+            echo "::error::seahtrue not present in emscripten PACKAGES; wasm build failed."
+            grep -rH '^Package:' $pkgs || true
+            exit 1
+          fi
+          echo "OK: seahtrue wasm binary is present in the repo."
+          grep -rH -A1 '^Package: seahtrue$' $pkgs || true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
