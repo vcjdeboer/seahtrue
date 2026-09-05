@@ -612,13 +612,13 @@ plot_ribbon_per_meas_and_group <- function(df, var, y_title) {
                 panel.grid.minor.x = element_blank(),
                 panel.grid.major.x = element_blank(),
                 panel.grid.minor.y = element_blank(),
-                panel.grid.major.y = element_line(size = 0.5, 
+                panel.grid.major.y = element_line(linewidth = 0.5,
                                                   linetype = "dashed"),
                 panel.border = element_blank(),
                 # axis.ticks.x = element_blank(),
                 axis.ticks.y = element_blank(),
-                axis.line = element_line(size = 0.6),
-                plot.title = element_text(hjust = 0, color = "black", 
+                axis.line = element_line(linewidth = 0.6),
+                plot.title = element_text(hjust = 0, color = "black",
                                           size = rel(1)),
                 legend.text = element_text(size = rel(0.6)),
                 legend.title.align = 0,
@@ -708,13 +708,13 @@ plot_line_per_well <- function(df, var, y_title) {
                 panel.grid.minor.x = element_blank(),
                 panel.grid.major.x = element_blank(),
                 panel.grid.minor.y = element_blank(),
-                panel.grid.major.y = element_line(size = 0.5, 
+                panel.grid.major.y = element_line(linewidth = 0.5,
                                                   linetype = "dashed"),
                 panel.border = element_blank(),
                 # axis.ticks.x = element_blank(),
                 axis.ticks.y = element_blank(),
-                axis.line = element_line(size = 0.6),
-                plot.title = element_text(hjust = 0, 
+                axis.line = element_line(linewidth = 0.6),
+                plot.title = element_text(hjust = 0,
                                           color = "black", size = rel(1)),
                 legend.text = element_text(size = rel(0.6)),
                 legend.title.align = 0,
@@ -1022,13 +1022,13 @@ plot_bioenergetic_space <- function(df,
     ggplot2::coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE) +
     ggplot2::theme_classic(base_size = 13) +
     ggplot2::theme(
-      panel.grid.major = ggplot2::element_line(color = "grey90", size = 0.3),
+      panel.grid.major = ggplot2::element_line(color = "grey90", linewidth = 0.3),
       panel.grid.minor = ggplot2::element_blank(),
       axis.line = ggplot2::element_line(color = "black"),
       plot.title = ggplot2::element_text(hjust = 0)
     ) +
-    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
-    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", linewidth = 0.3) +
+    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", linewidth = 0.3) +
     ggplot2::facet_wrap(ggplot2::vars(.data$group))
   
   if (!is.null(palette)) {
@@ -1133,13 +1133,13 @@ plot_bioenergetic_trajectory <- function(df,
     ) +
     ggplot2::theme_classic(base_size = 13) +
     ggplot2::theme(
-      panel.grid.major = ggplot2::element_line(color = "grey90", size = 0.3),
+      panel.grid.major = ggplot2::element_line(color = "grey90", linewidth = 0.3),
       panel.grid.minor = ggplot2::element_blank(),
       axis.line = ggplot2::element_line(color = "black"),
       plot.title = ggplot2::element_text(hjust = 0)
     ) +
-    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", size = 0.3) +
-    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", size = 0.3) +
+    ggplot2::geom_hline(yintercept = seq(0, y_max, by = 10), color = "grey90", linewidth = 0.3) +
+    ggplot2::geom_vline(xintercept = seq(0, x_max, by = 10), color = "grey90", linewidth = 0.3) +
     ggplot2::coord_cartesian(xlim = c(0, x_max), ylim = c(0, y_max), expand = FALSE)
   
   if (!is.null(palette)) {
