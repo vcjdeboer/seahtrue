@@ -1,4 +1,4 @@
-# seahtrue (development version)
+# seahtrue 1.7.1
 
 * Added input validation with clear error messages for `calculate_space()`.
 * Documented the canonical injection-name contract; `calculate_space()` now warns when the plot-required columns can't be produced.
@@ -9,6 +9,7 @@
 * Package hygiene: converted source files to ASCII-only, cleared R CMD check NOTEs, and switched internal messaging to `cli`.
 * Regenerated the `revive_output_donor_A` example dataset with current code, removing a stale dependency on the `validate`/`settings` packages that broke `R CMD check` in environments without them.
 * Switched the vignette output from `BiocStyle::html_document` to `rmarkdown::html_document` and dropped `BiocStyle` from Suggests, so the webR build (which cannot resolve Bioconductor-only packages) builds without it.
+* Rewrote the internal O2/pH tick-range quality check as a single vectorized whole-plate pass instead of a per-well loop; identical output, but fast enough to run under webR/wasm in the interactive book.
 
 # seahtrue 0.99.2
 
