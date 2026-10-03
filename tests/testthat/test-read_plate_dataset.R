@@ -281,14 +281,23 @@ test_that("background columns average the unflagged Background wells", {
   without_h01 <- mean(t0$O2_em_corr[t0$well %in% c("A01", "A12", "H12")])
   expect_false(isTRUE(all.equal(all_bkg, without_h01)))
   expect_equal(unique(t0$O2_em_corr_bkg), all_bkg)
+  # The pH side: H01's pH emission also differs from the other three.
+  ph_all <- mean(t0$pH_em_corr[t0$well %in% synthetic_background_wells])
+  ph_without_h01 <- mean(t0$pH_em_corr[t0$well %in% c("A01", "A12", "H12")])
+  expect_false(isTRUE(all.equal(ph_all, ph_without_h01)))
+  expect_equal(unique(t0$pH_em_corr_bkg), ph_all)
 
   by_wave_flag <- df
   by_wave_flag$flagged_well[by_wave_flag$well == "H01"] <- TRUE
-  expect_equal(unique(t0_of(by_wave_flag)$O2_em_corr_bkg), without_h01)
+  t0_wave <- t0_of(by_wave_flag)
+  expect_equal(unique(t0_wave$O2_em_corr_bkg), without_h01)
+  expect_equal(unique(t0_wave$pH_em_corr_bkg), ph_without_h01)
 
   by_plate_flag <- df
   by_plate_flag$plate_flagged_well[by_plate_flag$well == "H01"] <- TRUE
-  expect_equal(unique(t0_of(by_plate_flag)$O2_em_corr_bkg), without_h01)
+  t0_plate <- t0_of(by_plate_flag)
+  expect_equal(unique(t0_plate$O2_em_corr_bkg), without_h01)
+  expect_equal(unique(t0_plate$pH_em_corr_bkg), ph_without_h01)
 })
 
 test_that("a plate whose every Background well is flagged gets missing background columns", {
