@@ -49,7 +49,8 @@ plate_dataset_schema_v1 <- function() {
     str("group", "well"),
     # Two manual flags a person set while looking at the data (Wave's well
     # flags and the plate layout's own flag). Stored and returned as data;
-    # neither excludes a well.
+    # a Background well flagged in either is left out of the background
+    # average, and they exclude nothing else.
     col("flagged_well", "BOOLEAN", "well"),
     col("plate_flagged_well", "BOOLEAN", "well"),
     dbl("cell_n", "well", nullable = TRUE),

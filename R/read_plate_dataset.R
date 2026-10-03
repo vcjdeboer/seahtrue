@@ -40,8 +40,9 @@
 #'   \item{raw_data}{one row per well per tick, with O2 (mmHg), pH and the
 #'     background columns. Every well is kept. `flagged_well` and
 #'     `plate_flagged_well` are two manual flags a person set while looking
-#'     at the data; they are carried as data, not used to exclude wells, and
-#'     background wells are averaged whether flagged or not.}
+#'     at the data; both are carried as data. Their one effect: a Background
+#'     well flagged in either column is left out of the background average.
+#'     A plate whose every Background well is flagged is refused.}
 #'   \item{rate_data}{zero rows: no OCR or ECAR is computed by this reader}
 #'   \item{validation_output}{seahtrue's validation result. Because the
 #'     reader refuses any plate without 96 wells, `all_96_wells_are_present`
@@ -397,12 +398,22 @@ build_plate <- function(df, date_run, date_processed, file_name, version) {
     }
 
     # A background well is exactly a well whose group is "Background";
-    # calc_background() selects it that way. Well flags are manual marks
-    # stored as data, never exclusions, so every background well counts:
-    # calc_background() is given the wells with their flags cleared.
-    unflagged <- raw
-    unflagged$flagged_well <- FALSE
-    background <- calc_background(unflagged)
+    # calc_background() selects it that way and leaves out wells marked
+    # flagged_well. A background well flagged by a person in either flag
+    # column is left out of the background average (Vincent: "flagged
+    # background should be excluded!"). The flags exclude nothing else:
+    # every well stays in raw_data, with both flag columns as data.
+    background_wells <- raw$group == "Background"
+    flagged_either <- raw$flagged_well | raw$plate_flagged_well
+    if (any(background_wells) && all(flagged_either[background_wells])) {
+        refuse_plate_dataset(paste0(
+            "Every Background well is flagged, so no background can be ",
+            "computed."
+        ))
+    }
+    for_background <- raw
+    for_background$flagged_well <- flagged_either
+    background <- calc_background(for_background)
     raw <- dplyr::left_join(raw, background, by = "tick")
 
     raw <- raw[, c(

@@ -267,17 +267,39 @@ test_that("a plate with no background well gets missing background columns", {
   expect_true(all(is.na(raw$pH_bkgd)))
 })
 
-test_that("background columns come from every Background well, flagged or not", {
+test_that("background columns average the unflagged Background wells", {
+  # Background wells A01, A12, H01, H12 have distinct O2_em_corr at tick 0,
+  # and H01 differs from the mean of the other three, so leaving it out
+  # changes the average.
+  t0_of <- function(df) {
+    raw <- read_synthetic(df)$raw_data[[1]]
+    raw[raw$tick == 0L, ]
+  }
   df <- synthetic_plate_frame()
-  df$flagged_well[df$well == "A01"] <- TRUE
-  df$plate_flagged_well[df$well == "H12"] <- TRUE
-  raw <- read_synthetic(df)$raw_data[[1]]
-  t0 <- raw[raw$tick == 0L, ]
-  used <- t0$well %in% synthetic_background_wells
-  expect_equal(unique(t0$O2_em_corr_bkg), mean(t0$O2_em_corr[used]))
+  t0 <- t0_of(df)
+  all_bkg <- mean(t0$O2_em_corr[t0$well %in% synthetic_background_wells])
+  without_h01 <- mean(t0$O2_em_corr[t0$well %in% c("A01", "A12", "H12")])
+  expect_false(isTRUE(all.equal(all_bkg, without_h01)))
+  expect_equal(unique(t0$O2_em_corr_bkg), all_bkg)
+
+  by_wave_flag <- df
+  by_wave_flag$flagged_well[by_wave_flag$well == "H01"] <- TRUE
+  expect_equal(unique(t0_of(by_wave_flag)$O2_em_corr_bkg), without_h01)
+
+  by_plate_flag <- df
+  by_plate_flag$plate_flagged_well[by_plate_flag$well == "H01"] <- TRUE
+  expect_equal(unique(t0_of(by_plate_flag)$O2_em_corr_bkg), without_h01)
 })
 
-test_that("both manual flags are carried as data, never exclusions, and may disagree", {
+test_that("a plate whose every Background well is flagged is refused", {
+  df <- synthetic_plate_frame()
+  bkg <- df$well %in% synthetic_background_wells
+  df$flagged_well[bkg & df$well %in% c("A01", "A12")] <- TRUE
+  df$plate_flagged_well[bkg & df$well %in% c("H01", "H12")] <- TRUE
+  expect_refused(read_synthetic(df), "Every Background well is flagged")
+})
+
+test_that("both manual flags are carried as data, never exclude a well, and may disagree", {
   df <- synthetic_plate_frame()
   df$flagged_well[df$well %in% c("A05", "C08")] <- TRUE
   df$plate_flagged_well[df$well %in% c("A05", "E06", "F01")] <- TRUE
