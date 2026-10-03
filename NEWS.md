@@ -7,6 +7,10 @@
   returns the plate with seahtrue's `validation_output`. Uses `nanoparquet`
   (new import), which also runs under webR.
 
+# seahtrue 1.7.2
+
+* Fixed the `BugReports` URL in DESCRIPTION, which pointed to a non-existent GitHub Pages path; it now points to the GitHub issue tracker.
+
 # seahtrue 1.7.1
 
 * Added input validation with clear error messages for `calculate_space()`.

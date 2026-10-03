@@ -14,7 +14,7 @@ Seahtrue organizes oxygen consumption and extracellular acidification analysis d
 Useful links:
 \itemize{
   \item \url{https://vcjdeboer.github.io/seahtrue/}
-  \item Report bugs at \url{https://vcjdeboer.github.io/seahtrue/issues}
+  \item Report bugs at \url{https://github.com/vcjdeboer/seahtrue/issues}
 }
 
 }
