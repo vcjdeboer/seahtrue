@@ -26,6 +26,7 @@ synthetic_plate_frame <- function(n_measurements = 3L, ticks_per_measurement = 3
     well = grid$well,
     group = ifelse(grid$well %in% background, "Background", "control"),
     flagged_well = FALSE,
+    plate_flagged_well = FALSE,
     cell_n = 10000 + well_index,
     normalisation_unit = "Cell number",
     normalisation_scale_factor = 10000,

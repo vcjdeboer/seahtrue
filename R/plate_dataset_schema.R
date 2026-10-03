@@ -21,9 +21,9 @@ known_plate_dataset_schema_versions <- function() {
 # is returned in assay_info by read_plate_dataset(), so a caller can compare
 # it with the parser's file without using seahtrue internals.
 PLATE_DATASET_SCHEMA_V1_SHA256 <-
-  "5b6ea40df01cd3ee2fca80b04aad0a23b17451aa31e92a1386c9cdb7910bc165"
+  "8ffe7fdd20e0e92c338eaa4fc9ec0a016a91b6223e1658415e00826e1b264c5b"
 PLATE_DATASET_SCHEMA_V1_PARSER_COMMIT <-
-  "b4d6a762a563ca58188a3c73860171e155c8917f"
+  "f6d95e10899d3c1b11127707742ba3ecae2b8e7e"
 
 # Version 1 column contract, in the parser's column order. level says at
 # which level a column's value must be constant: "plate" (whole file),
@@ -47,7 +47,11 @@ plate_dataset_schema_v1 <- function() {
     str("date_run", "plate"),
     str("well", "row"),
     str("group", "well"),
+    # Two manual flags a person set while looking at the data (Wave's well
+    # flags and the plate layout's own flag). Stored and returned as data;
+    # neither excludes a well.
     col("flagged_well", "BOOLEAN", "well"),
+    col("plate_flagged_well", "BOOLEAN", "well"),
     dbl("cell_n", "well", nullable = TRUE),
     str("normalisation_unit", "well", nullable = TRUE),
     dbl("normalisation_scale_factor", "well", nullable = TRUE),

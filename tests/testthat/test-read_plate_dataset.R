@@ -172,6 +172,72 @@ test_that("size caps are enforced", {
   expect_refused(read_plate_dataset(tempfile()), "does not exist")
 })
 
+# The footer values below come from the file itself; a crafted file can claim
+# any of them, so each is replaced through a mocked footer reader.
+with_footer <- function(path, change) {
+  real <- nanoparquet::read_parquet_metadata(path)
+  testthat::local_mocked_bindings(
+    read_parquet_metadata = function(file, ...) change(real),
+    .package = "nanoparquet",
+    .env = parent.frame()
+  )
+}
+
+test_that("a footer row count over the cap is refused before reading", {
+  path <- write_plate_dataset(synthetic_plate_frame())
+  with_footer(path, function(m) {
+    m$file_meta_data$num_rows <- PLATE_DATASET_MAX_ROWS + 1
+    m
+  })
+  expect_refused(read_plate_dataset(path), "more rows than allowed")
+})
+
+test_that("rows read differing from the footer row count are refused", {
+  path <- write_plate_dataset(synthetic_plate_frame())
+  with_footer(path, function(m) {
+    m$file_meta_data$num_rows <- m$file_meta_data$num_rows - 1
+    m
+  })
+  expect_refused(read_plate_dataset(path), "differ from the file's own row count")
+})
+
+test_that("an uncompressed size over the cap is refused before reading", {
+  path <- write_plate_dataset(synthetic_plate_frame())
+  with_footer(path, function(m) {
+    m$column_chunks$total_uncompressed_size[1] <- PLATE_DATASET_MAX_UNCOMPRESSED + 1
+    m
+  })
+  expect_refused(read_plate_dataset(path), "too large once uncompressed")
+})
+
+test_that("non-finite values are refused, in the file and after conversion", {
+  df <- synthetic_plate_frame()
+
+  bad <- df
+  bad$O2_em_corr[1] <- Inf
+  expect_refused(read_synthetic(bad), "O2_em_corr has a non-finite value")
+
+  bad <- df
+  bad$pH_cal_em[bad$well == "B02"] <- -Inf
+  expect_refused(read_synthetic(bad), "pH_cal_em has a non-finite value")
+
+  bad <- df
+  bad$cell_n[bad$well == "B02"] <- Inf # nullable, but never infinite
+  expect_refused(read_synthetic(bad), "cell_n has a non-finite value")
+
+  bad <- df
+  bad$O2_em_corr[bad$well == "C03" & bad$tick == 4L] <- 0
+  expect_refused(read_synthetic(bad), "non-finite O2_mmHg value")
+
+  bad <- df
+  bad$O2_ksv[] <- 0
+  expect_refused(read_synthetic(bad), "non-finite O2_mmHg value")
+
+  bad <- df
+  bad$pH_cal_em[bad$well == "B02"] <- 0
+  expect_refused(read_synthetic(bad), "non-finite pH_em_corr_corr value")
+})
+
 test_that("file metadata is read as data only: nothing is executed or restored", {
   canary <- tempfile("canary")
   payload_code <- sprintf("writeLines('pwned', '%s')", canary)
@@ -201,13 +267,36 @@ test_that("a plate with no background well gets missing background columns", {
   expect_true(all(is.na(raw$pH_bkgd)))
 })
 
-test_that("background columns come from the Background group, flagged wells left out", {
+test_that("background columns come from every Background well, flagged or not", {
   df <- synthetic_plate_frame()
   df$flagged_well[df$well == "A01"] <- TRUE
+  df$plate_flagged_well[df$well == "H12"] <- TRUE
   raw <- read_synthetic(df)$raw_data[[1]]
   t0 <- raw[raw$tick == 0L, ]
-  used <- t0$well %in% c("A12", "H01", "H12")
+  used <- t0$well %in% synthetic_background_wells
   expect_equal(unique(t0$O2_em_corr_bkg), mean(t0$O2_em_corr[used]))
+})
+
+test_that("both manual flags are carried as data, never exclusions, and may disagree", {
+  df <- synthetic_plate_frame()
+  df$flagged_well[df$well %in% c("A05", "C08")] <- TRUE
+  df$plate_flagged_well[df$well %in% c("A05", "E06", "F01")] <- TRUE
+  p <- read_synthetic(df)
+  raw <- p$raw_data[[1]]
+  expect_equal(nrow(raw), 96L * 9L)
+  expect_true(p$validation_output[[1]]$all_96_wells_are_present)
+  expect_equal(sort(unique(raw$well[raw$flagged_well])), c("A05", "C08"))
+  expect_equal(sort(unique(raw$well[raw$plate_flagged_well])), c("A05", "E06", "F01"))
+  flags <- p$validation_output[[1]]$failed_ticks_combined$flag
+  expect_true(all(c("A05", "C08", "E06", "F01") %in% flags$well))
+})
+
+test_that("a plate dataset without plate_flagged_well is refused", {
+  df <- synthetic_plate_frame()
+  expect_refused(
+    read_plate_dataset(write_plate_dataset(df[, names(df) != "plate_flagged_well"])),
+    "lacks columns: plate_flagged_well"
+  )
 })
 
 test_that("the output carries no Agilent or Wave name and no rates", {

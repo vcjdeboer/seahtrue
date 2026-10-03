@@ -38,7 +38,10 @@
 #'     and plate_dataset_schema_sha256}
 #'   \item{injection_info}{measurement, interval, injection}
 #'   \item{raw_data}{one row per well per tick, with O2 (mmHg), pH and the
-#'     background columns}
+#'     background columns. Every well is kept. `flagged_well` and
+#'     `plate_flagged_well` are two manual flags a person set while looking
+#'     at the data; they are carried as data, not used to exclude wells, and
+#'     background wells are averaged whether flagged or not.}
 #'   \item{rate_data}{zero rows: no OCR or ECAR is computed by this reader}
 #'   \item{validation_output}{seahtrue's validation result. Because the
 #'     reader refuses any plate without 96 wells, `all_96_wells_are_present`
@@ -239,6 +242,9 @@ check_plate_dataset_values <- function(df, contract) {
         if (!contract[[name]]$nullable && anyNA(x)) {
             refuse_plate_dataset(paste0("Column ", name, " has missing values."))
         }
+        if (is.double(x) && any(is.infinite(x) | is.nan(x))) {
+            refuse_plate_dataset(paste0("Column ", name, " has a non-finite value."))
+        }
         if (is.character(x) &&
             any(nchar(x, type = "bytes", allowNA = TRUE) >
                     PLATE_DATASET_MAX_STRING_BYTES, na.rm = TRUE)) {
@@ -373,16 +379,30 @@ build_plate <- function(df, date_run, date_processed, file_name, version) {
         cell_n = df$cell_n,
         normalisation_unit = df$normalisation_unit,
         normalisation_scale_factor = df$normalisation_scale_factor,
-        flagged_well = df$flagged_well
+        flagged_well = df$flagged_well,
+        plate_flagged_well = df$plate_flagged_well
     )
     raw$pH <- convert_pH_emission(
         raw$pH_em_corr_corr, df$pH_target_emission, df$pH_0,
         df$pH_gain1, df$pH_gain2
     )
+    # A zero emission, F0, Ksv or calibration emission would give Inf or NaN,
+    # which validation would pass over silently.
+    for (name in c("O2_mmHg", "pH_em_corr_corr", "pH")) {
+        if (!all(is.finite(raw[[name]]))) {
+            refuse_plate_dataset(paste0(
+                "The plate dataset gives a non-finite ", name, " value."
+            ))
+        }
+    }
 
     # A background well is exactly a well whose group is "Background";
-    # calc_background() selects it that way and leaves flagged wells out.
-    background <- calc_background(raw)
+    # calc_background() selects it that way. Well flags are manual marks
+    # stored as data, never exclusions, so every background well counts:
+    # calc_background() is given the wells with their flags cleared.
+    unflagged <- raw
+    unflagged$flagged_well <- FALSE
+    background <- calc_background(unflagged)
     raw <- dplyr::left_join(raw, background, by = "tick")
 
     raw <- raw[, c(
@@ -391,7 +411,7 @@ build_plate <- function(df, date_run, date_processed, file_name, version) {
         "O2_mmHg", "pH", "pH_em_corr_corr", "O2_em_corr_bkg",
         "pH_em_corr_bkg", "O2_mmHg_bkg", "pH_bkgd", "pH_em_corr_corr_bkg",
         "bufferfactor", "cell_n", "normalisation_unit",
-        "normalisation_scale_factor", "flagged_well"
+        "normalisation_scale_factor", "flagged_well", "plate_flagged_well"
     )]
 
     first <- df[1, , drop = FALSE]
