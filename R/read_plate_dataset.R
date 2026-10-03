@@ -42,7 +42,8 @@
 #'     `plate_flagged_well` are two manual flags a person set while looking
 #'     at the data; both are carried as data. Their one effect: a Background
 #'     well flagged in either column is left out of the background average.
-#'     A plate whose every Background well is flagged is refused.}
+#'     When every Background well is flagged, or there is none, the
+#'     background columns are missing.}
 #'   \item{rate_data}{zero rows: no OCR or ECAR is computed by this reader}
 #'   \item{validation_output}{seahtrue's validation result. Because the
 #'     reader refuses any plate without 96 wells, `all_96_wells_are_present`
@@ -402,17 +403,11 @@ build_plate <- function(df, date_run, date_processed, file_name, version) {
     # flagged_well. A background well flagged by a person in either flag
     # column is left out of the background average (Vincent: "flagged
     # background should be excluded!"). The flags exclude nothing else:
-    # every well stays in raw_data, with both flag columns as data.
-    background_wells <- raw$group == "Background"
-    flagged_either <- raw$flagged_well | raw$plate_flagged_well
-    if (any(background_wells) && all(flagged_either[background_wells])) {
-        refuse_plate_dataset(paste0(
-            "Every Background well is flagged, so no background can be ",
-            "computed."
-        ))
-    }
+    # every well stays in raw_data, with both flag columns as data. When every
+    # Background well is flagged, the background columns are missing, as for
+    # a plate with no Background well (Vincent: "accept no refusal").
     for_background <- raw
-    for_background$flagged_well <- flagged_either
+    for_background$flagged_well <- raw$flagged_well | raw$plate_flagged_well
     background <- calc_background(for_background)
     raw <- dplyr::left_join(raw, background, by = "tick")
 

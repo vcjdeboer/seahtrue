@@ -36,7 +36,8 @@ A one-row nested tibble in seahtrue's plate structure:
     `plate_flagged_well` are two manual flags a person set while looking
     at the data; both are carried as data. Their one effect: a Background
     well flagged in either column is left out of the background average.
-    A plate whose every Background well is flagged is refused.}
+    When every Background well is flagged, or there is none, the
+    background columns are missing.}
   \item{rate_data}{zero rows: no OCR or ECAR is computed by this reader}
   \item{validation_output}{seahtrue's validation result. Because the
     reader refuses any plate without 96 wells, `all_96_wells_are_present`

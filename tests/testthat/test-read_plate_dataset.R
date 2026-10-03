@@ -291,12 +291,19 @@ test_that("background columns average the unflagged Background wells", {
   expect_equal(unique(t0_of(by_plate_flag)$O2_em_corr_bkg), without_h01)
 })
 
-test_that("a plate whose every Background well is flagged is refused", {
+test_that("a plate whose every Background well is flagged gets missing background columns", {
   df <- synthetic_plate_frame()
   bkg <- df$well %in% synthetic_background_wells
   df$flagged_well[bkg & df$well %in% c("A01", "A12")] <- TRUE
   df$plate_flagged_well[bkg & df$well %in% c("H01", "H12")] <- TRUE
-  expect_refused(read_synthetic(df), "Every Background well is flagged")
+  p <- read_synthetic(df)
+  raw <- p$raw_data[[1]]
+  expect_equal(nrow(raw), 96L * 9L)
+  for (col in c("O2_em_corr_bkg", "pH_em_corr_bkg", "O2_mmHg_bkg",
+                "pH_bkgd", "pH_em_corr_corr_bkg")) {
+    expect_true(all(is.na(raw[[col]])), info = col)
+  }
+  expect_true(p$validation_output[[1]]$all_96_wells_are_present)
 })
 
 test_that("both manual flags are carried as data, never exclude a well, and may disagree", {
