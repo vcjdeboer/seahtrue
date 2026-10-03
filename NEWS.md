@@ -1,3 +1,12 @@
+# seahtrue (development version)
+
+* New exported `read_plate_dataset()`: reads one plate dataset (the Parquet
+  file the parser writes for one plate, plate dataset schema version 1) as
+  data only, refuses an unknown schema version and any column or value
+  outside the schema, converts O2 and pH emissions to O2 (mmHg) and pH, and
+  returns the plate with seahtrue's `validation_output`. Uses `nanoparquet`
+  (new import), which also runs under webR.
+
 # seahtrue 1.7.1
 
 * Added input validation with clear error messages for `calculate_space()`.
