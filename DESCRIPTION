@@ -62,7 +62,8 @@ Imports:
     readr (>= 2.1.5),
     scales (>= 1.3.0),
     ggrepel,
-    grid
+    grid,
+    digest (>= 0.6.39)
 Depends:
     R (>= 4.2.0) 
 VignetteBuilder: knitr

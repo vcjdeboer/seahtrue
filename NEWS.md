@@ -1,3 +1,20 @@
+# seahtrue (development version)
+
+* Added the foundation for rate calculation methods: `rate_method()`,
+  `method_parameter()`, `method_id()`, `method_canonical_json()` and
+  `method_digest()` (sha256 of the method's RFC 8785 JSON); the append-only
+  method registry, `method_registry()` and `lookup_rate_method()`, with its
+  JSON copy in `inst/extdata/method_registry.json` and the released record in
+  `inst/extdata/method_registry_released.tsv`; and `compute_rates()`, which
+  computes rates with a registered method and returns its rate table (and
+  fitted-values table), every row carrying the method id. The registry is
+  empty: no method is registered yet.
+* Release conditions: a version bump must refresh
+  `method_registry_released.tsv` (a test fails otherwise), and no tag may
+  carry a non-empty registry until the recompute test on a public plate
+  exists.
+* New dependency: digest (>= 0.6.39), for sha256.
+
 # seahtrue 1.7.2
 
 * Fixed the `BugReports` URL in DESCRIPTION, which pointed to a non-existent GitHub Pages path; it now points to the GitHub issue tracker.
